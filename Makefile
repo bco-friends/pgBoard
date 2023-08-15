@@ -4,10 +4,10 @@
 # Outputs list of available commands.
 help:
 	@echo The following commands are available: \
-	"\n" start: Start the Docker container \
-	"\n" stop: Stop the Docker container \
-	"\n" refresh: Stop, rebuild, and restart the Docker container \
-	"\n" php-shell: Open a shell session into the PHP container
+	"\n" start: "\t" Start the Docker container \
+	"\n" stop: "\t\t" Stop the Docker container \
+	"\n" refresh: "\t" Stop, rebuild, and restart the Docker container \
+	"\n" php-shell: "\t" Open a shell session into the PHP container
 
 # Starts the Docker container.
 start:
