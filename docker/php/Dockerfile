@@ -1,6 +1,11 @@
-FROM php:7.0-fpm-alpine
+FROM php:8.2-fpm
 
-RUN set -ex \
-    && apk --no-cache add postgresql-dev bash
+RUN apt-get -y update \
+    && apt-get install -y build-essential autoconf postgresql libpq-dev less
 
 RUN docker-php-ext-install pgsql pdo_pgsql
+
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug
+
+COPY ./conf/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
