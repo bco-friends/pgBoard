@@ -74,24 +74,24 @@ function view_get()
 
   print "<li style=\"padding-top:15px\">\n";
   print "  <div class=\"pref\">date joined:</div>\n";
-  print "  <div class=\"prefdata\">".date(VIEW_DATE_FORMAT,$member['date_joined'])."</div>\n";
+  print "  <div class=\"prefdata\">".date(VIEW_DATE_FORMAT,(int)$member['date_joined'])."</div>\n";
   print "</li>\n";
 
   print "<li>\n";
   print "  <div class=\"pref\">last posted:</div>\n";
-  print "  <div class=\"prefdata\">".date(VIEW_DATE_FORMAT,$member['last_post'])."</div>\n";
+  print "  <div class=\"prefdata\">".date(VIEW_DATE_FORMAT,(int)$member['last_post'])."</div>\n";
   print "</li>\n";
 
   print "<li>\n";
   print "  <div class=\"pref\">last seen:</div>\n";
-  print "  <div class=\"prefdata\">".date(VIEW_DATE_FORMAT,$member['last_view'])."</div>\n";
+  print "  <div class=\"prefdata\">".date(VIEW_DATE_FORMAT,(int)$member['last_view'])."</div>\n";
   print "</li>\n";
 
   print "<li>\n";
   print "  <div class=\"pref\">member:</div>\n";
   print "  <div class=\"prefdata\">$member[id]</div>\n";
   print "</li>\n";
-  
+
   // total threads
   $threads_percent = 0;
   $total_threads = $Core->thread_count();

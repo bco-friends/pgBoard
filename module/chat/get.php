@@ -42,7 +42,7 @@ function history_get()
   $output = $last;
   foreach($chats as $chat)
   {
-    $output .= date("h:i:s A",$chat['stamp'])."&nbsp; | ";
+    $output .= date("h:i:s A",(int)$chat['stamp'])."&nbsp; | ";
     $output .= "<strong>".$Core->member_link($chat['name'])."</strong>: ";
     $output .= "<span>".$Parse->run($chat['chat'])."</span><br/>\n";
   }

@@ -44,10 +44,10 @@ class BoardQuery
   /**
   * build thread listing query
   */
-  function list_thread($sticky=false,$offset,$limit,$threads=false,$cond=false,$ignore_threads=true)
+  function list_thread($offset, $limit, $sticky = false, $threads = false, $cond = false, $ignore_threads = true)
   {
     global $Core;
-    
+
     // set query conditionals
     $where = "WHERE t.sticky IS false";
     $order = "ORDER BY t.date_last_posted DESC";
@@ -126,13 +126,13 @@ class BoardQuery
   function list_thread_bymember($member_id,$offset,$limit)
   {
     $cond = "WHERE t.member_id=$member_id";
-    return $this->list_thread(false,$offset,$limit,array(),$cond);
+    return $this->list_thread($offset, $limit, false, [], $cond);
   }
 
   /**
   * build thread view query
   */
-  function view_thread($thread=false,$offset,$limit,$posts=false,$cond=false)
+  function view_thread($offset, $limit, $thread = false, $posts = false, $cond = false)
   {
     global $Core;
 
@@ -207,7 +207,7 @@ class BoardQuery
   function view_thread_bymember($member_id,$offset,$limit)
   {
     $cond = "WHERE tp.member_id=$member_id";
-    return $this->view_thread(false,$offset,$limit,false,$cond);
+    return $this->view_thread($offset, $limit, false, false, $cond);
   }
 
   /**
@@ -216,7 +216,7 @@ class BoardQuery
   function list_message($offset,$limit,$messages=false)
   {
     global $Core;
-  
+
     // set query conditionals
     $where = "WHERE";
     $order = "ORDER BY m.date_last_posted DESC";

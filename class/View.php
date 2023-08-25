@@ -18,9 +18,9 @@ class BoardView extends Base
   function prep_data($row)
   {
     global $Parse;
-    
+
     $data = array_values($row);
-    $data['date'] = date(VIEW_DATE_FORMAT,$data[VIEW_DATE_POSTED]);
+    $data['date'] = date(VIEW_DATE_FORMAT,(int)$data[VIEW_DATE_POSTED]);
 
     $data['me'] = $data['quote'] = $data['admin'] = "";
     if(session('id'))
@@ -85,7 +85,7 @@ class BoardView extends Base
       if($list = array_keys($Core->list_ignored(session('id')))) $list = implode(",",$list);
       else
       $list = "0";
-      
+
       // minimum number of posts before collapse
       $mincollapse = is_numeric(session('mincollapse')) ? session('mincollapse') : COLLAPSE_DEFAULT;
 
@@ -95,7 +95,7 @@ class BoardView extends Base
 
       // offset collapsing by the number of people ignored
       $offsetignores = $DB->value("SELECT count(*) FROM {$this->table}_post WHERE {$this->table}_id=$1 AND member_id IN ($list)",array(id()));
-      
+
       $this->collapse($DB->value("SELECT COALESCE(last_view_posts,0)-$offsetignores-$collapseopen FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2",array(id(),session('id'))));
 
       // don't collapse if there aren't new posts or if we are offsetting/limiting
@@ -164,14 +164,14 @@ class BoardView extends Base
   function thread_xml()
   {
     global $DB,$Core;
-    
+
     if(!isset($this->data))
     {
       print "No data to display specified.";
       return;
     }
     if(!$this->data) $this->data = array();
-    
+
     if(session('id') && ($this->type == VIEW_THREAD || $this->type == VIEW_MESSAGE) && !$this->ajax)
     {
       if($list = array_keys($Core->list_ignored(session('id')))) $list = implode(",",$list);
@@ -217,7 +217,7 @@ class BoardView extends Base
         $i = $this->collapse+1;
       }
     } // End thread_xml
-   
+
     foreach($this->data as $row)
     {
       $field = $this->prep_data($row);
@@ -254,7 +254,7 @@ class BoardView extends Base
   }
 
   function message() { $this->thread(); }
-  
+
   function member_update()
   {
     global $DB;
