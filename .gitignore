@@ -16,3 +16,6 @@ docker-compose.override.yml
 # IDE
 .idea/
 .vscode/
+
+# Composer
+/vendor/
