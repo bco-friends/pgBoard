@@ -190,12 +190,12 @@ class BoardParse
     }
 
     // start line break stuff
-    $s = str_replace('<br />',NULL,$s);
+    $s = str_replace('<br />','',$s);
     $s = nl2br(chop($s));
-  
+
     // remove line breaks inside these tags
     $lbr = array(array("<pre>","</pre>"));
-  
+
     foreach($lbr as $lb)
     {
       $lb1 = $lb[0];
@@ -211,7 +211,7 @@ class BoardParse
       $s = preg_replace("#".$lb2q."(\r\n)\<br \/\>#i",$lb2,$s);
     }
     // end line break stuff
-  
+
     return $s;
   }
 }
