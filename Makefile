@@ -27,3 +27,6 @@ refresh: stop build-up
 # Opens a Bash session within the PHP container.
 php-shell:
 	docker exec -it pgb-php /bin/bash
+
+phpstan:
+	./vendor/bin/phpstan analyse index.php config.php error.php core.php class module
