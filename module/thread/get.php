@@ -128,7 +128,7 @@ function view_get()
 
   $View->header();
 
-  $DB->query($Query->view_thread(id(true),cmd(3,true),cmd(4,true)));
+  $DB->query($Query->view_thread(cmd(3, true), cmd(4, true), id(true)));
   $View->data($DB->load_all());
   if(get('xml'))
   {

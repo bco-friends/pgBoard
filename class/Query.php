@@ -132,7 +132,7 @@ class BoardQuery
   /**
   * build thread view query
   */
-  function view_thread($thread=false,$offset,$limit,$posts=false,$cond=false)
+  function view_thread($offset, $limit, $thread = false, $posts = false, $cond = false)
   {
     global $Core;
 
@@ -207,7 +207,7 @@ class BoardQuery
   function view_thread_bymember($member_id,$offset,$limit)
   {
     $cond = "WHERE tp.member_id=$member_id";
-    return $this->view_thread(false,$offset,$limit,false,$cond);
+    return $this->view_thread($offset, $limit, false, false, $cond);
   }
 
   /**
@@ -216,7 +216,7 @@ class BoardQuery
   function list_message($offset,$limit,$messages=false)
   {
     global $Core;
-  
+
     // set query conditionals
     $where = "WHERE";
     $order = "ORDER BY m.date_last_posted DESC";

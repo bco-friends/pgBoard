@@ -50,7 +50,7 @@ function thread_post_get()
   $View->header_menu();
 
   if($res['total'] == 0) $ids = array(0);
-  $DB->query($Query->view_thread(false,cmd(3,true),cmd(4,true),$ids));
+  $DB->query($Query->view_thread(cmd(3, true), cmd(4, true), false, $ids));
   $View->data($DB->load_all());
   $View->thread();
 
