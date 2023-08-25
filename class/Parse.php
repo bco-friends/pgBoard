@@ -109,7 +109,8 @@ class BoardParse
     if(($host == "twitter.com" || $host == "www.twitter.com" || $host == "mobile.twitter.com") && isset($url['path']))
     {
       // The tweet ID is the last part of the path, and it should be numeric.
-      $tweet_id = end(explode('/', $url['path']));
+      $tweet_url_path = explode('/', $url['path']);
+      $tweet_id = end($tweet_url_path);
       if ($tweet_id && is_numeric($tweet_id))
       {
         // Assign this tweet's DOM elements unique IDs to distinguish them from
