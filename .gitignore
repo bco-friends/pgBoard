@@ -6,3 +6,5 @@ lang/en_footer.php
 lang/en_header.php
 
 class/Plugin.php
+
+/vendor/
