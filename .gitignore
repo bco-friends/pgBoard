@@ -19,3 +19,6 @@ docker-compose.override.yml
 
 # Composer
 /vendor/
+
+# Ignore cache directories in root.
+/*cache*/
