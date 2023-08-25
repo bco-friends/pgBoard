@@ -1,0 +1,6 @@
+{
+    "name": "pgboard/pgboard",
+    "description": "A pretty good board.",
+    "type": "project",
+    "require": {}
+}
