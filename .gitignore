@@ -8,3 +8,6 @@ lang/en_header.php
 class/Plugin.php
 
 /vendor/
+
+# Ignore cache directories in root.
+/*cache*/

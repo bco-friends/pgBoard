@@ -1,7 +1,7 @@
 FROM php:8.2-fpm
 
 RUN apt-get -y update \
-    && apt-get install -y build-essential autoconf postgresql libpq-dev less
+    && apt-get install -y build-essential git zip unzip autoconf postgresql libpq-dev less
 
 RUN docker-php-ext-install pgsql pdo_pgsql
 
