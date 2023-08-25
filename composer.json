@@ -2,5 +2,7 @@
     "name": "pgboard/pgboard",
     "description": "A pretty good board.",
     "type": "project",
-    "require": {}
+    "require-dev": {
+        "phpstan/phpstan": "^1.10"
+    }
 }

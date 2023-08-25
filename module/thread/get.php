@@ -29,16 +29,16 @@ function list_get()
 
 
   // stickies
-  $DB->query($Query->list_thread(true,false,false));
+  $DB->query($Query->list_thread(false, false, true));
   $List->data($DB->load_all());
   if (get('xml')) {
     $xmldata .= $List->thread_xml(true);
   } else {
     $List->thread(true);
   }
-  
+
   // the rest
-  $DB->query($Query->list_thread(false,cmd(2,true),cmd(3,true)));
+  $DB->query($Query->list_thread(cmd(2, true), cmd(3, true)));
   $List->data($DB->load_all());
   if (get('xml')) {
     $xmldata .= $List->thread_xml();
@@ -130,7 +130,7 @@ function view_get()
 
   $View->header();
 
-  $DB->query($Query->view_thread(id(true),cmd(3,true),cmd(4,true)));
+  $DB->query($Query->view_thread(cmd(3, true), cmd(4, true), id(true)));
   $View->data($DB->load_all());
   if(get('xml'))
   {
@@ -230,7 +230,7 @@ function listbymemberposted_get()
   $List->subtitle("page: $page");
   $List->header();
 
-  $DB->query($Query->list_thread(false,cmd(3,true),cmd(4,true),$threads));
+  $DB->query($Query->list_thread(cmd(3, true), cmd(4, true), false, $threads));
   $List->data($DB->load_all());
   $List->thread();
 
@@ -273,7 +273,7 @@ function listfavoritesbymember_get()
   $List->subtitle("page: $page");
   $List->header();
 
-  $DB->query($Query->list_thread(false,cmd(3,true),cmd(4,true),$threads));
+  $DB->query($Query->list_thread(cmd(3, true), cmd(4, true), false, $threads));
   $List->data($DB->load_all());
   $List->thread();
 
@@ -316,7 +316,7 @@ function listignoredthreadsbymember_get()
   $List->subtitle("page: $page");
   $List->header();
 
-  $DB->query($Query->list_thread(false,cmd(3,true),cmd(4,true),$threads, false, false));
+  $DB->query($Query->list_thread(cmd(3, true), cmd(4, true), false, $threads, false, false));
   $List->data($DB->load_all());
   $List->thread();
 
