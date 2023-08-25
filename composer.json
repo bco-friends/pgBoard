@@ -3,6 +3,18 @@
     "description": "A pretty good board.",
     "type": "project",
     "require-dev": {
-        "phpstan/phpstan": "^1.10"
+        "phpstan/phpstan": "^1.10",
+        "phpunit/phpunit": "^10.3"
+    },
+    "autoload": {
+        "classmap": ["class/"],
+        "files": [
+            "core.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PgBoard\\PgBoard\\Tests\\": "tests/"
+        }
     }
 }
