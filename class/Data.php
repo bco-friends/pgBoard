@@ -27,7 +27,7 @@ class Data
         $post['thread_id'] = $DB->value("SELECT currval('thread_id_seq')");
         $post['body'] = $data['body'];
 
-        $Search = new Search("thread");
+        $Search = new Search();
         if($Search->thread_insert($this->insert,$post['thread_id']))
         {
           if($this->thread_post_insert($post,$member_id))
@@ -54,9 +54,9 @@ class Data
   function thread_post_insert($data,$member_id=false)
   {
     global $DB,$Security;
-    
+
     if($DB->value("SELECT locked FROM thread WHERE id=$1",array($data['thread_id'])) == 't') return false;
-    
+
     $this->clear_data();
     $this->set_value("thread_id",$data['thread_id']);
     $this->set_value("body",$data['body']);
@@ -67,7 +67,7 @@ class Data
     if(!$member_id = $Security->form_login($data['name'],$data['pass'])) return false;
 
     $this->set_value("member_id",$member_id);
-      
+
     $DB->begin();
     if($DB->insert("thread_post",$this->insert,array_keys($this->insert)))
     {
@@ -89,7 +89,7 @@ class Data
       return false;
     }
   }
-  
+
   function thread_post_update($data,$id)
   {
     global $DB;
@@ -117,7 +117,7 @@ class Data
       return false;
     }
   }
-  
+
   function message_insert($data)
   {
     global $DB,$Security;
@@ -126,7 +126,7 @@ class Data
 
     if(!isset($data['name'])) $data['name'] = "";
     if(!isset($data['pass'])) $data['pass'] = "";
-    
+
     if($member_id = $Security->form_login($data['name'],$data['pass']))
     {
       $this->set_value("member_id",$member_id);
@@ -164,7 +164,7 @@ class Data
       return false;
     }
   }
-  
+
   function message_post_insert($data,$member_id=false)
   {
     global $DB,$Security;

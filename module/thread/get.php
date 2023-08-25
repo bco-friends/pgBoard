@@ -7,7 +7,7 @@ function list_get()
 
   // Container for XML data
   $xmldata = '';
-  
+
   $Query = new BoardQuery;
   $List = new BoardList;
   $List->type(LIST_THREAD);
@@ -63,7 +63,7 @@ function view_get()
   global $DB,$Core;
 
   $xmldata = '';
- 
+
   if(!id(true)) return to_index();
 
   $Query = new BoardQuery;
@@ -173,9 +173,9 @@ function listbymember_get()
   $id = $Core->idfromname(id());
   $name = $Core->namefromid($id);
   $page = cmd(3,true)+1;
-  
+
   if(!$id || !$name) return to_index();
-  
+
   $Query = new BoardQuery;
   $List = new BoardList;
   $List->type(LIST_THREAD_HISTORY);
@@ -407,6 +407,3 @@ function undot_get()
   print "undotted";
   exit_clean();
 }
-
-?>
-
