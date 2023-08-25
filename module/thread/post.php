@@ -85,5 +85,3 @@ function view_post()
   print "[/quote]";
   exit();
 }
-
-?>

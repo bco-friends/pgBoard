@@ -19,7 +19,7 @@ function accept_post()
   curl_setopt($ch,CURLOPT_POST,1);
   curl_setopt($ch,CURLOPT_POSTFIELDS,$req);
   $res = curl_exec($ch);
-  curl_close($ch); 
+  curl_close($ch);
 
   if(strcmp($res,"VERIFIED") == 0)
   {
@@ -33,7 +33,7 @@ function accept_post()
       $data['payer_email'] = post('payer_email');
       $data['txn_id'] = post('txn_id');
       $data['payment_fee'] = '$'.post('payment_fee');
-      $data['payment_gross'] = '$'.post('payment_gross');  
+      $data['payment_gross'] = '$'.post('payment_gross');
 
       // if transaction exists, update it otherwise insert it
       if($DB->check("SELECT true FROM donation WHERE txn_id=$1 AND fundraiser_id=$2",array(post('txn_id'),FUNDRAISER_ID)))
@@ -52,5 +52,3 @@ function accept_post()
   }
   exit_clean();
 }
-?>
-
