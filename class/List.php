@@ -16,11 +16,11 @@ class BoardList extends Base
   function prep_data($row)
   {
     global $Parse;
-  
+
     $data = array_values($row);
-    
+
     // start shared parsing
-    $data['date'] = date(LIST_DATE_FORMAT,$data[LIST_DATE_LAST_POST]);
+    $data['date'] = date(LIST_DATE_FORMAT,(int)$data[LIST_DATE_LAST_POST]);
     $data['subject'] = htmlentities($data[LIST_SUBJECT],ENT_QUOTES,"UTF-8");
 
     $data['dot'] = $data['fav'] = $data['read'] = $data['me'] = "";
