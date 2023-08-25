@@ -44,10 +44,10 @@ class BoardQuery
   /**
   * build thread listing query
   */
-  function list_thread($sticky=false,$offset,$limit,$threads=false,$cond=false,$ignore_threads=true)
+  function list_thread($offset, $limit, $sticky = false, $threads = false, $cond = false, $ignore_threads = true)
   {
     global $Core;
-    
+
     // set query conditionals
     $where = "WHERE t.sticky IS false";
     $order = "ORDER BY t.date_last_posted DESC";
@@ -126,7 +126,7 @@ class BoardQuery
   function list_thread_bymember($member_id,$offset,$limit)
   {
     $cond = "WHERE t.member_id=$member_id";
-    return $this->list_thread(false,$offset,$limit,array(),$cond);
+    return $this->list_thread($offset, $limit, false, [], $cond);
   }
 
   /**

@@ -21,7 +21,7 @@ function thread_get()
   $List->header_menu();
 
   if($res['total'] == 0 || $offset > $res['total']) $ids = array(0);
-  $DB->query($Query->list_thread(false,false,false,$ids));
+  $DB->query($Query->list_thread(false, false, false, $ids));
   $List->data($DB->load_all());
   $List->thread();
 
