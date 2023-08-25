@@ -6,6 +6,9 @@
         "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^10.3"
     },
+    "autoload": {
+        "classmap": ["class/"]
+    },
     "autoload-dev": {
         "psr-4": {
             "PgBoard\\PgBoard\\Tests\\": "tests/"
