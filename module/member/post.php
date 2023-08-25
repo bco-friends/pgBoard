@@ -185,13 +185,13 @@ function editcolors_post()
         $val = "#".substr($val,0,6);
         break;
       default:
-        continue;
+        continue 2;
         break;
     }
     $theme[$key] = strip_tags($val);
   }
   $save = serialize($theme);
-  
+
   if($Core->member_pref(session('id'),"theme"))
   {
     $DB->query("UPDATE member_pref SET value=$1 WHERE member_id=$2 AND pref_id=15",array($save,session('id')));
