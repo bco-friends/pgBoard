@@ -8,6 +8,14 @@ services:
       - ./:/var/www/html/
     links:
       - postgres
+  composer:
+    image: composer:latest
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html
+    command: composer install
+    networks:
+      - app-network
   nginx:
     container_name: pgb-nginx
     image: nginx
@@ -35,3 +43,6 @@ services:
 volumes:
   postgres:
     external: false
+networks:
+  app-network:
+    driver: bridge
