@@ -604,7 +604,7 @@ class SphinxClient
 				}
 			}
 		}
-		if ( $this->_socket === false )
+		if ( !property_exists($this, '_socket') || $this->_socket === false )
 			fclose ( $fp );
 
 		// check response
