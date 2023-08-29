@@ -12,10 +12,7 @@ class Search
     $res = $sphinx->Query($query,$index);
 
     if (is_bool($res)) {
-      return [
-        'matches' => [],
-        'total' => 0.0
-      ];
+      return $this->get_default_results();
     }
 
     return $res;
