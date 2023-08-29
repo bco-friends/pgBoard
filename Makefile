@@ -71,3 +71,6 @@ db-create:
 
 db-seed:
 	docker exec -it pgb-php php bin/console.php db:seed --no-interaction
+
+search-init:
+	docker compose run sphinx indexer --config /opt/sphinx/conf/sphinx.conf --all
