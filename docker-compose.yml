@@ -47,12 +47,12 @@ services:
     image: macbre/sphinxsearch:latest
     restart: always
     ports:
-      - 36307:36307
+      - 127.0.0.1:36307:36307
     depends_on:
-      - php
+      - postgres
     volumes:
       - ./lib/sphinx/sphinx.conf:/opt/sphinx/conf/sphinx.conf
-      - ./data/sphinx/:/mnt/search/
+      - ./docker/data/sphinx/:/mnt/search/
 volumes:
   postgres:
     external: false
