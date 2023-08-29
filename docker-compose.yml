@@ -6,8 +6,11 @@ services:
       - 9000
     volumes:
       - ./:/var/www/html/
-    links:
+    depends_on:
       - postgres
+      - sphinx
+    networks:
+      - app-network
   composer:
     container_name: pgb-composer
     image: composer:latest
@@ -29,6 +32,8 @@ services:
     volumes:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./:/var/www/html/
+    networks:
+      - app-network
   postgres:
     container_name: pgb-postgres
     image: postgres:14.4-alpine
@@ -42,17 +47,21 @@ services:
     volumes:
       - postgres:/var/lib/postgresql/data
       - ./doc:/etc/data
+    networks:
+      - app-network
   sphinx:
     container_name: pgb-sphinx
     image: macbre/sphinxsearch:latest
     restart: always
     ports:
-      - 127.0.0.1:36307:36307
+      - 9306:9306
     depends_on:
       - postgres
     volumes:
-      - ./lib/sphinx/sphinx.conf:/opt/sphinx/conf/sphinx.conf
       - ./docker/data/sphinx/:/mnt/search/
+      - ./lib/sphinx/sphinx.conf:/opt/sphinx/conf/sphinx.conf
+    networks:
+      - app-network
 volumes:
   postgres:
     external: false
