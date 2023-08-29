@@ -42,6 +42,17 @@ services:
     volumes:
       - postgres:/var/lib/postgresql/data
       - ./doc:/etc/data
+  sphinx:
+    container_name: pgb-sphinx
+    image: macbre/sphinxsearch:latest
+    restart: always
+    ports:
+      - 36307:36307
+    depends_on:
+      - php
+    volumes:
+      - ./lib/sphinx/sphinx.conf:/opt/sphinx/conf/sphinx.conf
+      - ./data/sphinx/:/mnt/search/
 volumes:
   postgres:
     external: false
