@@ -28,7 +28,7 @@ class BoardList extends Base
 
     if(session('id'))
     {
-      if($data[LIST_CREATOR_ID] == session('id')) $data['me'] = SPACE.CSS_ME;
+      if($data[BoardQuery::LIST_CREATOR_ID] == session('id')) $data['me'] = SPACE.CSS_ME;
       if(in_array($data[BoardQuery::LIST_ID],$this->favorites)) $data['fav'] = LIST_FAV.NON_BREAKING_SPACE;
     }
     // end shared parsing
