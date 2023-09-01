@@ -1,5 +1,4 @@
 <?php
-define("FORM_DATE",1000);
 
 class Form
 {
@@ -12,6 +11,8 @@ class Form
   public const FORM_RADIO = 700;
   public const FORM_BUTTON = 800;
   public const FORM_SUBMIT = 900;
+  public const FORM_DATE = 1000;
+
   public $name = "form";
   public $ajax = true;
   public $values = array();
