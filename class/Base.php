@@ -3,7 +3,6 @@
 /*
 * View Functions
 **/
-define("VIEW_THREAD_SEARCH",1000);
 define("VIEW_THREAD_PREVIEW",1100);
 define("VIEW_MESSAGE",1200);
 define("VIEW_MESSAGE_HISTORY",1300);
@@ -36,6 +35,7 @@ class Base
   public const LIST_MEMBER = 700;
   public const VIEW_THREAD = 800;
   public const VIEW_THREAD_HISTORY = 900;
+  public const VIEW_THREAD_SEARCH = 1000;
 
 
   public $ajax = false;     // data only flag
@@ -82,7 +82,7 @@ class Base
       case self::LIST_THREAD_HISTORY:
       case self::LIST_THREAD_SEARCH:
       case self::VIEW_THREAD_HISTORY:
-      case VIEW_THREAD_SEARCH:
+      case self::VIEW_THREAD_SEARCH:
         $this->table = "thread";
         break;
       case self::LIST_MESSAGE:
@@ -197,7 +197,7 @@ class Base
       case self::LIST_THREAD_HISTORY:
       case self::LIST_THREAD_SEARCH:
       case self::VIEW_THREAD_HISTORY:
-      case VIEW_THREAD_SEARCH:
+      case self::VIEW_THREAD_SEARCH:
       case self::LIST_MESSAGE_HISTORY:
       case self::LIST_MESSAGE_SEARCH:
       case VIEW_MESSAGE_HISTORY:
@@ -214,7 +214,7 @@ class Base
       case self::LIST_MESSAGE:
       case self::LIST_MESSAGE_HISTORY:
       case self::LIST_MESSAGE_SEARCH:
-      case VIEW_THREAD_SEARCH:
+      case self::VIEW_THREAD_SEARCH:
       case self::VIEW_THREAD_HISTORY:
       case VIEW_MESSAGE_SEARCH:
       case VIEW_MESSAGE_HISTORY:

@@ -41,7 +41,7 @@ function thread_post_get()
 
   $Query = new BoardQuery;
   $View = new BoardView;
-  $View->type(VIEW_THREAD_SEARCH);
+  $View->type(Base::VIEW_THREAD_SEARCH);
 
   $View->title("Search Thread Posts: ".htmlentities(cmd(2)));
   $View->subtitle(number_format($res['total'])." results found showing ".($offset?$offset:1)."-".($offset+100).SPACE.ARROW_RIGHT.SPACE."page: $page");
