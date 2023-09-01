@@ -334,7 +334,7 @@ function viewbymember_get()
 
   $Query = new BoardQuery;
   $View = new BoardView;
-  $View->type(VIEW_THREAD_HISTORY);
+  $View->type(Base::VIEW_THREAD_HISTORY);
 
   $View->title("Posts Created: $name");
   $View->subtitle("page $page");

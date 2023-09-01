@@ -32,7 +32,7 @@ class BoardView extends Base
     switch($this->type)
     {
       case VIEW_THREAD_SEARCH:
-      case VIEW_THREAD_HISTORY:
+      case Base::VIEW_THREAD_HISTORY:
         $data['body'] = "<strong>thread:</strong> <a href=\"/thread/view/{$data[VIEW_THREAD_ID]}/\">".htmlentities($data[VIEW_SUBJECT],ENT_QUOTES,'UTF-8')."</a><br/><br/>\n".$data['body'];
         break;
 

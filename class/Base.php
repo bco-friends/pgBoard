@@ -3,7 +3,6 @@
 /*
 * View Functions
 **/
-define("VIEW_THREAD_HISTORY",900);
 define("VIEW_THREAD_SEARCH",1000);
 define("VIEW_THREAD_PREVIEW",1100);
 define("VIEW_MESSAGE",1200);
@@ -36,6 +35,7 @@ class Base
   public const LIST_MESSAGE_SEARCH = 600;
   public const LIST_MEMBER = 700;
   public const VIEW_THREAD = 800;
+  public const VIEW_THREAD_HISTORY = 900;
 
 
   public $ajax = false;     // data only flag
@@ -81,7 +81,7 @@ class Base
       case self::VIEW_THREAD:
       case self::LIST_THREAD_HISTORY:
       case self::LIST_THREAD_SEARCH:
-      case VIEW_THREAD_HISTORY:
+      case self::VIEW_THREAD_HISTORY:
       case VIEW_THREAD_SEARCH:
         $this->table = "thread";
         break;
@@ -196,7 +196,7 @@ class Base
 
       case self::LIST_THREAD_HISTORY:
       case self::LIST_THREAD_SEARCH:
-      case VIEW_THREAD_HISTORY:
+      case self::VIEW_THREAD_HISTORY:
       case VIEW_THREAD_SEARCH:
       case self::LIST_MESSAGE_HISTORY:
       case self::LIST_MESSAGE_SEARCH:
@@ -215,7 +215,7 @@ class Base
       case self::LIST_MESSAGE_HISTORY:
       case self::LIST_MESSAGE_SEARCH:
       case VIEW_THREAD_SEARCH:
-      case VIEW_THREAD_HISTORY:
+      case self::VIEW_THREAD_HISTORY:
       case VIEW_MESSAGE_SEARCH:
       case VIEW_MESSAGE_HISTORY:
         $next = (cmd($end,true) ? cmd($end,true)+1 : 1);
