@@ -42,14 +42,14 @@ class BoardList extends Base
         if($data[LIST_STICKY] == "t") $data['subject'] = STICKY_TEXT.NON_BREAKING_SPACE.$data['subject'];
         if(session('id'))
         {
-          if($data[LIST_LAST_POSTER_ID] != session('id') && $data[LIST_DOTFLAG] == "t") $data['dot'] = LIST_DOT;
+          if($data[BoardQuery::LIST_LAST_POSTER_ID] != session('id') && $data[LIST_DOTFLAG] == "t") $data['dot'] = LIST_DOT;
           if($data[LIST_POSTS] != $data[LIST_LAST_VIEW_POSTS]) $data['read'] = SPACE.CSS_READ;
         }
         break;
       case Base::LIST_MESSAGE:
         if(session('id'))
         {
-          if($data[LIST_LAST_POSTER_ID] != session('id') && $data[LIST_DOTFLAG] == "t") $data['dot'] = LIST_DOT;
+          if($data[BoardQuery::LIST_LAST_POSTER_ID] != session('id') && $data[LIST_DOTFLAG] == "t") $data['dot'] = LIST_DOT;
           if($data[LIST_POSTS] != $data[LIST_LAST_VIEW_POSTS])
           {
             $data['read'] = SPACE.CSS_READ;
