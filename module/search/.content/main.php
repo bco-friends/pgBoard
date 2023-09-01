@@ -2,7 +2,7 @@
 if(!isset($res)) // if calling from within search itself don't include structure
 {
   $Base = new Base;
-  $Base->type(SEARCH);
+  $Base->type(Base::SEARCH);
   $Base->title("Search");
   $Base->header();
 }

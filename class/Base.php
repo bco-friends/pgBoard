@@ -1,5 +1,4 @@
 <?php
-define("SEARCH",1800);
 define("ERROR",1900);
 define("MISC",2000);
 
@@ -37,6 +36,7 @@ class Base
    */
   public const CREATE = 1600;
   public const EDIT = 1700;
+  public const SEARCH = 1800;
 
 
   public $ajax = false;     // data only flag
@@ -173,7 +173,7 @@ class Base
     {
       case self::CREATE:
       case self::EDIT:
-      case SEARCH:
+      case self::SEARCH:
       case ERROR:
         print "<div class=\"hr\"><hr/></div>\n";
         break;
