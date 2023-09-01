@@ -250,7 +250,7 @@ print "<br/>";
 
 $view                         = array();
 $view[0][BoardQuery::VIEW_ID] = "";
-$view[0][VIEW_DATE_POSTED]    = time();
+$view[0][BoardQuery::VIEW_DATE_POSTED]    = time();
 $view[0][VIEW_CREATOR_ID] = 0;
 $view[0][VIEW_CREATOR_NAME] = "color scheme";
 $view[0][VIEW_BODY] = "color scheme post text";

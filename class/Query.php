@@ -1,5 +1,4 @@
 <?php
-define("VIEW_DATE_POSTED",1);
 define("VIEW_CREATOR_ID",2);
 define("VIEW_CREATOR_NAME",3);
 define("VIEW_BODY",4);
@@ -41,6 +40,7 @@ class BoardQuery
   * view_query constants
   **/
   public const VIEW_ID = 0;
+  public const VIEW_DATE_POSTED = 1;
 
   /**
   * build thread listing query

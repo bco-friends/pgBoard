@@ -20,7 +20,7 @@ class BoardView extends Base
     global $Parse;
 
     $data = array_values($row);
-    $data['date'] = date(VIEW_DATE_FORMAT,(int)$data[VIEW_DATE_POSTED]);
+    $data['date'] = date(VIEW_DATE_FORMAT,(int)$data[BoardQuery::VIEW_DATE_POSTED]);
 
     $data['me'] = $data['quote'] = $data['admin'] = "";
     if(session('id'))
