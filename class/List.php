@@ -1,6 +1,8 @@
 <?php
 class BoardList extends Base
 {
+  public const NO_DATA_ERROR = 'No data to display specified.';
+
   public $data;
   public $favorites;
   function data($data) { $this->data = $data; }
@@ -75,7 +77,7 @@ class BoardList extends Base
 
     if(!isset($this->data))
     {
-      print "No data to display specified.";
+      print self::NO_DATA_ERROR;
       return;
     }
     if(!$this->data) $this->data = array();
