@@ -2,7 +2,7 @@
 if(!id() || !session('admin')) return to_index();
 
 $Base = new Base;
-$Base->type(EDIT);
+$Base->type(Base::EDIT);
 $Base->title("Edit Post");
 $Base->header();
 

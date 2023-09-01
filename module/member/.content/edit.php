@@ -27,12 +27,12 @@ if(!is_numeric($prefs['uncollapsecount'])) $prefs['uncollapsecount'] = UNCOLLAPS
 if($prefs['uncollapsecount'] < 1) $prefs['uncollapsecount'] = 1;
 
 $Base = new Base;
-$Base->type(EDIT);
+$Base->type(Base::EDIT);
 $Base->title("Account Management: $member[name]");
 $Base->header();
 
 print "<div class=\"box clear\">\n";
-  
+
 $Form = new Form;
 $Form->values(array_merge($member,$prefs));
 $Form->header(url(),"post",FORM_SALT);
@@ -68,7 +68,7 @@ $DB->query("SELECT
               p.editable IS true
             ORDER BY
               p.ordering");
-              
+
 while($pref = $DB->load_array())
 {
   switch($pref['type'])

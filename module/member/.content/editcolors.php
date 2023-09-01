@@ -75,7 +75,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 <script type="text/javascript" src="/lib/colorpicker/colorpicker.js"></script>
 <?php
 $Base = new Base;
-$Base->type(EDIT);
+$Base->type(Base::EDIT);
 $Base->title("Color Theme Styler");
 $Base->header();
 ?>
