@@ -3,7 +3,6 @@
 /*
 * View Functions
 **/
-define("VIEW_MESSAGE",1200);
 define("VIEW_MESSAGE_HISTORY",1300);
 define("VIEW_MESSAGE_SEARCH",1400);
 define("VIEW_MESSAGE_PREVIEW",1100);
@@ -36,6 +35,7 @@ class Base
   public const VIEW_THREAD_HISTORY = 900;
   public const VIEW_THREAD_SEARCH = 1000;
   public const VIEW_THREAD_PREVIEW = 1100;
+  public const VIEW_MESSAGE = 1200;
 
 
   public $ajax = false;     // data only flag
@@ -86,7 +86,7 @@ class Base
         $this->table = "thread";
         break;
       case self::LIST_MESSAGE:
-      case VIEW_MESSAGE:
+      case self::VIEW_MESSAGE:
       case self::LIST_MESSAGE_HISTORY:
       case self::LIST_MESSAGE_SEARCH:
       case VIEW_MESSAGE_HISTORY:
@@ -190,7 +190,7 @@ class Base
       case self::LIST_THREAD:
       case self::VIEW_THREAD:
       case self::LIST_MESSAGE:
-      case VIEW_MESSAGE:
+      case self::VIEW_MESSAGE:
         $end = 2;
         break;
 
@@ -229,7 +229,7 @@ class Base
         break;
 
       case self::VIEW_THREAD:
-      case VIEW_MESSAGE:
+      case self::VIEW_MESSAGE:
         print "<ul class=\"nav bottom clear shiftup\">\n";
         print "  <li><a href=\"/{$this->table}/list/\">".HOME_BUTTON."</a></li>\n";
         print "  <li><a href=\"javascript:;\" onclick=\"loadposts('{$this->table}',this)\">load new posts</a></li>\n";
