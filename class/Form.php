@@ -1,5 +1,4 @@
 <?php
-define("FORM_SELECT",500);
 define("FORM_CHECKBOX",600);
 define("FORM_RADIO",700);
 define("FORM_BUTTON",800);
@@ -12,6 +11,7 @@ class Form
   public const FORM_TEXT = 200;
   public const FORM_PASSWORD = 300;
   public const FORM_TEXTAREA = 400;
+  public const FORM_SELECT = 500;
   public $name = "form";
   public $ajax = true;
   public $values = array();
@@ -96,7 +96,7 @@ class Form
   function add_select($name,$title,$initial,$data=false,$extra=">")
   {
     $curr = new stdClass();
-    $curr->type    = FORM_SELECT;
+    $curr->type    = self::FORM_SELECT;
     $curr->name    = $name;
     $curr->title   = $title;
     $curr->initial = $initial;
@@ -247,7 +247,7 @@ class Form
       case self::FORM_TEXT:        $buff = $this->build_text($ob);        break;
       case self::FORM_PASSWORD:    $buff = $this->build_password($ob);    break;
       case self::FORM_TEXTAREA:    $buff = $this->build_textarea($ob);    break;
-      case FORM_SELECT:      $buff = $this->build_select($ob);      break;
+      case self::FORM_SELECT:      $buff = $this->build_select($ob);      break;
       case FORM_CHECKBOX:    $buff = $this->build_checkbox($ob);    break;
       case FORM_RADIO:       $buff = $this->build_radio($ob);       break;
       case FORM_BUTTON:      $buff = $this->build_button($ob);      break;
