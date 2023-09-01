@@ -68,7 +68,7 @@ function view_get()
 
   $Query = new BoardQuery;
   $View = new BoardView;
-  $View->type(VIEW_THREAD);
+  $View->type(Base::VIEW_THREAD);
   $View->increment_views();
 
   $subtitle="";

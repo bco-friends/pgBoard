@@ -3,7 +3,6 @@
 /*
 * View Functions
 **/
-define("VIEW_THREAD",800);
 define("VIEW_THREAD_HISTORY",900);
 define("VIEW_THREAD_SEARCH",1000);
 define("VIEW_THREAD_PREVIEW",1100);
@@ -36,6 +35,9 @@ class Base
   public const LIST_MESSAGE_HISTORY = 500;
   public const LIST_MESSAGE_SEARCH = 600;
   public const LIST_MEMBER = 700;
+  public const VIEW_THREAD = 800;
+
+
   public $ajax = false;     // data only flag
   public $xml = false;
   public $name;             // unique name
@@ -76,7 +78,7 @@ class Base
     switch($this->type)
     {
       case self::LIST_THREAD:
-      case VIEW_THREAD:
+      case self::VIEW_THREAD:
       case self::LIST_THREAD_HISTORY:
       case self::LIST_THREAD_SEARCH:
       case VIEW_THREAD_HISTORY:
@@ -186,7 +188,7 @@ class Base
     switch($this->type)
     {
       case self::LIST_THREAD:
-      case VIEW_THREAD:
+      case self::VIEW_THREAD:
       case self::LIST_MESSAGE:
       case VIEW_MESSAGE:
         $end = 2;
@@ -226,7 +228,7 @@ class Base
         print "<div class=\"clear\"></div>\n";
         break;
 
-      case VIEW_THREAD:
+      case self::VIEW_THREAD:
       case VIEW_MESSAGE:
         print "<ul class=\"nav bottom clear shiftup\">\n";
         print "  <li><a href=\"/{$this->table}/list/\">".HOME_BUTTON."</a></li>\n";

@@ -9,7 +9,7 @@ class BoardView extends Base
   function increment_views()
   {
     global $DB;
-    if(!$this->ajax && $this->type == VIEW_THREAD || $this->type == VIEW_MESSAGE)
+    if(!$this->ajax && $this->type == Base::VIEW_THREAD || $this->type == VIEW_MESSAGE)
     {
       $DB->query("UPDATE {$this->table} SET views=views+1 WHERE id=$1",array(id(true)));
     }
@@ -36,7 +36,7 @@ class BoardView extends Base
         $data['body'] = "<strong>thread:</strong> <a href=\"/thread/view/{$data[VIEW_THREAD_ID]}/\">".htmlentities($data[VIEW_SUBJECT],ENT_QUOTES,'UTF-8')."</a><br/><br/>\n".$data['body'];
         break;
 
-      case VIEW_THREAD:
+      case Base::VIEW_THREAD:
       case VIEW_MESSAGE:
         $data['quote'] = NON_BREAKING_SPACE.ARROW_RIGHT." <a href=\"javascript:;\" onclick=\"quote_post({$data[VIEW_ID]})\"\">quote</a>";
     }
@@ -77,7 +77,7 @@ class BoardView extends Base
     if(!$this->data) $this->data = array();
 
     $uncollapsecount = UNCOLLAPSE_COUNT_DEFAULT;
-    if(session('id') && ($this->type == VIEW_THREAD || $this->type == VIEW_MESSAGE) && !$this->ajax)
+    if(session('id') && ($this->type == Base::VIEW_THREAD || $this->type == VIEW_MESSAGE) && !$this->ajax)
     {
       if (intval(session('uncollapsecount')) >= 1)
         $uncollapsecount = intval(session('uncollapsecount'));
@@ -172,7 +172,7 @@ class BoardView extends Base
     }
     if(!$this->data) $this->data = array();
 
-    if(session('id') && ($this->type == VIEW_THREAD || $this->type == VIEW_MESSAGE) && !$this->ajax)
+    if(session('id') && ($this->type == Base::VIEW_THREAD || $this->type == VIEW_MESSAGE) && !$this->ajax)
     {
       if($list = array_keys($Core->list_ignored(session('id')))) $list = implode(",",$list);
       else
