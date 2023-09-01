@@ -1,5 +1,4 @@
 <?php
-define("VIEW_CREATOR_NAME",3);
 define("VIEW_BODY",4);
 define("VIEW_CREATOR_IP",5);
 define("VIEW_SUBJECT",6);
@@ -41,6 +40,7 @@ class BoardQuery
   public const VIEW_ID = 0;
   public const VIEW_DATE_POSTED = 1;
   public const VIEW_CREATOR_ID = 2;
+  public const VIEW_CREATOR_NAME = 3;
 
   /**
   * build thread listing query

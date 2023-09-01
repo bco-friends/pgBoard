@@ -139,7 +139,7 @@ class BoardView extends Base
       print "<div id=\"view_".id()."_{$field[BoardQuery::VIEW_ID]}_{$i}\" class=\"post\">\n";
       print "<ul class=\"view\" id=\"post_{$field[BoardQuery::VIEW_ID]}\">\n";
       print "  <li class=\"info even$field[me]\">\n";
-      print "    <div class=\"postinfo\">".$Core->member_link($field[VIEW_CREATOR_NAME])." posted this on $field[date]</div>\n";
+      print "    <div class=\"postinfo\">".$Core->member_link($field[BoardQuery::VIEW_CREATOR_NAME])." posted this on $field[date]</div>\n";
       print "    <div class=\"controls\">$field[quote]$field[admin]</div>\n";
       print "    <div class=\"count\"><a href=\"#{$i}\" name=\"$i\">{$count}</a></div>\n";
       print "    <div class=\"clear\"></div>\n";
@@ -225,7 +225,7 @@ class BoardView extends Base
       #if(session('nopostnumber')) $count = "";
       print "<post number=\"$i\">";
       print "<id>{$field[BoardQuery::VIEW_ID]}</id>\n";
-      print "<member>{$field[VIEW_CREATOR_NAME]}</member>\n";
+      print "<member>{$field[BoardQuery::VIEW_CREATOR_NAME]}</member>\n";
       print "<date>{$field['date']}</date>\n";
       print "<body>{$field['body']}</body>\n";
       print "</post>\n";
