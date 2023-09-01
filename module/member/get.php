@@ -48,7 +48,7 @@ function view_get()
 
   $pref = $DB->load_all_key();
 
-  $Base = new Base;
+  $Base = Base::init();
   $Base->title($member['name']);
   $Base->type(Base::VIEW_MEMBER);
 
@@ -165,7 +165,7 @@ function ignore_get()
 
   if(!$listen = $Core->idfromname(id()))
   {
-    $Base = new Base;
+    $Base = Base::init();
     $Base->type(Base::ERROR);
     $Base->title(ERROR_MEMBER_NOTFOUND);
     $Base->header();
@@ -191,7 +191,7 @@ function listen_get()
 
   if(!$listen = $Core->idfromname(id()))
   {
-    $Base = new Base;
+    $Base = Base::init();
     $Base->type(Base::ERROR);
     $Base->title(ERROR_MEMBER_NOTFOUND);
     $Base->header();

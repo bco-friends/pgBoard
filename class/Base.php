@@ -62,6 +62,33 @@ class Base
     if(get('xml')) $this->xml = true;
   }
 
+  public static function init(): Base
+  {
+    global $DB;
+
+    $base = new self();
+
+    $base->name = "l" . substr(md5(time()), 0, 5);
+    if (session('id'))
+    {
+      $DB->query("UPDATE member SET last_view=now() WHERE id=$1", [session('id')]);
+    }
+    if (session('blocked'))
+    {
+      $base->blocked(session('blocked'));
+    }
+    if (get('ajax'))
+    {
+      $base->ajax = true;
+    }
+    if (get('xml'))
+    {
+      $base->xml = true;
+    }
+
+    return $base;
+  }
+
   function title($title)
   {
     global $_title_;

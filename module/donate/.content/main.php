@@ -1,7 +1,7 @@
 <?php
 function number($str) { return str_replace(array("$",","),"",$str); }
 
-$Base = new Base;
+$Base = Base::init();
 $Base->type(Base::MISC);
 $Base->title("Donate");
 $Base->header();

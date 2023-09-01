@@ -1,7 +1,7 @@
 <?php
 if(session('id')) return to_index();
 
-$Base = new Base;
+$Base = Base::init();
 $Base->title("Forgotten Password");
 $Base->type(Base::CREATE);
 $Base->header();

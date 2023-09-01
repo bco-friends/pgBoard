@@ -171,7 +171,7 @@ if(!isset($commandline))
   ob_start();
   if(!$DB->db)
   {
-    $Base = new Base;
+    $Base = Base::init();
     $Base->title("Dead database!");
     $Base->header();
     $Base->footer();

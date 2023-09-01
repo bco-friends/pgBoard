@@ -1,7 +1,7 @@
 <?php
 if(!id() || !session('admin')) return to_index();
 
-$Base = new Base;
+$Base = Base::init();
 $Base->type(Base::EDIT);
 $Base->title("Edit Post");
 $Base->header();

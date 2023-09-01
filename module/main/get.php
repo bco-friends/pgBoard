@@ -7,7 +7,7 @@ function logout_get()
 
 function changelog_get()
 {
-  $Base = new Base;
+  $Base = Base::init();
   $Base->type(Base::MISC);
   $Base->title("pgBoard v".VERSION.SPACE.ARROW_RIGHT." Change Log");
   $Base->header();
@@ -33,7 +33,7 @@ function status_get()
   asort($active);
   $chatting = array_keys($chatting);
 
-  $Base = new Base;
+  $Base = Base::init();
   $Base->type(Base::MISC);
   $Base->title("Board Status");
   $Base->header();

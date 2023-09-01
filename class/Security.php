@@ -8,7 +8,7 @@ class BoardSecurity
     {
       if(!in_array(implode("-",module()).func(),$_allowed_))
       {
-        $Base = new Base;
+        $Base = Base::init();
         $Base->type(Base::ERROR);
         $Base->title(ERROR_MUST_LOGIN);
         $Base->header();

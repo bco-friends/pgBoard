@@ -1,5 +1,5 @@
 <?php
-$Base = new Base;
+$Base = Base::init();
 $Base->type(Base::MISC);
 $Base->title(TITLE_CHAT);
 $Base->header();

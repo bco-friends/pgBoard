@@ -26,7 +26,7 @@ if(!isset($prefs['uncollapsecount'])) $prefs['uncollapsecount'] = UNCOLLAPSE_COU
 if(!is_numeric($prefs['uncollapsecount'])) $prefs['uncollapsecount'] = UNCOLLAPSE_COUNT_DEFAULT;
 if($prefs['uncollapsecount'] < 1) $prefs['uncollapsecount'] = 1;
 
-$Base = new Base;
+$Base = Base::init();
 $Base->type(Base::EDIT);
 $Base->title("Account Management: $member[name]");
 $Base->header();

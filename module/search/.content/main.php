@@ -1,7 +1,7 @@
 <?php
 if(!isset($res)) // if calling from within search itself don't include structure
 {
-  $Base = new Base;
+  $Base = Base::init();
   $Base->type(Base::SEARCH);
   $Base->title("Search");
   $Base->header();

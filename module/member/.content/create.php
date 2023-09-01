@@ -1,7 +1,7 @@
 <?php
 if(session('id') || !REGISTRATION_OPEN) return to_index();
 
-$Base = new Base;
+$Base = Base::init();
 $Base->type(Base::CREATE);
 $Base->title("Create Account");
 $Base->header();

@@ -2,12 +2,12 @@
 class BoardCore
 {
   public $data;
-  
+
   function command_parse()
   {
     global $DB,$Core,$Parse,$Security,$Base,$Style;
     if(!$Security->allowed()) return;
-    
+
     $include = implode("/",module());
     if(file_exists("module/{$include}/main.php"))
     {
@@ -27,7 +27,7 @@ class BoardCore
     }
     else
     {
-      $Base = new Base;
+      $Base = Base::init();
       $Base->title("Invalid Module");
       $Base->Header();
       $Base->Footer();
@@ -40,14 +40,14 @@ class BoardCore
     if(!is_numeric($id)) return false;
     return $DB->value("SELECT name FROM member WHERE id=$1",array($id));
   }
-  
+
   function idfromname($name)
   {
     global $DB;
     $name = str_replace(SPACE,"",strtolower($name));
     return $DB->value("SELECT id FROM member WHERE LOWER(REPLACE(name,' ',''))=$1",array($name));
   }
-  
+
   function member_link($id)
   {
     if(is_int($id))
@@ -63,7 +63,7 @@ class BoardCore
     $output = "<a href=\"/member/view/$id/\" class=\"memberlink\">".str_replace(SPACE,"&nbsp;",$id)."</a>";
     return $output;
   }
-  
+
   function member_pref($member_id,$name)
   {
     global $DB;
@@ -80,13 +80,13 @@ class BoardCore
                        AND
                          LOWER(p.name)=LOWER($2)",array($member_id,$name));
   }
-  
+
   function is_ignoring($member_id,$ignored)
   {
     global $DB;
     if(!is_numeric($ignored)) $ignored = $this->idfromname($ignored);
     if(!$ignored) return false;
-    
+
     return $DB->check("SELECT true FROM member_ignore WHERE member_id=$1 AND ignore_member_id=$2",array($member_id,$ignored));
   }
 
@@ -117,7 +117,7 @@ class BoardCore
     else
     return $time<time();
   }
-  
+
   function list_ignored($member_id)
   {
     global $DB;
@@ -136,7 +136,7 @@ class BoardCore
                   m.name",array($member_id));
     return $DB->load_all_key();
   }
-  
+
   function list_ignoredby($member_id)
   {
     global $DB;
@@ -155,7 +155,7 @@ class BoardCore
                   m.name",array($member_id));
     return $DB->load_all_key();
   }
-  
+
   function message_unread_count($member_id)
   {
     global $DB;
@@ -170,7 +170,7 @@ class BoardCore
                        AND
                          mm.last_view_posts=0",array($member_id));
   }
-  
+
   /* there is a bug here, figure out how posts and last_view_posts get out of sync */
   function message_unread_post_count($member_id)
   {
@@ -188,7 +188,7 @@ class BoardCore
                        AND
                          mm.deleted IS false",array($member_id));
   }
-  
+
   function check_favorite($thread_id)
   {
     global $DB;
@@ -218,7 +218,7 @@ class BoardCore
     global $DB;
     return $DB->value("SELECT value FROM board_data where name='total_threads'");
   }
-  
+
   function thread_post_count()
   {
     global $DB;
@@ -261,7 +261,7 @@ class BoardCore
     $DB->query("SELECT id,name FROM member WHERE last_view BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
     return $DB->load_all_key();
   }
-  
+
   function posting_members()
   {
     global $DB;
@@ -275,7 +275,7 @@ class BoardCore
     $DB->query("SELECT id,name FROM member WHERE last_chat BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
     return $DB->load_all_key();
   }
-  
+
   function lurking_members()
   {
     global $DB;
@@ -294,7 +294,7 @@ class BoardCore
     global $DB;
     return $DB->value("SELECT goal FROM fundraiser WHERE id=$1",array(FUNDRAISER_ID));
   }
-  
+
   function fundraiser_total()
   {
     global $DB;
