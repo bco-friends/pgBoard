@@ -7,7 +7,7 @@ function list_get()
 
   $Query = new BoardQuery;
   $List = new BoardList;
-  $List->type(LIST_MESSAGE);
+  $List->type(Base::LIST_MESSAGE);
 
   $List->title(TITLE_BOARD);
   $List->header();
@@ -35,7 +35,7 @@ function view_get()
   $View->type(VIEW_MESSAGE);
   $View->member_update();
   $View->increment_views();
-  
+
   $subject = $View->subject(id());
   $subject .= "<span class=\"smaller\">";
   if(session('hidemedia'))
@@ -50,7 +50,7 @@ function view_get()
   }
   $subject .= SPACE.ARROW_RIGHT.SPACE."<a href=\"/message/delete/".id()."/".md5(session_id())."/\">delete</a>";
   $subject .= "</span>";
-  
+
   $View->title($subject);
 
   $DB->query("SELECT m.name,mm.deleted FROM message_member mm LEFT JOIN member m ON m.id=mm.member_id WHERE mm.message_id=$1",array(id()));

@@ -2,7 +2,6 @@
 /*
 * List Functions
 **/
-define("LIST_MESSAGE",400);
 define("LIST_MESSAGE_HISTORY",500);
 define("LIST_MESSAGE_SEARCH",600);
 define("LIST_MEMBER",700);
@@ -36,6 +35,7 @@ class Base
   public const LIST_THREAD = 100;
   public const LIST_THREAD_HISTORY = 200;
   public const LIST_THREAD_SEARCH = 300;
+  public const LIST_MESSAGE = 400;
   public $ajax = false;     // data only flag
   public $xml = false;
   public $name;             // unique name
@@ -83,7 +83,7 @@ class Base
       case VIEW_THREAD_SEARCH:
         $this->table = "thread";
         break;
-      case LIST_MESSAGE:
+      case self::LIST_MESSAGE:
       case VIEW_MESSAGE:
       case LIST_MESSAGE_HISTORY:
       case LIST_MESSAGE_SEARCH:
@@ -132,7 +132,7 @@ class Base
       case self::LIST_THREAD:
       case self::LIST_THREAD_HISTORY:
       case self::LIST_THREAD_SEARCH:
-      case LIST_MESSAGE:
+      case self::LIST_MESSAGE:
       case LIST_MESSAGE_HISTORY:
       case LIST_MESSAGE_SEARCH:
         print "<div id=\"quicksearch\"><div class=\"setdown searchwrap\">\n";
@@ -187,7 +187,7 @@ class Base
     {
       case self::LIST_THREAD:
       case VIEW_THREAD:
-      case LIST_MESSAGE:
+      case self::LIST_MESSAGE:
       case VIEW_MESSAGE:
         $end = 2;
         break;
@@ -209,7 +209,7 @@ class Base
       case self::LIST_THREAD:
       case self::LIST_THREAD_HISTORY:
       case self::LIST_THREAD_SEARCH:
-      case LIST_MESSAGE:
+      case self::LIST_MESSAGE:
       case LIST_MESSAGE_HISTORY:
       case LIST_MESSAGE_SEARCH:
       case VIEW_THREAD_SEARCH:
@@ -288,7 +288,7 @@ class Base
       case self::LIST_THREAD:
       case self::LIST_THREAD_HISTORY:
       case self::LIST_THREAD_SEARCH:
-      case LIST_MESSAGE:
+      case self::LIST_MESSAGE:
       case LIST_MESSAGE_HISTORY:
       case LIST_MESSAGE_SEARCH:
         print "<script type=\"text/javascript\">\n";

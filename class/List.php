@@ -46,7 +46,7 @@ class BoardList extends Base
           if($data[LIST_POSTS] != $data[LIST_LAST_VIEW_POSTS]) $data['read'] = SPACE.CSS_READ;
         }
         break;
-      case LIST_MESSAGE:
+      case Base::LIST_MESSAGE:
         if(session('id'))
         {
           if($data[LIST_LAST_POSTER_ID] != session('id') && $data[LIST_DOTFLAG] == "t") $data['dot'] = LIST_DOT;
