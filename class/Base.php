@@ -3,7 +3,6 @@
 /*
 * View Functions
 **/
-define("VIEW_THREAD_PREVIEW",1100);
 define("VIEW_MESSAGE",1200);
 define("VIEW_MESSAGE_HISTORY",1300);
 define("VIEW_MESSAGE_SEARCH",1400);
@@ -36,6 +35,7 @@ class Base
   public const VIEW_THREAD = 800;
   public const VIEW_THREAD_HISTORY = 900;
   public const VIEW_THREAD_SEARCH = 1000;
+  public const VIEW_THREAD_PREVIEW = 1100;
 
 
   public $ajax = false;     // data only flag

@@ -26,7 +26,7 @@ function previewpost_post()
 
   // use standard board display to build preview
   $View = new BoardView;
-  $View->type(VIEW_THREAD_PREVIEW);
+  $View->type(Base::VIEW_THREAD_PREVIEW);
   $View->data($data);
   $View->thread();
   exit_clean();

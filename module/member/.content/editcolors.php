@@ -267,7 +267,7 @@ $view[3] = $view[0];
 
 // use standard board display to build preview
 $View = new BoardView;
-$View->type(VIEW_THREAD_PREVIEW);
+$View->type(Base::VIEW_THREAD_PREVIEW);
 $View->data($view);
 $View->thread();
 

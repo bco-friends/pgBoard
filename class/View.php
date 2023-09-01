@@ -114,7 +114,7 @@ class BoardView extends Base
       $hidemedia = get('media') ? "true" : "false";
 
       print "<div id=\"view_".id()."\">\n";
-      if($this->collapse && $this->type != VIEW_THREAD_PREVIEW && $this->type != VIEW_MESSAGE_PREVIEW)
+      if($this->collapse && $this->type != Base::VIEW_THREAD_PREVIEW && $this->type != VIEW_MESSAGE_PREVIEW)
       {
         $uncollapsecount = min($this->collapse, $uncollapsecount);
         print "<div class=\"post clear\" id=\"uncollapse\">\n";
@@ -206,7 +206,7 @@ class BoardView extends Base
       $hidemedia = get('media') ? "true" : "false";
 
       #print "<div id=\"view_".id()."\">\n";
-      if($this->collapse && $this->type != VIEW_THREAD_PREVIEW && $this->type != VIEW_MESSAGE_PREVIEW)
+      if($this->collapse && $this->type != Base::VIEW_THREAD_PREVIEW && $this->type != VIEW_MESSAGE_PREVIEW)
       {
         print "<div class=\"post clear\" id=\"uncollapse\">\n";
         print "  <ul class=\"postbody odd collapse\">\n";
