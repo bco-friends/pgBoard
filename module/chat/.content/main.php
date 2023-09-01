@@ -1,6 +1,6 @@
 <?php
 $Base = new Base;
-$Base->type(MISC);
+$Base->type(Base::MISC);
 $Base->title(TITLE_CHAT);
 $Base->header();
 ?>

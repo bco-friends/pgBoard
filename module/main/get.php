@@ -8,11 +8,11 @@ function logout_get()
 function changelog_get()
 {
   $Base = new Base;
-  $Base->type(MISC);
+  $Base->type(Base::MISC);
   $Base->title("pgBoard v".VERSION.SPACE.ARROW_RIGHT." Change Log");
   $Base->header();
   print "<div class=\"box clear\" style=\"font: 12px courier new\">";
-  print str_replace("»","&raquo;",nl2br(file_get_contents(DIR."/CHANGELOG")));
+  print str_replace("ï¿½","&raquo;",nl2br(file_get_contents(DIR."/CHANGELOG")));
   print "<br/>\n";
   print "<a href=\"http://pgboard.googlecode.com/\" onclick=\"window.open(this.href);return false\">click here to download pgBoard</a> &raquo;";
   print "</div>";
@@ -34,7 +34,7 @@ function status_get()
   $chatting = array_keys($chatting);
 
   $Base = new Base;
-  $Base->type(MISC);
+  $Base->type(Base::MISC);
   $Base->title("Board Status");
   $Base->header();
   $output = "";
@@ -77,7 +77,7 @@ function status_get()
     print "<ol style=\"padding-left:30px\">\n";
     while($row = $DB->load_array()) print "  <li>".$Core->member_link($row['name'])." ($row[num])</li>\n";
     print "</ol>\n";
-  
+
     $DB->query("SELECT
                   count(*) as num,
                   m.name
@@ -96,7 +96,7 @@ function status_get()
     while($row = $DB->load_array()) print "  <li>".$Core->member_link($row['name'])." ($row[num])</li>\n";
     print "</ol>\n";
   }
-  
+
   $DB->query("SELECT
                 count(*) as num,
                 (SELECT subject FROM thread WHERE id=f.thread_id) as subject,
@@ -107,7 +107,7 @@ function status_get()
                 f.thread_id
               ORDER BY num DESC
               LIMIT 25");
-  
+
   print "<br/><br/><strong>top 25 favorited threads:</strong><br/><br/>";
   print "<ol style=\"padding-left:30px\">\n";
   while($row = $DB->load_array()) print "  <li><a href=\"/thread/view/$row[id]/\">".strip_tags($row['subject'])."</a> ($row[num])</li>\n";

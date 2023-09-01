@@ -1,5 +1,4 @@
 <?php
-define("MISC",2000);
 
 /**
 * Base Display Class
@@ -37,6 +36,7 @@ class Base
   public const EDIT = 1700;
   public const SEARCH = 1800;
   public const ERROR = 1900;
+  public const MISC = 2000;
 
 
   public $ajax = false;     // data only flag
