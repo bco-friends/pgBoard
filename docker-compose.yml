@@ -51,10 +51,12 @@ services:
       - app-network
   sphinx:
     container_name: pgb-sphinx
+    platform: linux/x86_64
     image: macbre/sphinxsearch:latest
     restart: always
     ports:
       - 9306:9306
+    mem_limit: 512m
     depends_on:
       - postgres
     volumes:
