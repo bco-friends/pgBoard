@@ -166,7 +166,7 @@ function ignore_get()
   if(!$listen = $Core->idfromname(id()))
   {
     $Base = new Base;
-    $Base->type(ERROR);
+    $Base->type(Base::ERROR);
     $Base->title(ERROR_MEMBER_NOTFOUND);
     $Base->header();
     $Base->footer();
@@ -192,7 +192,7 @@ function listen_get()
   if(!$listen = $Core->idfromname(id()))
   {
     $Base = new Base;
-    $Base->type(ERROR);
+    $Base->type(Base::ERROR);
     $Base->title(ERROR_MEMBER_NOTFOUND);
     $Base->header();
     $Base->footer();

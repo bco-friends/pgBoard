@@ -9,7 +9,7 @@ class BoardSecurity
       if(!in_array(implode("-",module()).func(),$_allowed_))
       {
         $Base = new Base;
-        $Base->type(ERROR);
+        $Base->type(Base::ERROR);
         $Base->title(ERROR_MUST_LOGIN);
         $Base->header();
         $Base->footer();
@@ -66,7 +66,7 @@ class BoardSecurity
     }
     return $DB->value("SELECT id FROM member WHERE LOWER(name)=LOWER($1) AND $field=$2 AND banned IS false",array($name,$pass));
   }
-  
+
   function setcookie()
   {
     global $DB;
@@ -126,7 +126,7 @@ class BoardSecurity
       $_SESSION[$pref['name']] = $pref['value'];
     }
   }
-  
+
   function login($name,$pass,$field="pass",$prehash=false)
   {
     global $DB;
@@ -139,7 +139,7 @@ class BoardSecurity
     else
     return false;
   }
-  
+
   function login_cookie()
   {
     if(cookie('board'))
@@ -161,7 +161,7 @@ class BoardSecurity
       return false;
     }
   }
-  
+
   function is_admin($id)
   {
     global $DB;
@@ -196,7 +196,7 @@ class BoardSecurity
     session_destroy();
     setcookie("board","",0,"/",$_SERVER['SERVER_NAME']);
     unset($_COOKIE);
-    
+
     if(get('login')) return to_index("/main/login/");
     else
     return to_index('/');

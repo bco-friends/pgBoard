@@ -1,5 +1,4 @@
 <?php
-define("ERROR",1900);
 define("MISC",2000);
 
 /**
@@ -37,6 +36,7 @@ class Base
   public const CREATE = 1600;
   public const EDIT = 1700;
   public const SEARCH = 1800;
+  public const ERROR = 1900;
 
 
   public $ajax = false;     // data only flag
@@ -106,7 +106,7 @@ class Base
     print "<div id=\"wrap_{$this->name}\" class=\"clear\">\n";
     print "  <h3 class=\"title\">$this->title</h3>\n";
     $Security->auth_control();
-    if(!$this->subtitle && $this->type != ERROR)
+    if(!$this->subtitle && $this->type != self::ERROR)
     {
       $subtitle = "<a href=\"/\">".number_format($Core->thread_count())." threads</a> ".ARROW_RIGHT.SPACE;
       $subtitle .= "<a href=\"/main/status/\">".number_format($Core->active_member_count())." active members, ";
@@ -174,7 +174,7 @@ class Base
       case self::CREATE:
       case self::EDIT:
       case self::SEARCH:
-      case ERROR:
+      case self::ERROR:
         print "<div class=\"hr\"><hr/></div>\n";
         break;
 
