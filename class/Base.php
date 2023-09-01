@@ -2,7 +2,6 @@
 /*
 * List Functions
 **/
-define("LIST_MESSAGE_HISTORY",500);
 define("LIST_MESSAGE_SEARCH",600);
 define("LIST_MEMBER",700);
 
@@ -36,6 +35,7 @@ class Base
   public const LIST_THREAD_HISTORY = 200;
   public const LIST_THREAD_SEARCH = 300;
   public const LIST_MESSAGE = 400;
+  public const LIST_MESSAGE_HISTORY = 500;
   public $ajax = false;     // data only flag
   public $xml = false;
   public $name;             // unique name
@@ -85,7 +85,7 @@ class Base
         break;
       case self::LIST_MESSAGE:
       case VIEW_MESSAGE:
-      case LIST_MESSAGE_HISTORY:
+      case self::LIST_MESSAGE_HISTORY:
       case LIST_MESSAGE_SEARCH:
       case VIEW_MESSAGE_HISTORY:
       case VIEW_MESSAGE_SEARCH:
@@ -133,7 +133,7 @@ class Base
       case self::LIST_THREAD_HISTORY:
       case self::LIST_THREAD_SEARCH:
       case self::LIST_MESSAGE:
-      case LIST_MESSAGE_HISTORY:
+      case self::LIST_MESSAGE_HISTORY:
       case LIST_MESSAGE_SEARCH:
         print "<div id=\"quicksearch\"><div class=\"setdown searchwrap\">\n";
         print "<input type=\"text\" class=\"searchtext\" id=\"filter_{$this->name}\"/>\n";
@@ -196,7 +196,7 @@ class Base
       case self::LIST_THREAD_SEARCH:
       case VIEW_THREAD_HISTORY:
       case VIEW_THREAD_SEARCH:
-      case LIST_MESSAGE_HISTORY:
+      case self::LIST_MESSAGE_HISTORY:
       case LIST_MESSAGE_SEARCH:
       case VIEW_MESSAGE_HISTORY:
       case VIEW_MESSAGE_SEARCH:
@@ -210,7 +210,7 @@ class Base
       case self::LIST_THREAD_HISTORY:
       case self::LIST_THREAD_SEARCH:
       case self::LIST_MESSAGE:
-      case LIST_MESSAGE_HISTORY:
+      case self::LIST_MESSAGE_HISTORY:
       case LIST_MESSAGE_SEARCH:
       case VIEW_THREAD_SEARCH:
       case VIEW_THREAD_HISTORY:
@@ -289,7 +289,7 @@ class Base
       case self::LIST_THREAD_HISTORY:
       case self::LIST_THREAD_SEARCH:
       case self::LIST_MESSAGE:
-      case LIST_MESSAGE_HISTORY:
+      case self::LIST_MESSAGE_HISTORY:
       case LIST_MESSAGE_SEARCH:
         print "<script type=\"text/javascript\">\n";
         print "setTimeout(function(){init_search('{$this->name}','list');},50);\n";
