@@ -1,5 +1,4 @@
 <?php
-define("FORM_TEXTAREA",400);
 define("FORM_SELECT",500);
 define("FORM_CHECKBOX",600);
 define("FORM_RADIO",700);
@@ -12,6 +11,7 @@ class Form
   public const FORM_HIDDEN = 100;
   public const FORM_TEXT = 200;
   public const FORM_PASSWORD = 300;
+  public const FORM_TEXTAREA = 400;
   public $name = "form";
   public $ajax = true;
   public $values = array();
@@ -84,7 +84,7 @@ class Form
   function add_textarea($name,$title,$height=100,$width=600,$extra=">")
   {
     $curr = new stdClass();
-    $curr->type   = FORM_TEXTAREA;
+    $curr->type   = self::FORM_TEXTAREA;
     $curr->name   = $name;
     $curr->title = $title;
     $curr->height = $height;
@@ -228,7 +228,7 @@ class Form
     {
       if(isset($this->values[$ob->name]))
       {
-        if($ob->type != FORM_TEXTAREA && !is_array($this->values[$ob->name]))
+        if($ob->type != self::FORM_TEXTAREA && !is_array($this->values[$ob->name]))
         {
           $ob->value=htmlentities($this->values[$ob->name]);
         }
@@ -246,7 +246,7 @@ class Form
       case self::FORM_HIDDEN:      $buff = $this->build_hidden($ob);      break;
       case self::FORM_TEXT:        $buff = $this->build_text($ob);        break;
       case self::FORM_PASSWORD:    $buff = $this->build_password($ob);    break;
-      case FORM_TEXTAREA:    $buff = $this->build_textarea($ob);    break;
+      case self::FORM_TEXTAREA:    $buff = $this->build_textarea($ob);    break;
       case FORM_SELECT:      $buff = $this->build_select($ob);      break;
       case FORM_CHECKBOX:    $buff = $this->build_checkbox($ob);    break;
       case FORM_RADIO:       $buff = $this->build_radio($ob);       break;
