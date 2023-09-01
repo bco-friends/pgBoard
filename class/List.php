@@ -43,14 +43,14 @@ class BoardList extends Base
         if(session('id'))
         {
           if($data[BoardQuery::LIST_LAST_POSTER_ID] != session('id') && $data[LIST_DOTFLAG] == "t") $data['dot'] = LIST_DOT;
-          if($data[LIST_POSTS] != $data[LIST_LAST_VIEW_POSTS]) $data['read'] = SPACE.CSS_READ;
+          if($data[BoardQuery::LIST_POSTS] != $data[LIST_LAST_VIEW_POSTS]) $data['read'] = SPACE.CSS_READ;
         }
         break;
       case Base::LIST_MESSAGE:
         if(session('id'))
         {
           if($data[BoardQuery::LIST_LAST_POSTER_ID] != session('id') && $data[LIST_DOTFLAG] == "t") $data['dot'] = LIST_DOT;
-          if($data[LIST_POSTS] != $data[LIST_LAST_VIEW_POSTS])
+          if($data[BoardQuery::LIST_POSTS] != $data[LIST_LAST_VIEW_POSTS])
           {
             $data['read'] = SPACE.CSS_READ;
             $data['subject'] = "<strong>$data[subject]</strong>";
@@ -95,7 +95,7 @@ class BoardList extends Base
       $firstpost = "<a href=\"javascript:;\" onclick=\"firstpost('{$this->table}',{$field[BoardQuery::LIST_ID]},this);return false;\">".ARROW_RIGHT."</a>&nbsp;";
       if(session('nofirstpost')) $firstpost = "";
       print "<div class=\"{$class}$field[me]\" id=\"{$this->table}_{$field[BoardQuery::LIST_ID]}\">\n";
-      print "<ul class=\"list$field[read]\" ondblclick=\"location.href='/{$this->table}/view/{$field[BoardQuery::LIST_ID]}/&r={$field[LIST_POSTS]}'\">\n";
+      print "<ul class=\"list$field[read]\" ondblclick=\"location.href='/{$this->table}/view/{$field[BoardQuery::LIST_ID]}/&r={$field[BoardQuery::LIST_POSTS]}'\">\n";
       print "  <li class=\"readbar\">&nbsp;</li>\n";
       print "  <li class=\"member\"><span>Thread By: </span>".$Core->member_link($field[BoardQuery::LIST_CREATOR_NAME])."</li>\n";
       print "  <li class=\"subject\">\n";
@@ -103,9 +103,9 @@ class BoardList extends Base
       print "      $field[dot]&nbsp;$field[fav]{$firstpost}\n";
       print "    </div>\n";
       print "    <span>Subject: </span>\n";
-      print "    <a href=\"/{$this->table}/view/{$field[BoardQuery::LIST_ID]}/&p={$field[LIST_POSTS]}\">$field[subject]</a>\n";
+      print "    <a href=\"/{$this->table}/view/{$field[BoardQuery::LIST_ID]}/&p={$field[BoardQuery::LIST_POSTS]}\">$field[subject]</a>\n";
       print "  </li>\n";
-      print "  <li class=\"posts\"><span>Posts: </span>{$field[LIST_POSTS]}</li>\n";
+      print "  <li class=\"posts\"><span>Posts: </span>{$field[BoardQuery::LIST_POSTS]}</li>\n";
       print "  <li class=\"lastpost\"><span>Last Post By:</span>".$Core->member_link($field[BoardQuery::LIST_LAST_POSTER_NAME])." on $field[date]</li>\n";
       print "  <li class=\"readbar\" style=\"float:right\">&nbsp;</li>\n";
       print "</ul>\n";

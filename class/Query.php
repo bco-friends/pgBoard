@@ -2,7 +2,6 @@
 /*
 * list_query constants
 **/
-define("LIST_POSTS",7);
 define("LIST_VIEWS",8);
 define("LIST_FIRSTPOST_BODY",9);
 define("LIST_LAST_VIEW_POSTS",10);
@@ -41,6 +40,7 @@ class BoardQuery
   public const LIST_LAST_POSTER_ID = 4;
   public const LIST_LAST_POSTER_NAME = 5;
   public const LIST_SUBJECT = 6;
+  public const LIST_POSTS = 7;
 
   /**
   * build thread listing query
