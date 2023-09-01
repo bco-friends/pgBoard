@@ -1,8 +1,5 @@
 <?php
-/*
-* List Functions
-**/
-define("LIST_MESSAGE_SEARCH",600);
+
 define("LIST_MEMBER",700);
 
 /*
@@ -31,11 +28,15 @@ define("MISC",2000);
 */
 class Base
 {
+  /**
+  * List Functions
+  */
   public const LIST_THREAD = 100;
   public const LIST_THREAD_HISTORY = 200;
   public const LIST_THREAD_SEARCH = 300;
   public const LIST_MESSAGE = 400;
   public const LIST_MESSAGE_HISTORY = 500;
+  public const LIST_MESSAGE_SEARCH = 600;
   public $ajax = false;     // data only flag
   public $xml = false;
   public $name;             // unique name
@@ -86,7 +87,7 @@ class Base
       case self::LIST_MESSAGE:
       case VIEW_MESSAGE:
       case self::LIST_MESSAGE_HISTORY:
-      case LIST_MESSAGE_SEARCH:
+      case self::LIST_MESSAGE_SEARCH:
       case VIEW_MESSAGE_HISTORY:
       case VIEW_MESSAGE_SEARCH:
         $this->table = "message";
@@ -134,7 +135,7 @@ class Base
       case self::LIST_THREAD_SEARCH:
       case self::LIST_MESSAGE:
       case self::LIST_MESSAGE_HISTORY:
-      case LIST_MESSAGE_SEARCH:
+      case self::LIST_MESSAGE_SEARCH:
         print "<div id=\"quicksearch\"><div class=\"setdown searchwrap\">\n";
         print "<input type=\"text\" class=\"searchtext\" id=\"filter_{$this->name}\"/>\n";
         print "<input type=\"button\" class=\"clearbutton\" value=\"clear\" onclick=\"clear_search('{$this->name}')\"/>\n";
@@ -197,7 +198,7 @@ class Base
       case VIEW_THREAD_HISTORY:
       case VIEW_THREAD_SEARCH:
       case self::LIST_MESSAGE_HISTORY:
-      case LIST_MESSAGE_SEARCH:
+      case self::LIST_MESSAGE_SEARCH:
       case VIEW_MESSAGE_HISTORY:
       case VIEW_MESSAGE_SEARCH:
         $end = 3;
@@ -211,7 +212,7 @@ class Base
       case self::LIST_THREAD_SEARCH:
       case self::LIST_MESSAGE:
       case self::LIST_MESSAGE_HISTORY:
-      case LIST_MESSAGE_SEARCH:
+      case self::LIST_MESSAGE_SEARCH:
       case VIEW_THREAD_SEARCH:
       case VIEW_THREAD_HISTORY:
       case VIEW_MESSAGE_SEARCH:
@@ -290,7 +291,7 @@ class Base
       case self::LIST_THREAD_SEARCH:
       case self::LIST_MESSAGE:
       case self::LIST_MESSAGE_HISTORY:
-      case LIST_MESSAGE_SEARCH:
+      case self::LIST_MESSAGE_SEARCH:
         print "<script type=\"text/javascript\">\n";
         print "setTimeout(function(){init_search('{$this->name}','list');},50);\n";
         print "</script>\n";
