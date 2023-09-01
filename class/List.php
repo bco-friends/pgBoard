@@ -21,7 +21,7 @@ class BoardList extends Base
 
     // start shared parsing
     $data['date'] = date(LIST_DATE_FORMAT,(int)$data[BoardQuery::LIST_DATE_LAST_POST]);
-    $data['subject'] = htmlentities($data[LIST_SUBJECT],ENT_QUOTES,"UTF-8");
+    $data['subject'] = htmlentities($data[BoardQuery::LIST_SUBJECT],ENT_QUOTES,"UTF-8");
 
     $data['dot'] = $data['fav'] = $data['read'] = $data['me'] = "";
     $data['body'] = $Parse->run($data[LIST_FIRSTPOST_BODY]);
