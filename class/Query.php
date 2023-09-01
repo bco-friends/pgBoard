@@ -2,7 +2,6 @@
 /*
 * list_query constants
 **/
-define("LIST_ID",0);
 define("LIST_DATE_LAST_POST",1);
 define("LIST_CREATOR_ID",2);
 define("LIST_CREATOR_NAME",3);
@@ -41,6 +40,8 @@ define("VIEW_CREATOR_IS_ADMIN",8);
 */
 class BoardQuery
 {
+  public const LIST_ID = 0;
+
   /**
   * build thread listing query
   */
@@ -80,9 +81,9 @@ class BoardQuery
       $where = "WHERE t.id in ($threads)";
       $order = "ORDER BY indexOf(t.id,ARRAY[$threads])";
     }
-    
+
     if($cond) $where = $cond;
-    
+
     return "SELECT
               t.id as thread,
               extract(epoch from t.date_last_posted) as date_last_posted,
@@ -281,7 +282,7 @@ class BoardQuery
             $limit
             $offset";
   }
-  
+
   /**
   * build thread view query
   */

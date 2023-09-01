@@ -29,7 +29,7 @@ class BoardList extends Base
     if(session('id'))
     {
       if($data[LIST_CREATOR_ID] == session('id')) $data['me'] = SPACE.CSS_ME;
-      if(in_array($data[LIST_ID],$this->favorites)) $data['fav'] = LIST_FAV.NON_BREAKING_SPACE;
+      if(in_array($data[BoardQuery::LIST_ID],$this->favorites)) $data['fav'] = LIST_FAV.NON_BREAKING_SPACE;
     }
     // end shared parsing
 
@@ -92,10 +92,10 @@ class BoardList extends Base
       $field = $this->prep_data($row);
       $class = ($class==CSS_ODD?CSS_EVEN:CSS_ODD);
       if($field['fav'] != "") $class .= " favorite";
-      $firstpost = "<a href=\"javascript:;\" onclick=\"firstpost('{$this->table}',{$field[LIST_ID]},this);return false;\">".ARROW_RIGHT."</a>&nbsp;";
+      $firstpost = "<a href=\"javascript:;\" onclick=\"firstpost('{$this->table}',{$field[BoardQuery::LIST_ID]},this);return false;\">".ARROW_RIGHT."</a>&nbsp;";
       if(session('nofirstpost')) $firstpost = "";
-      print "<div class=\"{$class}$field[me]\" id=\"{$this->table}_{$field[LIST_ID]}\">\n";
-      print "<ul class=\"list$field[read]\" ondblclick=\"location.href='/{$this->table}/view/{$field[LIST_ID]}/&r={$field[LIST_POSTS]}'\">\n";
+      print "<div class=\"{$class}$field[me]\" id=\"{$this->table}_{$field[BoardQuery::LIST_ID]}\">\n";
+      print "<ul class=\"list$field[read]\" ondblclick=\"location.href='/{$this->table}/view/{$field[BoardQuery::LIST_ID]}/&r={$field[LIST_POSTS]}'\">\n";
       print "  <li class=\"readbar\">&nbsp;</li>\n";
       print "  <li class=\"member\"><span>Thread By: </span>".$Core->member_link($field[LIST_CREATOR_NAME])."</li>\n";
       print "  <li class=\"subject\">\n";
@@ -103,13 +103,13 @@ class BoardList extends Base
       print "      $field[dot]&nbsp;$field[fav]{$firstpost}\n";
       print "    </div>\n";
       print "    <span>Subject: </span>\n";
-      print "    <a href=\"/{$this->table}/view/{$field[LIST_ID]}/&p={$field[LIST_POSTS]}\">$field[subject]</a>\n";
+      print "    <a href=\"/{$this->table}/view/{$field[BoardQuery::LIST_ID]}/&p={$field[LIST_POSTS]}\">$field[subject]</a>\n";
       print "  </li>\n";
       print "  <li class=\"posts\"><span>Posts: </span>{$field[LIST_POSTS]}</li>\n";
       print "  <li class=\"lastpost\"><span>Last Post By:</span>".$Core->member_link($field[LIST_LAST_POSTER_NAME])." on $field[date]</li>\n";
       print "  <li class=\"readbar\" style=\"float:right\">&nbsp;</li>\n";
       print "</ul>\n";
-      print "<div id=\"fp_{$field[LIST_ID]}\" class=\"firstpost\"></div>\n";
+      print "<div id=\"fp_{$field[BoardQuery::LIST_ID]}\" class=\"firstpost\"></div>\n";
       print "</div>\n";
     }
     if(!$this->ajax)
@@ -153,7 +153,7 @@ class BoardList extends Base
       #print "      $field[dot]&nbsp;$field[fav]{$firstpost}\n";
       #print "    </div>\n";
       #print "    <span>Subject: </span>\n";
-      $xmldata .= "    <thread_id>{$field[LIST_ID]}</thread_id>\n";
+      $xmldata .= "    <thread_id>{$field[BoardQuery::LIST_ID]}</thread_id>\n";
       #print "    <a href=\"/{$this->table}/view/{$field[LIST_ID]}/&p={$field[LIST_POSTS]}\">$field[subject]</a>\n";
       #print "  </li>\n";
       #print "  <li class=\"posts\"><span>Posts: </span>{$field[LIST_POSTS]}</li>\n";
