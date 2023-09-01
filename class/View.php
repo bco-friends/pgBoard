@@ -28,7 +28,7 @@ class BoardView extends Base
       if($data[BoardQuery::VIEW_CREATOR_ID] == session('id')) $data['me'] = SPACE.CSS_ME;
     }
 
-    $data['body'] = $Parse->run($data[VIEW_BODY]);
+    $data['body'] = $Parse->run($data[BoardQuery::VIEW_BODY]);
     switch($this->type)
     {
       case Base::VIEW_THREAD_SEARCH:
