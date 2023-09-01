@@ -37,7 +37,7 @@ class BoardList extends Base
     switch($this->type)
     {
       case Base::LIST_THREAD:
-      case LIST_THREAD_HISTORY:
+      case Base::LIST_THREAD_HISTORY:
       case LIST_THREAD_SEARCH:
         if($data[LIST_STICKY] == "t") $data['subject'] = STICKY_TEXT.NON_BREAKING_SPACE.$data['subject'];
         if(session('id'))

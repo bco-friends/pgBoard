@@ -2,7 +2,6 @@
 /*
 * List Functions
 **/
-define("LIST_THREAD_HISTORY",200);
 define("LIST_THREAD_SEARCH",300);
 define("LIST_MESSAGE",400);
 define("LIST_MESSAGE_HISTORY",500);
@@ -36,6 +35,7 @@ define("MISC",2000);
 class Base
 {
   public const LIST_THREAD = 100;
+  public const LIST_THREAD_HISTORY = 200;
   public $ajax = false;     // data only flag
   public $xml = false;
   public $name;             // unique name
@@ -77,7 +77,7 @@ class Base
     {
       case self::LIST_THREAD:
       case VIEW_THREAD:
-      case LIST_THREAD_HISTORY:
+      case self::LIST_THREAD_HISTORY:
       case LIST_THREAD_SEARCH:
       case VIEW_THREAD_HISTORY:
       case VIEW_THREAD_SEARCH:
@@ -130,7 +130,7 @@ class Base
     switch($this->type)
     {
       case self::LIST_THREAD:
-      case LIST_THREAD_HISTORY:
+      case self::LIST_THREAD_HISTORY:
       case LIST_THREAD_SEARCH:
       case LIST_MESSAGE:
       case LIST_MESSAGE_HISTORY:
@@ -192,7 +192,7 @@ class Base
         $end = 2;
         break;
 
-      case LIST_THREAD_HISTORY:
+      case self::LIST_THREAD_HISTORY:
       case LIST_THREAD_SEARCH:
       case VIEW_THREAD_HISTORY:
       case VIEW_THREAD_SEARCH:
@@ -207,7 +207,7 @@ class Base
     switch($this->type)
     {
       case self::LIST_THREAD:
-      case LIST_THREAD_HISTORY:
+      case self::LIST_THREAD_HISTORY:
       case LIST_THREAD_SEARCH:
       case LIST_MESSAGE:
       case LIST_MESSAGE_HISTORY:
@@ -286,7 +286,7 @@ class Base
     switch($this->type)
     {
       case self::LIST_THREAD:
-      case LIST_THREAD_HISTORY:
+      case self::LIST_THREAD_HISTORY:
       case LIST_THREAD_SEARCH:
       case LIST_MESSAGE:
       case LIST_MESSAGE_HISTORY:
