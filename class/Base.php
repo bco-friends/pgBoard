@@ -1,8 +1,6 @@
 <?php
 
-/*
-* View Functions
-**/
+
 /*
 * Various Functions
 **/
@@ -27,6 +25,10 @@ class Base
   public const LIST_MESSAGE_HISTORY = 500;
   public const LIST_MESSAGE_SEARCH = 600;
   public const LIST_MEMBER = 700;
+
+  /**
+  * View Functions
+  */
   public const VIEW_THREAD = 800;
   public const VIEW_THREAD_HISTORY = 900;
   public const VIEW_THREAD_SEARCH = 1000;
