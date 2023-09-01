@@ -1,5 +1,4 @@
 <?php
-
 /**
 * Builds SQL queries for board usage
 *
