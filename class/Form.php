@@ -1,5 +1,4 @@
 <?php
-define("FORM_HIDDEN",100);
 define("FORM_TEXT",200);
 define("FORM_PASSWORD",300);
 define("FORM_TEXTAREA",400);
@@ -12,6 +11,7 @@ define("FORM_DATE",1000);
 
 class Form
 {
+  public const FORM_HIDDEN = 100;
   public $name = "form";
   public $ajax = true;
   public $values = array();
@@ -21,7 +21,7 @@ class Form
   function ajax($ajax) { $this->ajax = $ajax; }
   function values($values) { $this->values = $values; }
   function labels($labels) { $this->labels = $labels; }
-  
+
   function header($action,$method,$__fac__)
   {
     print "<div id=\"response_{$this->name}\"></div>\n";
@@ -29,14 +29,14 @@ class Form
     print "<input type=\"hidden\" name=\"_fac\" id=\"_fac\" value=\"$__fac__\"/>\n";
   }
   function footer() { print "</form>\n"; }
-    
+
   function fieldset_open($title)
   {
     print "<fieldset>\n";
     print "  <legend>$title</legend>\n";
     print "  <ol>\n";
   }
-  
+
   function fieldset_close()
   {
     print "  </ol>\n";
@@ -46,7 +46,7 @@ class Form
   function add_hidden($name)
   {
     $curr = new stdClass();
-    $curr->type  = FORM_HIDDEN;
+    $curr->type  = self::FORM_HIDDEN;
     $curr->name  = $name;
     return $this->build_element($curr);
   }
@@ -63,7 +63,7 @@ class Form
     if($max) $curr->max = $max;
     return $this->build_element($curr);
   }
-  
+
   function add_date($name,$title,$width=100)
   {
     $init = "/><script type=\"text/javascript\">$('#{$name}').datePicker({startDate:'2005-01-01'});</script>\n";
@@ -92,7 +92,7 @@ class Form
     $curr->extra = $extra;
     return $this->build_element($curr);
   }
-  
+
   function add_select($name,$title,$initial,$data=false,$extra=">")
   {
     $curr = new stdClass();
@@ -128,7 +128,7 @@ class Form
 
     return $this->build_element($curr);
   }
-  
+
   function add_button($name,$value,$func=false,$extra="/>")
   {
     $curr = new stdClass();
@@ -148,7 +148,7 @@ class Form
     $curr->extra = $extra;
     return $this->build_element($curr);
   }
-  
+
   function add_data($title,$text)
   {
     $output = "";
@@ -175,7 +175,7 @@ class Form
   {
     return "<input type=\"password\" name=\"$ob->name\" id=\"$ob->name\" value=\"$ob->value\" style=\"width:{$ob->width}px;\"$ob->extra";
   }
-  
+
   function build_textarea($ob)
   {
     $output = "<textarea name=\"$ob->name\" id=\"$ob->name\" style=\"float:left;height:{$ob->height}px;width:{$ob->width}px;\"{$ob->extra}$ob->value</textarea>";
@@ -216,7 +216,7 @@ class Form
   {
     return "<input type=\"button\" name=\"$ob->name\" id=\"$ob->name\" value=\"$ob->value\" onclick=\"$ob->func\"$ob->extra";
   }
-  
+
   function build_submit($ob)
   {
     return "<input type=\"submit\" class=\"submit\" value=\"$ob->value\"$ob->extra\n";
@@ -240,10 +240,10 @@ class Form
     }
 
     $ob->extra = isset($ob->extra) ? " $ob->extra" : "";
-    
+
     switch($ob->type)
     {
-      case FORM_HIDDEN:      $buff = $this->build_hidden($ob);      break;
+      case self::FORM_HIDDEN:      $buff = $this->build_hidden($ob);      break;
       case FORM_TEXT:        $buff = $this->build_text($ob);        break;
       case FORM_PASSWORD:    $buff = $this->build_password($ob);    break;
       case FORM_TEXTAREA:    $buff = $this->build_textarea($ob);    break;
@@ -264,10 +264,10 @@ class Form
     }
     else
     $output = $buff;
-      
+
     print $output;
   }
-  
+
   // clean up completed function branch
   function header_validate()
   {
