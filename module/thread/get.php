@@ -9,7 +9,7 @@ function list_get()
   $xmldata = '';
 
   $Query = new BoardQuery;
-  $List = new BoardList;
+  $List = BoardList::init();
   $List->type(Base::LIST_THREAD);
 
   $_title_ = TITLE_BOARD;
@@ -177,7 +177,7 @@ function listbymember_get()
   if(!$id || !$name) return to_index();
 
   $Query = new BoardQuery;
-  $List = new BoardList;
+  $List = BoardList::init();
   $List->type(Base::LIST_THREAD_HISTORY);
 
   $List->title("Threads Created: $name");
@@ -221,7 +221,7 @@ function listbymemberposted_get()
   if (!$threads) $threads = array(0);
 
   $Query = new BoardQuery;
-  $List = new BoardList;
+  $List = BoardList::init();
   $List->type(Base::LIST_THREAD_HISTORY);
 
   $List->title("Threads Participated: $name");
@@ -264,7 +264,7 @@ function listfavoritesbymember_get()
   if (!$threads) $threads = array(0);
 
   $Query = new BoardQuery;
-  $List = new BoardList;
+  $List = BoardList::init();
   $List->type(Base::LIST_THREAD_HISTORY);
 
   $List->title("Favorites: $name");
@@ -307,7 +307,7 @@ function listignoredthreadsbymember_get()
   if (!$threads) $threads = array(0);
 
   $Query = new BoardQuery;
-  $List = new BoardList;
+  $List = BoardList::init();
   $List->type(Base::LIST_THREAD_HISTORY);
 
   $List->title("Ignored threads: $name");

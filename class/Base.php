@@ -49,24 +49,17 @@ class Base
   public $subtitle = "";
 
 
-  function __construct()
-  {
-    global $DB;
-    $this->name = "l".substr(md5(time()),0,5);
-    if(session('id'))
-    {
-      $DB->query("UPDATE member SET last_view=now() WHERE id=$1",array(session('id')));
-    }
-    if(session('blocked')) $this->blocked(session('blocked'));
-    if(get('ajax')) $this->ajax = true;
-    if(get('xml')) $this->xml = true;
-  }
+  public function __construct(
+    public DB $db
+  ) {}
 
-  public static function init(): Base
+  public static function init()
   {
     global $DB;
 
-    $base = new self();
+    $called_classname = get_called_class();
+
+    $base = new $called_classname($DB);
 
     $base->name = "l" . substr(md5(time()), 0, 5);
     if (session('id'))

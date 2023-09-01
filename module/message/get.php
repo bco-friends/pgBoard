@@ -6,7 +6,7 @@ function list_get()
   global $DB;
 
   $Query = new BoardQuery;
-  $List = new BoardList;
+  $List = BoardList::init();
   $List->type(Base::LIST_MESSAGE);
 
   $List->title(TITLE_BOARD);

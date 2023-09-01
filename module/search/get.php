@@ -11,7 +11,7 @@ function thread_get()
   $page = cmd(3,true)+1;
 
   $Query = new BoardQuery;
-  $List = new BoardList;
+  $List = BoardList::init();
   $List->type(Base::LIST_THREAD_SEARCH);
 
   $List->title("Search Threads: ".htmlentities(cmd(2)));
