@@ -1,5 +1,4 @@
 <?php
-define("FORM_RADIO",700);
 define("FORM_BUTTON",800);
 define("FORM_SUBMIT",900);
 define("FORM_DATE",1000);
@@ -12,6 +11,7 @@ class Form
   public const FORM_TEXTAREA = 400;
   public const FORM_SELECT = 500;
   public const FORM_CHECKBOX = 600;
+  public const FORM_RADIO = 700;
   public $name = "form";
   public $ajax = true;
   public $values = array();
@@ -119,7 +119,7 @@ class Form
   function add_radio($name,$title,$val,$id,$extra="/>")
   {
     $curr = new stdClass();
-    $curr->type  = FORM_RADIO;
+    $curr->type  = self::FORM_RADIO;
     $curr->name  = $name;
     $curr->title = $title;
     $curr->val   = $val;
@@ -249,7 +249,7 @@ class Form
       case self::FORM_TEXTAREA:    $buff = $this->build_textarea($ob);    break;
       case self::FORM_SELECT:      $buff = $this->build_select($ob);      break;
       case self::FORM_CHECKBOX:    $buff = $this->build_checkbox($ob);    break;
-      case FORM_RADIO:       $buff = $this->build_radio($ob);       break;
+      case self::FORM_RADIO:       $buff = $this->build_radio($ob);       break;
       case FORM_BUTTON:      $buff = $this->build_button($ob);      break;
       case FORM_SUBMIT:      $buff = $this->build_submit($ob);      break;
     }
