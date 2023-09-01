@@ -13,15 +13,15 @@ function previewpost_post()
   if(id()) $cmd[3] = $DB->value("SELECT posts FROM thread WHERE id=$1",array(id()));
 
   // fake database resultset
-  $data = array();
-  $data[0][VIEW_ID] = 99999999; // use new parser
-  $data[0][VIEW_DATE_POSTED] = time();
-  $data[0][VIEW_CREATOR_ID] = post('member_id');
-  $data[0][VIEW_CREATOR_NAME] = $Core->namefromid(post('member_id'));
-  $data[0][VIEW_BODY] = post('body');
-  $data[0][VIEW_CREATOR_IP] = "";
-  $data[0][VIEW_SUBJECT] = "";
-  $data[0][VIEW_THREAD_ID] = "";
+  $data                           = array();
+  $data[0][BoardQuery::VIEW_ID]   = 99999999; // use new parser
+  $data[0][VIEW_DATE_POSTED]      = time();
+  $data[0][VIEW_CREATOR_ID]       = post('member_id');
+  $data[0][VIEW_CREATOR_NAME]     = $Core->namefromid(post('member_id'));
+  $data[0][VIEW_BODY]             = post('body');
+  $data[0][VIEW_CREATOR_IP]       = "";
+  $data[0][VIEW_SUBJECT]          = "";
+  $data[0][VIEW_THREAD_ID]        = "";
   $data[0][VIEW_CREATOR_IS_ADMIN] = session('admin') ? 't' : 'f';
 
   // use standard board display to build preview

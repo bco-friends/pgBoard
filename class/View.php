@@ -38,10 +38,10 @@ class BoardView extends Base
 
       case Base::VIEW_THREAD:
       case Base::VIEW_MESSAGE:
-        $data['quote'] = NON_BREAKING_SPACE.ARROW_RIGHT." <a href=\"javascript:;\" onclick=\"quote_post({$data[VIEW_ID]})\"\">quote</a>";
+        $data['quote'] = NON_BREAKING_SPACE.ARROW_RIGHT." <a href=\"javascript:;\" onclick=\"quote_post({$data[BoardQuery::VIEW_ID]})\"\">quote</a>";
     }
 
-    if(session('admin')) $data['admin'] = NON_BREAKING_SPACE.ARROW_RIGHT." <a href=\"/admin/editpost/{$data[VIEW_ID]}/\">edit</a>";
+    if(session('admin')) $data['admin'] = NON_BREAKING_SPACE.ARROW_RIGHT." <a href=\"/admin/editpost/{$data[BoardQuery::VIEW_ID]}/\">edit</a>";
 
     // Start Parsing Override
     $Plugin = new BoardPlugin;
@@ -136,8 +136,8 @@ class BoardView extends Base
       $field = $this->prep_data($row);
       $count = "#{$i}";
       if(session('nopostnumber')) $count = "";
-      print "<div id=\"view_".id()."_{$field[VIEW_ID]}_{$i}\" class=\"post\">\n";
-      print "<ul class=\"view\" id=\"post_{$field[VIEW_ID]}\">\n";
+      print "<div id=\"view_".id()."_{$field[BoardQuery::VIEW_ID]}_{$i}\" class=\"post\">\n";
+      print "<ul class=\"view\" id=\"post_{$field[BoardQuery::VIEW_ID]}\">\n";
       print "  <li class=\"info even$field[me]\">\n";
       print "    <div class=\"postinfo\">".$Core->member_link($field[VIEW_CREATOR_NAME])." posted this on $field[date]</div>\n";
       print "    <div class=\"controls\">$field[quote]$field[admin]</div>\n";
@@ -224,7 +224,7 @@ class BoardView extends Base
       $count = "#{$i}";
       #if(session('nopostnumber')) $count = "";
       print "<post number=\"$i\">";
-      print "<id>{$field[VIEW_ID]}</id>\n";
+      print "<id>{$field[BoardQuery::VIEW_ID]}</id>\n";
       print "<member>{$field[VIEW_CREATOR_NAME]}</member>\n";
       print "<date>{$field['date']}</date>\n";
       print "<body>{$field['body']}</body>\n";

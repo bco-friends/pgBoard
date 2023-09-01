@@ -1,8 +1,4 @@
 <?php
-/*
-* view_query constants
-**/
-define("VIEW_ID",0);
 define("VIEW_DATE_POSTED",1);
 define("VIEW_CREATOR_ID",2);
 define("VIEW_CREATOR_NAME",3);
@@ -40,6 +36,11 @@ class BoardQuery
   public const LIST_STICKY = 12;
   public const LIST_LOCKED = 13;
   public const LIST_LEGENDARY = 14;
+
+  /**
+  * view_query constants
+  **/
+  public const VIEW_ID = 0;
 
   /**
   * build thread listing query
