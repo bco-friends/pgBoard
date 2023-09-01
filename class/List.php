@@ -24,7 +24,7 @@ class BoardList extends Base
     $data['subject'] = htmlentities($data[BoardQuery::LIST_SUBJECT],ENT_QUOTES,"UTF-8");
 
     $data['dot'] = $data['fav'] = $data['read'] = $data['me'] = "";
-    $data['body'] = $Parse->run($data[LIST_FIRSTPOST_BODY]);
+    $data['body'] = $Parse->run($data[BoardQuery::LIST_FIRSTPOST_BODY]);
 
     if(session('id'))
     {
