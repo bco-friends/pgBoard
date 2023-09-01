@@ -3,7 +3,6 @@
 /*
 * View Functions
 **/
-define("VIEW_MEMBER",1500);
 /*
 * Various Functions
 **/
@@ -36,6 +35,7 @@ class Base
   public const VIEW_MESSAGE_HISTORY = 1300;
   public const VIEW_MESSAGE_SEARCH = 1400;
   public const VIEW_MESSAGE_PREVIEW = 1100;
+  public const VIEW_MEMBER = 1500;
 
 
   public $ajax = false;     // data only flag
@@ -238,7 +238,7 @@ class Base
         break;
 
 
-    case VIEW_MEMBER:
+    case self::VIEW_MEMBER:
         if(!is_numeric(id())) $idnum = $Core->idfromname(id());
         else
         $idnum = $DB->value("SELECT id FROM member WHERE name=$1",array(id()));
