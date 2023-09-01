@@ -106,7 +106,7 @@ class BoardList extends Base
       print "    <a href=\"/{$this->table}/view/{$field[BoardQuery::LIST_ID]}/&p={$field[LIST_POSTS]}\">$field[subject]</a>\n";
       print "  </li>\n";
       print "  <li class=\"posts\"><span>Posts: </span>{$field[LIST_POSTS]}</li>\n";
-      print "  <li class=\"lastpost\"><span>Last Post By:</span>".$Core->member_link($field[LIST_LAST_POSTER_NAME])." on $field[date]</li>\n";
+      print "  <li class=\"lastpost\"><span>Last Post By:</span>".$Core->member_link($field[BoardQuery::LIST_LAST_POSTER_NAME])." on $field[date]</li>\n";
       print "  <li class=\"readbar\" style=\"float:right\">&nbsp;</li>\n";
       print "</ul>\n";
       print "<div id=\"fp_{$field[BoardQuery::LIST_ID]}\" class=\"firstpost\"></div>\n";
