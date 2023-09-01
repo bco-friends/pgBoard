@@ -2,7 +2,6 @@
 /*
 * List Functions
 **/
-define("LIST_THREAD",100);
 define("LIST_THREAD_HISTORY",200);
 define("LIST_THREAD_SEARCH",300);
 define("LIST_MESSAGE",400);
@@ -36,6 +35,7 @@ define("MISC",2000);
 */
 class Base
 {
+  public const LIST_THREAD = 100;
   public $ajax = false;     // data only flag
   public $xml = false;
   public $name;             // unique name
@@ -44,7 +44,7 @@ class Base
   public $table;            // table split for thread/message
   public $blocked = false;  // blocked members
   public $subtitle = "";
-  
+
 
   function __construct()
   {
@@ -75,7 +75,7 @@ class Base
     $this->type = $type;
     switch($this->type)
     {
-      case LIST_THREAD:
+      case self::LIST_THREAD:
       case VIEW_THREAD:
       case LIST_THREAD_HISTORY:
       case LIST_THREAD_SEARCH:
@@ -118,18 +118,18 @@ class Base
     print "  <div class=\"clear\"></div>\n";
     if($loadmenu) $this->header_menu();
   }
-  
+
   function header_menu()
   {
     global $Core,$_menu_;
-    
+
     if(!isset($this->type) || $this->ajax) return;
     if(!isset($this->type) || $this->xml) return;
 
     // quicksearch
     switch($this->type)
     {
-      case LIST_THREAD:
+      case self::LIST_THREAD:
       case LIST_THREAD_HISTORY:
       case LIST_THREAD_SEARCH:
       case LIST_MESSAGE:
@@ -149,7 +149,7 @@ class Base
       $p = $Core->message_unread_post_count(session('id'));
       if($m != 0 || $p != 0) $messages = " <strong class=\"blink\">({$m}/{$p})</strong>";
     }
-    
+
     $c = $Core->chatting_member_count();
     if($c != 0) $chatters = " ({$c})";
 
@@ -181,17 +181,17 @@ class Base
   function footer_menu()
   {
     global $DB,$Security,$Core;
-    
+
     // setup message/thread split and next/prev offsets from url
     switch($this->type)
     {
-      case LIST_THREAD:
+      case self::LIST_THREAD:
       case VIEW_THREAD:
       case LIST_MESSAGE:
       case VIEW_MESSAGE:
         $end = 2;
         break;
-        
+
       case LIST_THREAD_HISTORY:
       case LIST_THREAD_SEARCH:
       case VIEW_THREAD_HISTORY:
@@ -206,7 +206,7 @@ class Base
 
     switch($this->type)
     {
-      case LIST_THREAD:
+      case self::LIST_THREAD:
       case LIST_THREAD_HISTORY:
       case LIST_THREAD_SEARCH:
       case LIST_MESSAGE:
@@ -285,7 +285,7 @@ class Base
     if($loadmenu) $this->footer_menu();
     switch($this->type)
     {
-      case LIST_THREAD:
+      case self::LIST_THREAD:
       case LIST_THREAD_HISTORY:
       case LIST_THREAD_SEARCH:
       case LIST_MESSAGE:
@@ -294,6 +294,6 @@ class Base
         print "<script type=\"text/javascript\">\n";
         print "setTimeout(function(){init_search('{$this->name}','list');},50);\n";
         print "</script>\n";
-    } 
+    }
   }
 }

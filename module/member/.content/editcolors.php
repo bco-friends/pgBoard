@@ -242,7 +242,7 @@ $list[2][LIST_CREATOR_ID] = session('id');
 $list[2][LIST_CREATOR_NAME] = $Core->namefromid(session('id'));
 $list[3] = $list[0];
 $List = new BoardList;
-$List->type(LIST_THREAD);
+$List->type(Base::LIST_THREAD);
 $List->data($list);
 $List->thread();
 

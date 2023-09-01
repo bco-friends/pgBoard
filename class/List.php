@@ -36,7 +36,7 @@ class BoardList extends Base
     // start list specific parsing
     switch($this->type)
     {
-      case LIST_THREAD:
+      case Base::LIST_THREAD:
       case LIST_THREAD_HISTORY:
       case LIST_THREAD_SEARCH:
         if($data[LIST_STICKY] == "t") $data['subject'] = STICKY_TEXT.NON_BREAKING_SPACE.$data['subject'];
@@ -59,7 +59,7 @@ class BoardList extends Base
         break;
     }
     // end list specific parsing
-    
+
     // Start Parsing Override
     $Plugin = new BoardPlugin;
     $data = $Plugin->list_prep_data($data,$row);
@@ -72,7 +72,7 @@ class BoardList extends Base
   function thread($stickies=false) // this stickies flag is crap, find a better way
   {
     global $Core;
-    
+
     if(!isset($this->data))
     {
       print "No data to display specified.";
@@ -124,7 +124,7 @@ class BoardList extends Base
   function thread_xml($stickies)
   {
     global $Core;
-     
+
     if(!isset($this->data))
     {
       print "No data to display specified.";
@@ -166,6 +166,6 @@ class BoardList extends Base
     }
     return $xmldata; // return the data
   }
-  
+
   function message() { $this->thread(); }
 }

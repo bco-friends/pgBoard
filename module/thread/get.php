@@ -10,7 +10,7 @@ function list_get()
 
   $Query = new BoardQuery;
   $List = new BoardList;
-  $List->type(LIST_THREAD);
+  $List->type(Base::LIST_THREAD);
 
   $_title_ = TITLE_BOARD;
 
