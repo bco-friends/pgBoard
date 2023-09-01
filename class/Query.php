@@ -2,7 +2,6 @@
 /*
 * list_query constants
 **/
-define("LIST_DATE_LAST_POST",1);
 define("LIST_CREATOR_ID",2);
 define("LIST_CREATOR_NAME",3);
 define("LIST_LAST_POSTER_ID",4);
@@ -41,6 +40,7 @@ define("VIEW_CREATOR_IS_ADMIN",8);
 class BoardQuery
 {
   public const LIST_ID = 0;
+  public const LIST_DATE_LAST_POST = 1;
 
   /**
   * build thread listing query

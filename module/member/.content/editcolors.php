@@ -222,7 +222,7 @@ $Form->footer();
 <?php
 $list                         = array();
 $list[0][BoardQuery::LIST_ID] = 0;
-$list[0][LIST_DATE_LAST_POST] = time();
+$list[0][BoardQuery::LIST_DATE_LAST_POST] = time();
 $list[0][LIST_CREATOR_ID] = 0;
 $list[0][LIST_CREATOR_NAME] = "color scheme";
 $list[0][LIST_LAST_POSTER_ID] = 0;
