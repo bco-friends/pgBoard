@@ -1,6 +1,4 @@
 <?php
-define("VIEW_THREAD_ID",7);
-define("VIEW_CREATOR_IS_ADMIN",8);
 
 /**
 * Builds SQL queries for board usage
@@ -41,6 +39,8 @@ class BoardQuery
   public const VIEW_BODY = 4;
   public const VIEW_CREATOR_IP = 5;
   public const VIEW_SUBJECT = 6;
+  public const VIEW_THREAD_ID = 7;
+  public const VIEW_CREATOR_IS_ADMIN = 8;
 
   /**
   * build thread listing query

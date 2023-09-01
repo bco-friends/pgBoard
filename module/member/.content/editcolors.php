@@ -256,8 +256,8 @@ $view[0][BoardQuery::VIEW_CREATOR_NAME] = "color scheme";
 $view[0][BoardQuery::VIEW_BODY] = "color scheme post text";
 $view[0][BoardQuery::VIEW_CREATOR_IP] = "";
 $view[0][BoardQuery::VIEW_SUBJECT] = "";
-$view[0][VIEW_THREAD_ID] = "";
-$view[0][VIEW_CREATOR_IS_ADMIN] = 'f';
+$view[0][BoardQuery::VIEW_THREAD_ID] = "";
+$view[0][BoardQuery::VIEW_CREATOR_IS_ADMIN] = 'f';
 
 $view[1] = $view[0];
 $view[2] = $view[0];
