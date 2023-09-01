@@ -1,7 +1,5 @@
 <?php
 
-define("LIST_MEMBER",700);
-
 /*
 * View Functions
 **/
@@ -37,6 +35,7 @@ class Base
   public const LIST_MESSAGE = 400;
   public const LIST_MESSAGE_HISTORY = 500;
   public const LIST_MESSAGE_SEARCH = 600;
+  public const LIST_MEMBER = 700;
   public $ajax = false;     // data only flag
   public $xml = false;
   public $name;             // unique name
