@@ -97,7 +97,7 @@ class BoardList extends Base
       print "<div class=\"{$class}$field[me]\" id=\"{$this->table}_{$field[BoardQuery::LIST_ID]}\">\n";
       print "<ul class=\"list$field[read]\" ondblclick=\"location.href='/{$this->table}/view/{$field[BoardQuery::LIST_ID]}/&r={$field[LIST_POSTS]}'\">\n";
       print "  <li class=\"readbar\">&nbsp;</li>\n";
-      print "  <li class=\"member\"><span>Thread By: </span>".$Core->member_link($field[LIST_CREATOR_NAME])."</li>\n";
+      print "  <li class=\"member\"><span>Thread By: </span>".$Core->member_link($field[BoardQuery::LIST_CREATOR_NAME])."</li>\n";
       print "  <li class=\"subject\">\n";
       print "    <div class=\"extra\">\n";
       print "      $field[dot]&nbsp;$field[fav]{$firstpost}\n";
@@ -147,7 +147,7 @@ class BoardList extends Base
       #print "  <class=\"{$class}$field[me]\" id=\"{$this->table}_{$field[LIST_ID]}\">\n";
       #print "<ul class=\"list$field[read]\" ondblclick=\"location.href='/{$this->table}/view/{$field[LIST_ID]}/&r={$field[LIST_POSTS]}'\">\n";
       #print "  <li class=\"readbar\">&nbsp;</li>\n";
-      $xmldata .= "    <member>{$field[LIST_CREATOR_NAME]}</member>\n";
+      $xmldata .= "    <member>{$field[BoardQuery::LIST_CREATOR_NAME]}</member>\n";
       #print "  <li class=\"subject\">\n";
       #print "    <div class=\"extra\">\n";
       #print "      $field[dot]&nbsp;$field[fav]{$firstpost}\n";
