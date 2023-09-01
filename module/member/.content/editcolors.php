@@ -251,7 +251,7 @@ print "<br/>";
 $view                         = array();
 $view[0][BoardQuery::VIEW_ID] = "";
 $view[0][BoardQuery::VIEW_DATE_POSTED]    = time();
-$view[0][VIEW_CREATOR_ID] = 0;
+$view[0][BoardQuery::VIEW_CREATOR_ID] = 0;
 $view[0][VIEW_CREATOR_NAME] = "color scheme";
 $view[0][VIEW_BODY] = "color scheme post text";
 $view[0][VIEW_CREATOR_IP] = "";
@@ -261,7 +261,7 @@ $view[0][VIEW_CREATOR_IS_ADMIN] = 'f';
 
 $view[1] = $view[0];
 $view[2] = $view[0];
-$view[2][VIEW_CREATOR_ID] = session('id');
+$view[2][BoardQuery::VIEW_CREATOR_ID] = session('id');
 $view[2][VIEW_CREATOR_NAME] = $Core->namefromid(session('id'));
 $view[3] = $view[0];
 

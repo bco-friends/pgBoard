@@ -16,7 +16,7 @@ function previewpost_post()
   $data                           = array();
   $data[0][BoardQuery::VIEW_ID]   = 99999999; // use new parser
   $data[0][BoardQuery::VIEW_DATE_POSTED]      = time();
-  $data[0][VIEW_CREATOR_ID]       = post('member_id');
+  $data[0][BoardQuery::VIEW_CREATOR_ID]       = post('member_id');
   $data[0][VIEW_CREATOR_NAME]     = $Core->namefromid(post('member_id'));
   $data[0][VIEW_BODY]             = post('body');
   $data[0][VIEW_CREATOR_IP]       = "";

@@ -25,7 +25,7 @@ class BoardView extends Base
     $data['me'] = $data['quote'] = $data['admin'] = "";
     if(session('id'))
     {
-      if($data[VIEW_CREATOR_ID] == session('id')) $data['me'] = SPACE.CSS_ME;
+      if($data[BoardQuery::VIEW_CREATOR_ID] == session('id')) $data['me'] = SPACE.CSS_ME;
     }
 
     $data['body'] = $Parse->run($data[VIEW_BODY]);
