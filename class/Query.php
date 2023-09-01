@@ -1,9 +1,5 @@
 <?php
 /*
-* list_query constants
-**/
-
-/*
 * view_query constants
 **/
 define("VIEW_ID",0);
@@ -26,6 +22,9 @@ define("VIEW_CREATOR_IS_ADMIN",8);
 */
 class BoardQuery
 {
+  /**
+  * list_query constants
+  **/
   public const LIST_ID = 0;
   public const LIST_DATE_LAST_POST = 1;
   public const LIST_CREATOR_ID = 2;
