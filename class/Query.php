@@ -2,7 +2,6 @@
 /*
 * list_query constants
 **/
-define("LIST_STICKY",12);
 define("LIST_LOCKED",13);
 define("LIST_LEGENDARY",14);
 
@@ -41,6 +40,7 @@ class BoardQuery
   public const LIST_FIRSTPOST_BODY = 9;
   public const LIST_LAST_VIEW_POSTS = 10;
   public const LIST_DOTFLAG = 11;
+  public const LIST_STICKY = 12;
 
   /**
   * build thread listing query
