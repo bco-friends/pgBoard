@@ -1,5 +1,4 @@
 <?php
-define("FORM_SUBMIT",900);
 define("FORM_DATE",1000);
 
 class Form
@@ -12,6 +11,7 @@ class Form
   public const FORM_CHECKBOX = 600;
   public const FORM_RADIO = 700;
   public const FORM_BUTTON = 800;
+  public const FORM_SUBMIT = 900;
   public $name = "form";
   public $ajax = true;
   public $values = array();
@@ -143,7 +143,7 @@ class Form
   function add_submit($value,$extra="/>")
   {
     $curr = new stdClass();
-    $curr->type  = FORM_SUBMIT;
+    $curr->type  = self::FORM_SUBMIT;
     $curr->value = $value;
     $curr->extra = $extra;
     return $this->build_element($curr);
@@ -224,7 +224,7 @@ class Form
 
   function build_element($ob)
   {
-    if($ob->type != FORM_SUBMIT && $ob->type != self::FORM_BUTTON)
+    if($ob->type != self::FORM_SUBMIT && $ob->type != self::FORM_BUTTON)
     {
       if(isset($this->values[$ob->name]))
       {
@@ -251,7 +251,7 @@ class Form
       case self::FORM_CHECKBOX:    $buff = $this->build_checkbox($ob);    break;
       case self::FORM_RADIO:       $buff = $this->build_radio($ob);       break;
       case self::FORM_BUTTON:      $buff = $this->build_button($ob);      break;
-      case FORM_SUBMIT:      $buff = $this->build_submit($ob);      break;
+      case self::FORM_SUBMIT:      $buff = $this->build_submit($ob);      break;
     }
     $output = "";
     if(isset($ob->title) && $this->labels)
