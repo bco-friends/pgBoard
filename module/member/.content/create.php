@@ -2,7 +2,7 @@
 if(session('id') || !REGISTRATION_OPEN) return to_index();
 
 $Base = new Base;
-$Base->type(CREATE);
+$Base->type(Base::CREATE);
 $Base->title("Create Account");
 $Base->header();
 
@@ -17,7 +17,7 @@ if(REGISTRATION_PASSWORD && !session('authorized'))
 {
   $Form = new Form;
   $Form->header(url(0,-1)."authorize/","post",FORM_SALT);
-  
+
   $Form->fieldset_open("Registration Authorization");
   $Form->add_password("password","Password:");
   $Form->fieldset_close();

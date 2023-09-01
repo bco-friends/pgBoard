@@ -1,10 +1,4 @@
 <?php
-
-
-/*
-* Various Functions
-**/
-define("CREATE",1600);
 define("EDIT",1700);
 define("SEARCH",1800);
 define("ERROR",1900);
@@ -38,6 +32,11 @@ class Base
   public const VIEW_MESSAGE_SEARCH = 1400;
   public const VIEW_MESSAGE_PREVIEW = 1100;
   public const VIEW_MEMBER = 1500;
+
+  /**
+   * Various Functions
+   */
+  public const CREATE = 1600;
 
 
   public $ajax = false;     // data only flag
@@ -172,7 +171,7 @@ class Base
     // line under nav (not showing standard board display)
     switch($this->type)
     {
-      case CREATE:
+      case self::CREATE:
       case EDIT:
       case SEARCH:
       case ERROR:

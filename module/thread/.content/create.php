@@ -1,6 +1,6 @@
 <?php
 $Base = new Base;
-$Base->type(CREATE);
+$Base->type(Base::CREATE);
 $Base->title("Create New Thread");
 $Base->header();
 
