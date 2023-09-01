@@ -1,5 +1,4 @@
 <?php
-define("FORM_PASSWORD",300);
 define("FORM_TEXTAREA",400);
 define("FORM_SELECT",500);
 define("FORM_CHECKBOX",600);
@@ -12,6 +11,7 @@ class Form
 {
   public const FORM_HIDDEN = 100;
   public const FORM_TEXT = 200;
+  public const FORM_PASSWORD = 300;
   public $name = "form";
   public $ajax = true;
   public $values = array();
@@ -73,7 +73,7 @@ class Form
   function add_password($name,$title,$width=150,$extra="/>")
   {
     $curr = new stdClass();
-    $curr->type  = FORM_PASSWORD;
+    $curr->type  = self::FORM_PASSWORD;
     $curr->name  = $name;
     $curr->title = $title;
     $curr->width = $width;
@@ -245,7 +245,7 @@ class Form
     {
       case self::FORM_HIDDEN:      $buff = $this->build_hidden($ob);      break;
       case self::FORM_TEXT:        $buff = $this->build_text($ob);        break;
-      case FORM_PASSWORD:    $buff = $this->build_password($ob);    break;
+      case self::FORM_PASSWORD:    $buff = $this->build_password($ob);    break;
       case FORM_TEXTAREA:    $buff = $this->build_textarea($ob);    break;
       case FORM_SELECT:      $buff = $this->build_select($ob);      break;
       case FORM_CHECKBOX:    $buff = $this->build_checkbox($ob);    break;
