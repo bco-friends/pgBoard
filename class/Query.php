@@ -2,7 +2,6 @@
 /*
 * list_query constants
 **/
-define("LIST_LEGENDARY",14);
 
 /*
 * view_query constants
@@ -41,6 +40,7 @@ class BoardQuery
   public const LIST_DOTFLAG = 11;
   public const LIST_STICKY = 12;
   public const LIST_LOCKED = 13;
+  public const LIST_LEGENDARY = 14;
 
   /**
   * build thread listing query
