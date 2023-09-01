@@ -1,5 +1,4 @@
 <?php
-define("FORM_TEXT",200);
 define("FORM_PASSWORD",300);
 define("FORM_TEXTAREA",400);
 define("FORM_SELECT",500);
@@ -12,6 +11,7 @@ define("FORM_DATE",1000);
 class Form
 {
   public const FORM_HIDDEN = 100;
+  public const FORM_TEXT = 200;
   public $name = "form";
   public $ajax = true;
   public $values = array();
@@ -55,7 +55,7 @@ class Form
   function add_text($name,$title,$width=150,$max=false,$extra="/>")
   {
     $curr = new stdClass();
-    $curr->type  = FORM_TEXT;
+    $curr->type  = self::FORM_TEXT;
     $curr->name  = $name;
     $curr->title = $title;
     $curr->width = $width;
@@ -244,7 +244,7 @@ class Form
     switch($ob->type)
     {
       case self::FORM_HIDDEN:      $buff = $this->build_hidden($ob);      break;
-      case FORM_TEXT:        $buff = $this->build_text($ob);        break;
+      case self::FORM_TEXT:        $buff = $this->build_text($ob);        break;
       case FORM_PASSWORD:    $buff = $this->build_password($ob);    break;
       case FORM_TEXTAREA:    $buff = $this->build_textarea($ob);    break;
       case FORM_SELECT:      $buff = $this->build_select($ob);      break;
