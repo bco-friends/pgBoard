@@ -25,7 +25,7 @@ function previewpost_post()
   $data[0][BoardQuery::VIEW_CREATOR_IS_ADMIN] = session('admin') ? 't' : 'f';
 
   // use standard board display to build preview
-  $View = new BoardView;
+  $View = BoardView::init();
   $View->type(Base::VIEW_THREAD_PREVIEW);
   $View->data($data);
   $View->thread();
@@ -53,7 +53,7 @@ function reply_post()
 function view_post()
 {
   global $DB;
-  $View = new BoardView;
+  $View = BoardView::init();
   $DB->query("SELECT
                 tp.id,
                 extract(epoch from tp.date_posted) as date_posted,

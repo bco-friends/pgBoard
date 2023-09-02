@@ -67,7 +67,7 @@ function view_get()
   if(!id(true)) return to_index();
 
   $Query = new BoardQuery;
-  $View = new BoardView;
+  $View = BoardView::init();
   $View->type(Base::VIEW_THREAD);
   $View->increment_views();
 
@@ -333,7 +333,7 @@ function viewbymember_get()
   if(!$id || !$name) return to_index();
 
   $Query = new BoardQuery;
-  $View = new BoardView;
+  $View = BoardView::init();
   $View->type(Base::VIEW_THREAD_HISTORY);
 
   $View->title("Posts Created: $name");

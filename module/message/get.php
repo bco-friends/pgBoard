@@ -31,7 +31,7 @@ function view_get()
   }
 
   $Query = new BoardQuery;
-  $View = new BoardView;
+  $View = BoardView::init();
   $View->type(Base::VIEW_MESSAGE);
   $View->member_update();
   $View->increment_views();

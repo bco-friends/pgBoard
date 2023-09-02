@@ -40,7 +40,7 @@ function thread_post_get()
   $page = cmd(3,true)+1;
 
   $Query = new BoardQuery;
-  $View = new BoardView;
+  $View = BoardView::init();
   $View->type(Base::VIEW_THREAD_SEARCH);
 
   $View->title("Search Thread Posts: ".htmlentities(cmd(2)));

@@ -25,7 +25,7 @@ function previewpost_post()
   $data[0][BoardQuery::VIEW_CREATOR_IS_ADMIN] = session('admin') ? 't' : 'f';
 
   // use standard board display to build preview
-  $View = new BoardView;
+  $View = BoardView::init();
   $View->type(Base::VIEW_MESSAGE_PREVIEW);
   $View->data($data);
   $View->thread();
