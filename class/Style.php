@@ -5,10 +5,13 @@ class BoardStyle
 
   function set_theme($theme) { $this->theme = $theme; }
   function get_theme() { return $this->theme; }
-  
-  function __construct()
+
+  function __construct(
+    public BoardCore $Core,
+    public DB $DB,
+    public $session_id,
+  )
   {
-    global $DB,$Core;
     if(!$this->theme)
     {
       if(session('id')) $this->set_theme($Core->member_pref(session('id'),"theme"));
@@ -18,10 +21,9 @@ class BoardStyle
 
   function load_default()
   {
-    global $DB;
-    $this->set_theme($DB->value("SELECT value FROM theme WHERE main IS true"));
+    $this->set_theme($this->DB->value("SELECT value FROM theme WHERE main IS true"));
   }
-  
+
   function calc_color($hex)
   {
     global $colors;
@@ -39,7 +41,7 @@ class BoardStyle
     else
     return "#000000";
   }
-  
+
   function display($theme)
   {
     global $Plugin;
@@ -75,10 +77,10 @@ class BoardStyle
     $Plugin = new BoardPlugin;
     $data = $Plugin->style_display($style);
     // End Style Override
-    
+
     print $style;
   }
-  
+
   function external_css($css)
   {
     $css = htmlentities(strip_tags($css));
