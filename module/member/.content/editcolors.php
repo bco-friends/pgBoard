@@ -1,6 +1,7 @@
 <?php
 global $Style;
 global $Core;
+global $DB;
 
 if (cmd(2))
 {
@@ -272,4 +273,3 @@ $View->data($view);
 $View->thread();
 
 $Base->footer();
-?>
