@@ -50,7 +50,7 @@ class Base
 
 
   public function __construct(
-    public DB $db
+    public DB $DB
   ) {}
 
   public static function init()
