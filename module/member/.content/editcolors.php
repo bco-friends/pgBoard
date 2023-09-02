@@ -266,7 +266,7 @@ $view[2][BoardQuery::VIEW_CREATOR_NAME] = $Core->namefromid(session('id'));
 $view[3] = $view[0];
 
 // use standard board display to build preview
-$View = new BoardView;
+$View = BoardView::init();
 $View->type(Base::VIEW_THREAD_PREVIEW);
 $View->data($view);
 $View->thread();
