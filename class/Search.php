@@ -17,6 +17,19 @@ class Search
 
     return $res;
   }
+
+  /**
+   * Get default results when a search returns nothing.
+   *
+   * @return array
+   */
+  private function get_default_results(): array {
+      return [
+        'matches' => [],
+        'total' => 0.0
+      ];
+  }
+
   function insert($type,$doc) { return true; }
   function delete($type,$id) { return true; }
   function thread_insert($data,$id) { return true; }
