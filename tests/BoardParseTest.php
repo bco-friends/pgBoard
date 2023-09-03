@@ -85,6 +85,10 @@ class BoardParseTest extends TestCase
       'vimeo' => [
         '[vimeo]https://vimeo.com/15262898[/vimeo]',
         '<a href="https://vimeo.com/15262898" onclick="window.open(this.href); return false;">VIMEO REMOVED CLICK TO VIEW</a>'
+      ],
+      'soundcloud' => [
+        '[soundcloud]https://soundcloud.com/subpop/pissed-jeans-false-jesii-part?utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing[/soundcloud]',
+        '<a href="https://soundcloud.com/subpop/pissed-jeans-false-jesii-part?utm_source=clipboard&amp;utm_medium=text&amp;utm_campaign=social_sharing" onclick="window.open(this.href); return false;">SOUNDCLOUD REMOVED CLICK TO VIEW</a>'
       ]
     ];
   }
