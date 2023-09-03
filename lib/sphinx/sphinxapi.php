@@ -377,92 +377,50 @@ function sphFixUint ( $value )
 /// sphinx searchd client class
 class SphinxClient
 {
-	var $_host;			///< searchd host (default is "localhost")
-	var $_port;			///< searchd port (default is 9312)
-	var $_offset;		///< how many records to seek from result-set start (default is 0)
-	var $_limit;		///< how many records to return from result-set starting at offset (default is 20)
-	var $_mode;			///< query matching mode (default is SPH_MATCH_ALL)
-	var $_weights;		///< per-field weights (default is 1 for all fields)
-	var $_sort;			///< match sorting mode (default is SPH_SORT_RELEVANCE)
-	var $_sortby;		///< attribute to sort by (defualt is "")
-	var $_min_id;		///< min ID to match (default is 0, which means no limit)
-	var $_max_id;		///< max ID to match (default is 0, which means no limit)
-	var $_filters;		///< search filters
-	var $_groupby;		///< group-by attribute name
-	var $_groupfunc;	///< group-by function (to pre-process group-by attribute value with)
-	var $_groupsort;	///< group-by sorting clause (to sort groups in result set with)
-	var $_groupdistinct;///< group-by count-distinct attribute
-	var $_maxmatches;	///< max matches to retrieve
-	var $_cutoff;		///< cutoff to stop searching at (default is 0)
-	var $_retrycount;	///< distributed retries count
-	var $_retrydelay;	///< distributed retries delay
-	var $_anchor;		///< geographical anchor point
-	var $_indexweights;	///< per-index weights
-	var $_ranker;		///< ranking mode (default is SPH_RANK_PROXIMITY_BM25)
-	var $_maxquerytime;	///< max query time, milliseconds (default is 0, do not limit)
-	var $_fieldweights;	///< per-field-name weights
-	var $_overrides;	///< per-query attribute values overrides
-	var $_select;		///< select-list (attributes or expressions, with optional aliases)
+  // per-client-object settings
+	public string $_host = 'localhost';			///< searchd host (default is "localhost")
+	public int $_port = 9312;			///< searchd port (default is 9312)
+  public $_path = false;
+  public $_socket = false;
 
-	var $_error;		///< last error message
-	var $_warning;		///< last warning message
-	var $_connerror;		///< connection error vs remote error flag
+  // per-query settings
+	public int $_offset = 0;		///< how many records to seek from result-set start (default is 0)
+	public int $_limit = 20;		///< how many records to return from result-set starting at offset (default is 20)
+	public $_mode = SPH_MATCH_ALL;			///< query matching mode (default is SPH_MATCH_ALL)
+	public $_weights = [];		///< per-field weights (default is 1 for all fields)
+	public $_sort = SPH_SORT_RELEVANCE;			///< match sorting mode (default is SPH_SORT_RELEVANCE)
+	public string $_sortby = '';		///< attribute to sort by (defualt is "")
+	public int $_min_id = 0;		///< min ID to match (default is 0, which means no limit)
+	public int $_max_id = 0;		///< max ID to match (default is 0, which means no limit)
+	public array $_filters = [];		///< search filters
+	public string $_groupby = '';		///< group-by attribute name
+	public $_groupfunc  = SPH_GROUPBY_DAY;	///< group-by function (to pre-process group-by attribute value with)
+	public string $_groupsort = '@group desc';	///< group-by sorting clause (to sort groups in result set with)
+	public string $_groupdistinct = '';///< group-by count-distinct attribute
+	public int $_maxmatches = 1000;	///< max matches to retrieve
+	public int $_cutoff = 0;		///< cutoff to stop searching at (default is 0)
+	public int $_retrycount = 0;	///< distributed retries count
+	public int $_retrydelay = 0;	///< distributed retries delay
+	public array $_anchor = [];		///< geographical anchor point
+	public array $_indexweights = [];	///< per-index weights
+	public $_ranker = SPH_RANK_PROXIMITY_BM25;		///< ranking mode (default is SPH_RANK_PROXIMITY_BM25)
+	public $_maxquerytime = 0;	///< max query time, milliseconds (default is 0, do not limit)
+	public $_fieldweights = [];	///< per-field-name weights
+	public $_overrides = [];	///< per-query attribute values overrides
+	public $_select = '*';		///< select-list (attributes or expressions, with optional aliases)
 
-	var $_reqs;			///< requests array for multi-query
-	var $_mbenc;		///< stored mbstring encoding
-	var $_arrayresult;	///< whether $result["matches"] should be a hash or an array
-	var $_timeout;		///< connect timeout
-  var $_path = false;
-  var $_socket = false;
+	public $_error = '';		///< last error message
+	public $_warning = '';		///< last warning message
+	public $_connerror = false;		///< connection error vs remote error flag
+
+	public $_reqs = [];			///< requests array for multi-query
+	public $_mbenc = '';		///< stored mbstring encoding
+	public $_arrayresult = false;	///< whether $result["matches"] should be a hash or an array
+	public $_timeout = 0;		///< connect timeout
 
 	/////////////////////////////////////////////////////////////////////////////
 	// common stuff
 	/////////////////////////////////////////////////////////////////////////////
-
-	/// create a new client object and fill defaults
-  public function __construct()
-  {
-    // per-client-object settings
-    $this->_host		= "localhost";
-    $this->_port		= 9312;
-    $this->_path		= false;
-    $this->_socket		= false;
-
-    // per-query settings
-    $this->_offset		= 0;
-    $this->_limit		= 20;
-    $this->_mode		= SPH_MATCH_ALL;
-    $this->_weights		= array ();
-    $this->_sort		= SPH_SORT_RELEVANCE;
-    $this->_sortby		= "";
-    $this->_min_id		= 0;
-    $this->_max_id		= 0;
-    $this->_filters		= array ();
-    $this->_groupby		= "";
-    $this->_groupfunc	= SPH_GROUPBY_DAY;
-    $this->_groupsort	= "@group desc";
-    $this->_groupdistinct= "";
-    $this->_maxmatches	= 1000;
-    $this->_cutoff		= 0;
-    $this->_retrycount	= 0;
-    $this->_retrydelay	= 0;
-    $this->_anchor		= array ();
-    $this->_indexweights= array ();
-    $this->_ranker		= SPH_RANK_PROXIMITY_BM25;
-    $this->_maxquerytime= 0;
-    $this->_fieldweights= array();
-    $this->_overrides 	= array();
-    $this->_select		= "*";
-
-    $this->_error		= ""; // per-reply fields (for single-query case)
-    $this->_warning		= "";
-    $this->_connerror	= false;
-
-    $this->_reqs		= array ();	// requests storage (for multi-query case)
-    $this->_mbenc		= "";
-    $this->_arrayresult	= false;
-    $this->_timeout		= 0;
-  }
 
 	function SphinxClient ()
 	{
