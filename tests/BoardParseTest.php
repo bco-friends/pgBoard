@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace PgBoard\PgBoard\Tests;
@@ -66,6 +67,11 @@ class BoardParseTest extends TestCase
     ];
   }
 
+  public function getDefaultParser()
+  {
+    return new BoardParse($this->bbc, $this->rep, false);
+  }
+
   /**
    * @covers BoardParse::__construct
    * @test
@@ -86,6 +92,21 @@ class BoardParseTest extends TestCase
     self::assertSame(
       '<a href="https://google.com" class="link" onclick="window.open(this.href); return false;" title="https://google.com">https://google.com</a> [google.com] &raquo;',
       $parse->run('[url]https://google.com[/url]')
+    );
+  }
+
+  /**
+   * @covers BoardParse::run
+   * @covers BoardParse::youtube
+   * @test
+   */
+  public function it_parses_youtube_urls()
+  {
+    $parse = $this->getDefaultParser();
+
+    self::assertSame(
+      '<object width="425" height="355"><param name="movie" value="https://youtube.com/v/VbhZZnIRPOI?si=x7H3P2hdz4LmJRef"></param><param name="wmode" value="transparent"></param><embed src="https://youtube.com/v/VbhZZnIRPOI?si=x7H3P2hdz4LmJRef" type="application/x-shockwave-flash" wmode="transparent" width="425" height="355"></embed></object>',
+      $parse->run('[youtube]https://youtu.be/VbhZZnIRPOI?si=x7H3P2hdz4LmJRef[/youtube]')
     );
   }
 }
