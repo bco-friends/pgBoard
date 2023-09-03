@@ -1,12 +1,15 @@
 <?php
 class BoardSecurity
 {
+  public function __construct(
+    private readonly DB $DB,
+    private readonly array $_allowed_ = [],
+  ) {}
   function allowed()
   {
-    global $_allowed_;
     if(!session('id'))
     {
-      if(!in_array(implode("-",module()).func(),$_allowed_))
+      if(!in_array(implode("-",module()).func(),$this->_allowed_))
       {
         $Base = Base::init();
         $Base->type(Base::ERROR);
@@ -58,18 +61,16 @@ class BoardSecurity
 
   function auth($name,$pass,$field="pass",$prehash=false)
   {
-    global $DB;
     if(!$prehash)
     {
       //$pass = MD5($__salt__.$pass.strtolower($login));
       $pass = MD5($pass);
     }
-    return $DB->value("SELECT id FROM member WHERE LOWER(name)=LOWER($1) AND $field=$2 AND banned IS false",array($name,$pass));
+    return $this->DB->value("SELECT id FROM member WHERE LOWER(name)=LOWER($1) AND $field=$2 AND banned IS false",array($name,$pass));
   }
 
   function setcookie()
   {
-    global $DB;
     $year = 31536000;
     $month = $year/12;
     $day = $year/365;
@@ -89,22 +90,21 @@ class BoardSecurity
         break;
     }
     setcookie("board",base64_encode(session('name')."|".session('cookie')."|".session('duration')),$duration,"/",$_SERVER['SERVER_NAME']);
-    $DB->query("UPDATE member SET cookie=$1 WHERE id=$2",array(session('cookie'),session('id')));
+    $this->DB->query("UPDATE member SET cookie=$1 WHERE id=$2",array(session('cookie'),session('id')));
   }
 
   function update_session($member_id)
   {
-    global $DB;
     $_SESSION = array();
-    $DB->query("SELECT * FROM member WHERE id=$1",array($member_id));
-    $data = $DB->load_array();
+    $this->DB->query("SELECT * FROM member WHERE id=$1",array($member_id));
+    $data = $this->DB->load_array();
     $_SESSION['id'] = $data['id'];
     $_SESSION['name'] = $data['name'];
     $_SESSION['admin'] = $data['is_admin'] == 't' ? true : false;
     $_SESSION['cookie'] = md5($data['email_signup'].$data['pass']);
     $_SESSION['duration'] = "year";
 
-    $DB->query("SELECT
+    $this->DB->query("SELECT
                   p.name,
                   mp.value
                 FROM
@@ -117,7 +117,7 @@ class BoardSecurity
                   mp.member_id=$1
                 AND
                   p.session IS true",array($member_id));
-    while($pref = $DB->load_array())
+    while($pref = $this->DB->load_array())
     {
       if($pref['value'] == "t" || $pref['value'] == "true") $_SESSION[$pref['name']] = true;
       else
@@ -129,7 +129,6 @@ class BoardSecurity
 
   function login($name,$pass,$field="pass",$prehash=false)
   {
-    global $DB;
     if($login = $this->auth($name,$pass,$field,$prehash))
     {
       $this->update_session($login);
@@ -164,18 +163,16 @@ class BoardSecurity
 
   function is_admin($id)
   {
-    global $DB;
     if(!is_numeric($id)) return false;
     else
-    return $DB->check("SELECT true FROM member WHERE is_admin IS true AND id=$1",array($id));
+    return $this->DB->check("SELECT true FROM member WHERE is_admin IS true AND id=$1",array($id));
   }
 
   function active_within($interval, $id)
   {
-    global $DB;
     if(!is_numeric($id)) return false;
     else
-    return $DB->check("WITH active_check AS (
+    return $this->DB->check("WITH active_check AS (
   SELECT
     m.id AS member_id,
     GREATEST(
