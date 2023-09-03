@@ -34,7 +34,9 @@ function previewpost_post()
 
 function create_post()
 {
-  $Data = new Data;
+  global $DB, $Security;
+
+  $Data = new Data($DB, $Security);
   if(trim(post('subject')) == "") print "You must enter a subject.";
   else
   if(!$Data->message_insert($_POST)) print "Your message was not submitted.";
@@ -44,7 +46,8 @@ function create_post()
 
 function reply_post()
 {
-  $Data = new Data;
+  global $DB, $Security;
+  $Data = new Data($DB, $Security);
   if(trim(post('body')) == "") print "You must enter a post body.";
   else
   if(!$Data->message_post_insert($_POST)) print "Your post was not submitted.";
@@ -69,4 +72,3 @@ function addmember_post()
   print substr($respond,0,-1);
   exit_clean();
 }
-?>
