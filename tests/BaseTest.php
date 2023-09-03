@@ -3,11 +3,19 @@ declare(strict_types=1);
 
 namespace PgBoard\PgBoard\Tests;
 
+use DB;
 use Base;
 use PHPUnit\Framework\TestCase;
 
 class BaseTest extends TestCase
 {
+  public function setUp(): void
+  {
+    global $DB;
+
+    $DB = $this->createMock(DB::class);
+  }
+
   public static function getTypes(): array
   {
     return [

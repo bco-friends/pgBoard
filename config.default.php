@@ -1,4 +1,13 @@
 <?php
+try {
+  require_once __DIR__ . '/vendor/autoload.php';
+
+  $dotenv = new \Symfony\Component\Dotenv\Dotenv();
+  $dotenv->load(__DIR__ . '/.env');
+} catch (Throwable $e) {
+  //
+}
+
 require_once __DIR__ . '/constants.php';
 
 // functions allowed no matter what your login state
