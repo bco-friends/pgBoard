@@ -420,48 +420,53 @@ class SphinxClient
 	/////////////////////////////////////////////////////////////////////////////
 
 	/// create a new client object and fill defaults
+  public function __construct()
+  {
+    // per-client-object settings
+    $this->_host		= "localhost";
+    $this->_port		= 9312;
+    $this->_path		= false;
+    $this->_socket		= false;
+
+    // per-query settings
+    $this->_offset		= 0;
+    $this->_limit		= 20;
+    $this->_mode		= SPH_MATCH_ALL;
+    $this->_weights		= array ();
+    $this->_sort		= SPH_SORT_RELEVANCE;
+    $this->_sortby		= "";
+    $this->_min_id		= 0;
+    $this->_max_id		= 0;
+    $this->_filters		= array ();
+    $this->_groupby		= "";
+    $this->_groupfunc	= SPH_GROUPBY_DAY;
+    $this->_groupsort	= "@group desc";
+    $this->_groupdistinct= "";
+    $this->_maxmatches	= 1000;
+    $this->_cutoff		= 0;
+    $this->_retrycount	= 0;
+    $this->_retrydelay	= 0;
+    $this->_anchor		= array ();
+    $this->_indexweights= array ();
+    $this->_ranker		= SPH_RANK_PROXIMITY_BM25;
+    $this->_maxquerytime= 0;
+    $this->_fieldweights= array();
+    $this->_overrides 	= array();
+    $this->_select		= "*";
+
+    $this->_error		= ""; // per-reply fields (for single-query case)
+    $this->_warning		= "";
+    $this->_connerror	= false;
+
+    $this->_reqs		= array ();	// requests storage (for multi-query case)
+    $this->_mbenc		= "";
+    $this->_arrayresult	= false;
+    $this->_timeout		= 0;
+  }
+
 	function SphinxClient ()
 	{
-		// per-client-object settings
-		$this->_host		= "localhost";
-		$this->_port		= 9312;
-		$this->_path		= false;
-		$this->_socket		= false;
-
-		// per-query settings
-		$this->_offset		= 0;
-		$this->_limit		= 20;
-		$this->_mode		= SPH_MATCH_ALL;
-		$this->_weights		= array ();
-		$this->_sort		= SPH_SORT_RELEVANCE;
-		$this->_sortby		= "";
-		$this->_min_id		= 0;
-		$this->_max_id		= 0;
-		$this->_filters		= array ();
-		$this->_groupby		= "";
-		$this->_groupfunc	= SPH_GROUPBY_DAY;
-		$this->_groupsort	= "@group desc";
-		$this->_groupdistinct= "";
-		$this->_maxmatches	= 1000;
-		$this->_cutoff		= 0;
-		$this->_retrycount	= 0;
-		$this->_retrydelay	= 0;
-		$this->_anchor		= array ();
-		$this->_indexweights= array ();
-		$this->_ranker		= SPH_RANK_PROXIMITY_BM25;
-		$this->_maxquerytime= 0;
-		$this->_fieldweights= array();
-		$this->_overrides 	= array();
-		$this->_select		= "*";
-
-		$this->_error		= ""; // per-reply fields (for single-query case)
-		$this->_warning		= "";
-		$this->_connerror	= false;
-
-		$this->_reqs		= array ();	// requests storage (for multi-query case)
-		$this->_mbenc		= "";
-		$this->_arrayresult	= false;
-		$this->_timeout		= 0;
+    return new SphinxClient();
 	}
 
 	function __destruct()
