@@ -10,6 +10,14 @@ class Search
     $sphinx->SetMatchMode(SPH_MATCH_EXTENDED);
     $sphinx->SetSortMode(SPH_SORT_ATTR_DESC,'date_posted');
     $res = $sphinx->Query($query,$index);
+
+    if (is_bool($res)) {
+      return [
+        'matches' => [],
+        'total' => 0.0
+      ];
+    }
+
     return $res;
   }
   function insert($type,$doc) { return true; }

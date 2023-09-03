@@ -1,17 +1,18 @@
 <?php
-define("FORM_HIDDEN",100);
-define("FORM_TEXT",200);
-define("FORM_PASSWORD",300);
-define("FORM_TEXTAREA",400);
-define("FORM_SELECT",500);
-define("FORM_CHECKBOX",600);
-define("FORM_RADIO",700);
-define("FORM_BUTTON",800);
-define("FORM_SUBMIT",900);
-define("FORM_DATE",1000);
 
 class Form
 {
+  public const FORM_HIDDEN = 100;
+  public const FORM_TEXT = 200;
+  public const FORM_PASSWORD = 300;
+  public const FORM_TEXTAREA = 400;
+  public const FORM_SELECT = 500;
+  public const FORM_CHECKBOX = 600;
+  public const FORM_RADIO = 700;
+  public const FORM_BUTTON = 800;
+  public const FORM_SUBMIT = 900;
+  public const FORM_DATE = 1000;
+
   public $name = "form";
   public $ajax = true;
   public $values = array();
@@ -21,7 +22,7 @@ class Form
   function ajax($ajax) { $this->ajax = $ajax; }
   function values($values) { $this->values = $values; }
   function labels($labels) { $this->labels = $labels; }
-  
+
   function header($action,$method,$__fac__)
   {
     print "<div id=\"response_{$this->name}\"></div>\n";
@@ -29,14 +30,14 @@ class Form
     print "<input type=\"hidden\" name=\"_fac\" id=\"_fac\" value=\"$__fac__\"/>\n";
   }
   function footer() { print "</form>\n"; }
-    
+
   function fieldset_open($title)
   {
     print "<fieldset>\n";
     print "  <legend>$title</legend>\n";
     print "  <ol>\n";
   }
-  
+
   function fieldset_close()
   {
     print "  </ol>\n";
@@ -46,7 +47,7 @@ class Form
   function add_hidden($name)
   {
     $curr = new stdClass();
-    $curr->type  = FORM_HIDDEN;
+    $curr->type  = self::FORM_HIDDEN;
     $curr->name  = $name;
     return $this->build_element($curr);
   }
@@ -55,7 +56,7 @@ class Form
   function add_text($name,$title,$width=150,$max=false,$extra="/>")
   {
     $curr = new stdClass();
-    $curr->type  = FORM_TEXT;
+    $curr->type  = self::FORM_TEXT;
     $curr->name  = $name;
     $curr->title = $title;
     $curr->width = $width;
@@ -63,7 +64,7 @@ class Form
     if($max) $curr->max = $max;
     return $this->build_element($curr);
   }
-  
+
   function add_date($name,$title,$width=100)
   {
     $init = "/><script type=\"text/javascript\">$('#{$name}').datePicker({startDate:'2005-01-01'});</script>\n";
@@ -73,7 +74,7 @@ class Form
   function add_password($name,$title,$width=150,$extra="/>")
   {
     $curr = new stdClass();
-    $curr->type  = FORM_PASSWORD;
+    $curr->type  = self::FORM_PASSWORD;
     $curr->name  = $name;
     $curr->title = $title;
     $curr->width = $width;
@@ -84,7 +85,7 @@ class Form
   function add_textarea($name,$title,$height=100,$width=600,$extra=">")
   {
     $curr = new stdClass();
-    $curr->type   = FORM_TEXTAREA;
+    $curr->type   = self::FORM_TEXTAREA;
     $curr->name   = $name;
     $curr->title = $title;
     $curr->height = $height;
@@ -92,11 +93,11 @@ class Form
     $curr->extra = $extra;
     return $this->build_element($curr);
   }
-  
+
   function add_select($name,$title,$initial,$data=false,$extra=">")
   {
     $curr = new stdClass();
-    $curr->type    = FORM_SELECT;
+    $curr->type    = self::FORM_SELECT;
     $curr->name    = $name;
     $curr->title   = $title;
     $curr->initial = $initial;
@@ -108,7 +109,7 @@ class Form
   function add_checkbox($name,$title,$extra="/>")
   {
     $curr = new stdClass();
-    $curr->type  = FORM_CHECKBOX;
+    $curr->type  = self::FORM_CHECKBOX;
     $curr->name  = $name;
     $curr->title = $title;
     $curr->extra = $extra;
@@ -119,7 +120,7 @@ class Form
   function add_radio($name,$title,$val,$id,$extra="/>")
   {
     $curr = new stdClass();
-    $curr->type  = FORM_RADIO;
+    $curr->type  = self::FORM_RADIO;
     $curr->name  = $name;
     $curr->title = $title;
     $curr->val   = $val;
@@ -128,11 +129,11 @@ class Form
 
     return $this->build_element($curr);
   }
-  
+
   function add_button($name,$value,$func=false,$extra="/>")
   {
     $curr = new stdClass();
-    $curr->type  = FORM_BUTTON;
+    $curr->type  = self::FORM_BUTTON;
     $curr->name  = $name;
     $curr->value = $value;
     $curr->func  = $func;
@@ -143,12 +144,12 @@ class Form
   function add_submit($value,$extra="/>")
   {
     $curr = new stdClass();
-    $curr->type  = FORM_SUBMIT;
+    $curr->type  = self::FORM_SUBMIT;
     $curr->value = $value;
     $curr->extra = $extra;
     return $this->build_element($curr);
   }
-  
+
   function add_data($title,$text)
   {
     $output = "";
@@ -175,7 +176,7 @@ class Form
   {
     return "<input type=\"password\" name=\"$ob->name\" id=\"$ob->name\" value=\"$ob->value\" style=\"width:{$ob->width}px;\"$ob->extra";
   }
-  
+
   function build_textarea($ob)
   {
     $output = "<textarea name=\"$ob->name\" id=\"$ob->name\" style=\"float:left;height:{$ob->height}px;width:{$ob->width}px;\"{$ob->extra}$ob->value</textarea>";
@@ -216,7 +217,7 @@ class Form
   {
     return "<input type=\"button\" name=\"$ob->name\" id=\"$ob->name\" value=\"$ob->value\" onclick=\"$ob->func\"$ob->extra";
   }
-  
+
   function build_submit($ob)
   {
     return "<input type=\"submit\" class=\"submit\" value=\"$ob->value\"$ob->extra\n";
@@ -224,11 +225,11 @@ class Form
 
   function build_element($ob)
   {
-    if($ob->type != FORM_SUBMIT && $ob->type != FORM_BUTTON)
+    if($ob->type != self::FORM_SUBMIT && $ob->type != self::FORM_BUTTON)
     {
       if(isset($this->values[$ob->name]))
       {
-        if($ob->type != FORM_TEXTAREA && !is_array($this->values[$ob->name]))
+        if($ob->type != self::FORM_TEXTAREA && !is_array($this->values[$ob->name]))
         {
           $ob->value=htmlentities($this->values[$ob->name]);
         }
@@ -240,18 +241,18 @@ class Form
     }
 
     $ob->extra = isset($ob->extra) ? " $ob->extra" : "";
-    
+
     switch($ob->type)
     {
-      case FORM_HIDDEN:      $buff = $this->build_hidden($ob);      break;
-      case FORM_TEXT:        $buff = $this->build_text($ob);        break;
-      case FORM_PASSWORD:    $buff = $this->build_password($ob);    break;
-      case FORM_TEXTAREA:    $buff = $this->build_textarea($ob);    break;
-      case FORM_SELECT:      $buff = $this->build_select($ob);      break;
-      case FORM_CHECKBOX:    $buff = $this->build_checkbox($ob);    break;
-      case FORM_RADIO:       $buff = $this->build_radio($ob);       break;
-      case FORM_BUTTON:      $buff = $this->build_button($ob);      break;
-      case FORM_SUBMIT:      $buff = $this->build_submit($ob);      break;
+      case self::FORM_HIDDEN:      $buff = $this->build_hidden($ob);      break;
+      case self::FORM_TEXT:        $buff = $this->build_text($ob);        break;
+      case self::FORM_PASSWORD:    $buff = $this->build_password($ob);    break;
+      case self::FORM_TEXTAREA:    $buff = $this->build_textarea($ob);    break;
+      case self::FORM_SELECT:      $buff = $this->build_select($ob);      break;
+      case self::FORM_CHECKBOX:    $buff = $this->build_checkbox($ob);    break;
+      case self::FORM_RADIO:       $buff = $this->build_radio($ob);       break;
+      case self::FORM_BUTTON:      $buff = $this->build_button($ob);      break;
+      case self::FORM_SUBMIT:      $buff = $this->build_submit($ob);      break;
     }
     $output = "";
     if(isset($ob->title) && $this->labels)
@@ -264,10 +265,10 @@ class Form
     }
     else
     $output = $buff;
-      
+
     print $output;
   }
-  
+
   // clean up completed function branch
   function header_validate()
   {

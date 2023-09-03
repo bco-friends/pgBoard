@@ -2,12 +2,18 @@
 class BoardCore
 {
   public $data;
-  
+
+  public function __construct(
+    public DB $DB,
+    public BoardSecurity $Security,
+    public BoardParse $Parse
+  ) {}
+
   function command_parse()
   {
-    global $DB,$Core,$Parse,$Security,$Base,$Style;
-    if(!$Security->allowed()) return;
-    
+    global $Base;
+    if(!$this->Security->allowed()) return;
+
     $include = implode("/",module());
     if(file_exists("module/{$include}/main.php"))
     {
@@ -27,7 +33,7 @@ class BoardCore
     }
     else
     {
-      $Base = new Base;
+      $Base = Base::init();
       $Base->title("Invalid Module");
       $Base->Header();
       $Base->Footer();
@@ -36,18 +42,16 @@ class BoardCore
 
   function namefromid($id)
   {
-    global $DB;
     if(!is_numeric($id)) return false;
-    return $DB->value("SELECT name FROM member WHERE id=$1",array($id));
+    return $this->DB->value("SELECT name FROM member WHERE id=$1",array($id));
   }
-  
+
   function idfromname($name)
   {
-    global $DB;
     $name = str_replace(SPACE,"",strtolower($name));
-    return $DB->value("SELECT id FROM member WHERE LOWER(REPLACE(name,' ',''))=$1",array($name));
+    return $this->DB->value("SELECT id FROM member WHERE LOWER(REPLACE(name,' ',''))=$1",array($name));
   }
-  
+
   function member_link($id)
   {
     if(is_int($id))
@@ -63,11 +67,10 @@ class BoardCore
     $output = "<a href=\"/member/view/$id/\" class=\"memberlink\">".str_replace(SPACE,"&nbsp;",$id)."</a>";
     return $output;
   }
-  
+
   function member_pref($member_id,$name)
   {
-    global $DB;
-    return $DB->value("SELECT
+    return $this->DB->value("SELECT
                          mp.value
                        FROM
                          member_pref mp
@@ -80,48 +83,44 @@ class BoardCore
                        AND
                          LOWER(p.name)=LOWER($2)",array($member_id,$name));
   }
-  
+
   function is_ignoring($member_id,$ignored)
   {
-    global $DB;
     if(!is_numeric($ignored)) $ignored = $this->idfromname($ignored);
     if(!$ignored) return false;
-    
-    return $DB->check("SELECT true FROM member_ignore WHERE member_id=$1 AND ignore_member_id=$2",array($member_id,$ignored));
+
+    return $this->DB->check("SELECT true FROM member_ignore WHERE member_id=$1 AND ignore_member_id=$2",array($member_id,$ignored));
   }
 
   function is_banned($member_id)
   {
-    global $DB;
-    return $DB->check("SELECT true FROM member WHERE id=$1 AND banned=true",array($member_id));
+    return $this->DB->check("SELECT true FROM member WHERE id=$1 AND banned=true",array($member_id));
   }
 
   function can_ignore($member_id)
   {
-    global $DB,$Security;
-    if($Security->is_admin($member_id)) return true;
+    if($this->Security->is_admin($member_id)) return true;
     if(!IGNORE_BUFFER) return true;
-    if ($DB->value("SELECT date_first_post FROM member WHERE id=$1",array($member_id)) === NULL)
+    if ($this->DB->value("SELECT date_first_post FROM member WHERE id=$1",array($member_id)) === NULL)
     {
-      $dfp = $DB->value("SELECT date_posted::date FROM thread_post WHERE member_id=$1 ORDER BY date_posted ASC LIMIT 1", array($member_id));
+      $dfp = $this->DB->value("SELECT date_posted::date FROM thread_post WHERE member_id=$1 ORDER BY date_posted ASC LIMIT 1", array($member_id));
       if (!$dfp) return false; // No posts
-      $DB->update("member","id",$member_id,array("date_first_post"=>$dfp));
+      $this->DB->update("member","id",$member_id,array("date_first_post"=>$dfp));
     }
-    $DB->query("SELECT
+    $this->DB->query("SELECT
                   extract(epoch FROM (date_first_post+interval '".IGNORE_BUFFER."'))
                 FROM
                   member
                 WHERE
                   id=$1",array($member_id));
-    if(!$time = $DB->load_result()) return false;
+    if(!$time = $this->DB->load_result()) return false;
     else
     return $time<time();
   }
-  
+
   function list_ignored($member_id)
   {
-    global $DB;
-    $DB->query("SELECT
+    $this->DB->query("SELECT
                   m.id,
                   m.name
                 FROM
@@ -134,13 +133,12 @@ class BoardCore
                   mi.member_id=$1
                 ORDER BY
                   m.name",array($member_id));
-    return $DB->load_all_key();
+    return $this->DB->load_all_key();
   }
-  
+
   function list_ignoredby($member_id)
   {
-    global $DB;
-    $DB->query("SELECT
+    $this->DB->query("SELECT
                   m.id,
                   m.name
                 FROM
@@ -153,13 +151,12 @@ class BoardCore
                   mi.ignore_member_id=$1
                 ORDER BY
                   m.name",array($member_id));
-    return $DB->load_all_key();
+    return $this->DB->load_all_key();
   }
-  
+
   function message_unread_count($member_id)
   {
-    global $DB;
-    return $DB->value("SELECT
+    return $this->DB->value("SELECT
                          count(*)
                        FROM
                          message_member mm
@@ -170,12 +167,11 @@ class BoardCore
                        AND
                          mm.last_view_posts=0",array($member_id));
   }
-  
+
   /* there is a bug here, figure out how posts and last_view_posts get out of sync */
   function message_unread_post_count($member_id)
   {
-    global $DB;
-    return $DB->value("SELECT
+    return $this->DB->value("SELECT
                          sum(m.posts-mm.last_view_posts)
                        FROM
                          message_member mm
@@ -188,117 +184,100 @@ class BoardCore
                        AND
                          mm.deleted IS false",array($member_id));
   }
-  
+
   function check_favorite($thread_id)
   {
-    global $DB;
     if(!session('id')) return false;
     else
-    return $DB->check("SELECT true FROM favorite WHERE thread_id=$1 AND member_id=$2",array($thread_id,session('id')));
+    return $this->DB->check("SELECT true FROM favorite WHERE thread_id=$1 AND member_id=$2",array($thread_id,session('id')));
   }
 
   function check_ignored_thread($thread_id)
   {
-    global $DB;
     if(!session('id')) return false;
-    $val = $DB->value("SELECT ignore FROM thread_member WHERE thread_id=$1 AND member_id=$2",array($thread_id,session('id')));
+    $val = $this->DB->value("SELECT ignore FROM thread_member WHERE thread_id=$1 AND member_id=$2",array($thread_id,session('id')));
     return $val=="t"?true:false;
   }
 
   function check_dotted($thread_id)
   {
-    global $DB;
     if(!session('id')) return false;
-    $dot = $DB->value("SELECT date_posted IS NOT null AND undot IS false FROM thread_member WHERE thread_id=$1 AND member_id=$2",array($thread_id,session('id')));
+    $dot = $this->DB->value("SELECT date_posted IS NOT null AND undot IS false FROM thread_member WHERE thread_id=$1 AND member_id=$2",array($thread_id,session('id')));
     return $dot=="t"?true:false;
   }
 
   function thread_count()
   {
-    global $DB;
-    return $DB->value("SELECT value FROM board_data where name='total_threads'");
+    return $this->DB->value("SELECT value FROM board_data where name='total_threads'");
   }
-  
+
   function thread_post_count()
   {
-    global $DB;
-    return $DB->value("SELECT value FROM board_data where name='total_thread_posts'");
+    return $this->DB->value("SELECT value FROM board_data where name='total_thread_posts'");
   }
 
   function member_count()
   {
-    global $DB;
-    return $DB->value("SELECT value FROM board_data where name='total_members'");
+    return $this->DB->value("SELECT value FROM board_data where name='total_members'");
   }
 
   function active_member_count()
   {
-    global $DB;
-    return $DB->value("SELECT count(id) FROM member WHERE last_view BETWEEN now() - INTERVAL '5 minutes' AND now()");
+    return $this->DB->value("SELECT count(id) FROM member WHERE last_view BETWEEN now() - INTERVAL '5 minutes' AND now()");
   }
 
   function posting_member_count()
   {
-    global $DB;
-    return $DB->value("SELECT count(id) FROM member WHERE last_post BETWEEN now() - INTERVAL '5 minutes' AND now()");
+    return $this->DB->value("SELECT count(id) FROM member WHERE last_post BETWEEN now() - INTERVAL '5 minutes' AND now()");
   }
 
   function chatting_member_count()
   {
-    global $DB;
-    return $DB->value("SELECT count(id) FROM member WHERE last_chat BETWEEN now() - INTERVAL '5 minutes' AND now()");
+    return $this->DB->value("SELECT count(id) FROM member WHERE last_chat BETWEEN now() - INTERVAL '5 minutes' AND now()");
   }
 
   function lurking_member_count()
   {
-    global $DB;
-    return $DB->value("SELECT count(id) FROM member WHERE last_post < now()-INTERVAL '3 day' AND last_view BETWEEN now() - INTERVAL '5 minutes' AND now()");
+    return $this->DB->value("SELECT count(id) FROM member WHERE last_post < now()-INTERVAL '3 day' AND last_view BETWEEN now() - INTERVAL '5 minutes' AND now()");
   }
 
   function active_members()
   {
-    global $DB;
-    $DB->query("SELECT id,name FROM member WHERE last_view BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
-    return $DB->load_all_key();
+    $this->DB->query("SELECT id,name FROM member WHERE last_view BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
+    return $this->DB->load_all_key();
   }
-  
+
   function posting_members()
   {
-    global $DB;
-    $DB->query("SELECT id,name FROM member WHERE last_post BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
-    return $DB->load_all_key();
+    $this->DB->query("SELECT id,name FROM member WHERE last_post BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
+    return $this->DB->load_all_key();
   }
 
   function chatting_members()
   {
-    global $DB;
-    $DB->query("SELECT id,name FROM member WHERE last_chat BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
-    return $DB->load_all_key();
+    $this->DB->query("SELECT id,name FROM member WHERE last_chat BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
+    return $this->DB->load_all_key();
   }
-  
+
   function lurking_members()
   {
-    global $DB;
-    $DB->query("SELECT id,name FROM member WHERE last_post < now()-INTERVAL '3 day' AND last_view BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
-    return $DB->load_all_key();
+    $this->DB->query("SELECT id,name FROM member WHERE last_post < now()-INTERVAL '3 day' AND last_view BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
+    return $this->DB->load_all_key();
   }
 
   function fundraiser_name()
   {
-    global $DB;
-    return $DB->value("SELECT name FROM fundraiser WHERE id=$1",array(FUNDRAISER_ID));
+    return $this->DB->value("SELECT name FROM fundraiser WHERE id=$1",array(FUNDRAISER_ID));
   }
 
   function fundraiser_goal()
   {
-    global $DB;
-    return $DB->value("SELECT goal FROM fundraiser WHERE id=$1",array(FUNDRAISER_ID));
+    return $this->DB->value("SELECT goal FROM fundraiser WHERE id=$1",array(FUNDRAISER_ID));
   }
-  
+
   function fundraiser_total()
   {
-    global $DB;
-    return $DB->value("SELECT
+    return $this->DB->value("SELECT
                          COALESCE(sum(payment_gross-payment_fee),'$0')
                        FROM
                          donation

@@ -13,20 +13,20 @@ function previewpost_post()
   if(id()) $cmd[3] = $DB->value("SELECT posts FROM thread WHERE id=$1",array(id()));
 
   // fake database resultset
-  $data = array();
-  $data[0][VIEW_ID] = 99999999; // use new parser
-  $data[0][VIEW_DATE_POSTED] = time();
-  $data[0][VIEW_CREATOR_ID] = post('member_id');
-  $data[0][VIEW_CREATOR_NAME] = $Core->namefromid(post('member_id'));
-  $data[0][VIEW_BODY] = post('body');
-  $data[0][VIEW_CREATOR_IP] = "";
-  $data[0][VIEW_SUBJECT] = "";
-  $data[0][VIEW_THREAD_ID] = "";
-  $data[0][VIEW_CREATOR_IS_ADMIN] = session('admin') ? 't' : 'f';
+  $data                           = array();
+  $data[0][BoardQuery::VIEW_ID]   = 99999999; // use new parser
+  $data[0][BoardQuery::VIEW_DATE_POSTED]      = time();
+  $data[0][BoardQuery::VIEW_CREATOR_ID]       = post('member_id');
+  $data[0][BoardQuery::VIEW_CREATOR_NAME]     = $Core->namefromid(post('member_id'));
+  $data[0][BoardQuery::VIEW_BODY]             = post('body');
+  $data[0][BoardQuery::VIEW_CREATOR_IP]       = "";
+  $data[0][BoardQuery::VIEW_SUBJECT]          = "";
+  $data[0][BoardQuery::VIEW_THREAD_ID]        = "";
+  $data[0][BoardQuery::VIEW_CREATOR_IS_ADMIN] = session('admin') ? 't' : 'f';
 
   // use standard board display to build preview
-  $View = new BoardView;
-  $View->type(VIEW_MESSAGE_PREVIEW);
+  $View = BoardView::init();
+  $View->type(Base::VIEW_MESSAGE_PREVIEW);
   $View->data($data);
   $View->thread();
   exit_clean();
@@ -34,7 +34,9 @@ function previewpost_post()
 
 function create_post()
 {
-  $Data = new Data;
+  global $DB, $Security;
+
+  $Data = new Data($DB, $Security);
   if(trim(post('subject')) == "") print "You must enter a subject.";
   else
   if(!$Data->message_insert($_POST)) print "Your message was not submitted.";
@@ -44,7 +46,8 @@ function create_post()
 
 function reply_post()
 {
-  $Data = new Data;
+  global $DB, $Security;
+  $Data = new Data($DB, $Security);
   if(trim(post('body')) == "") print "You must enter a post body.";
   else
   if(!$Data->message_post_insert($_POST)) print "Your post was not submitted.";
@@ -69,4 +72,3 @@ function addmember_post()
   print substr($respond,0,-1);
   exit_clean();
 }
-?>
