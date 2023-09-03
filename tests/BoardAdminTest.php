@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace PgBoard\PgBoard\Tests;
 
 use BoardAdmin;
+use DB;
 use PHPUnit\Framework\TestCase;
 
 class BoardAdminTest extends TestCase
@@ -14,6 +15,7 @@ class BoardAdminTest extends TestCase
    */
   public function it_is_a_class_instance()
   {
-    self::assertInstanceOf(BoardAdmin::class, new BoardAdmin());
+    $db = $this->createMock(DB::class);
+    self::assertInstanceOf(BoardAdmin::class, new BoardAdmin($db));
   }
 }

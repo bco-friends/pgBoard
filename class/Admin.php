@@ -1,6 +1,10 @@
 <?php
 class BoardAdmin
 {
+  public function __construct(
+    public DB $DB
+  ) {}
+
   function toggle_flag($table,$flag,$id)
   {
     global $DB;
@@ -11,7 +15,7 @@ class BoardAdmin
                 WHERE
                   id=$1",array($id));
   }
-  
+
   function check_flag($table,$flag,$id)
   {
     global $DB;

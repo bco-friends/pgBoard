@@ -117,7 +117,7 @@ function view_get()
 
   if(session('admin'))
   {
-    $Admin = new BoardAdmin;
+    $Admin = new BoardAdmin($DB);
     $sticky = $Admin->check_flag("thread","sticky",id());
     $locked = $Admin->check_flag("thread","locked",id());
     $subtitle .= SPACE.ARROW_RIGHT.SPACE."<a href=\"/admin/togglesticky/".id()."/".md5(session_id())."/\">".($sticky ? "unsticky" :"sticky")."</a>";
