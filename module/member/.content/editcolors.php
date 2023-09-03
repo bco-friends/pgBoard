@@ -1,6 +1,7 @@
 <?php
 global $Style;
 global $Core;
+global $DB;
 
 if (cmd(2))
 {
@@ -74,8 +75,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 <script type="text/javascript" src="/lib/colorpicker/slider.js"></script>
 <script type="text/javascript" src="/lib/colorpicker/colorpicker.js"></script>
 <?php
-$Base = new Base;
-$Base->type(EDIT);
+$Base = Base::init();
+$Base->type(Base::EDIT);
 $Base->title("Color Theme Styler");
 $Base->header();
 ?>
@@ -220,56 +221,55 @@ $Form->footer();
 <div class="clear"><br/></div>
 <div class="hr"><hr/></div><br/>
 <?php
-$list = array();
-$list[0][LIST_ID] = 0;
-$list[0][LIST_DATE_LAST_POST] = time();
-$list[0][LIST_CREATOR_ID] = 0;
-$list[0][LIST_CREATOR_NAME] = "color scheme";
-$list[0][LIST_LAST_POSTER_ID] = 0;
-$list[0][LIST_LAST_POSTER_NAME] = "color scheme";
-$list[0][LIST_SUBJECT] = "color schemer";
-$list[0][LIST_POSTS] = "5";
-$list[0][LIST_VIEWS] = "5";
-$list[0][LIST_FIRSTPOST_BODY] = "test";
-$list[0][LIST_LAST_VIEW_POSTS] = "";
-$list[0][LIST_DOTFLAG] = "";
-$list[0][LIST_STICKY] = "";
-$list[0][LIST_LOCKED] = "";
-$list[0][LIST_LEGENDARY] = "";
+$list                         = array();
+$list[0][BoardQuery::LIST_ID] = 0;
+$list[0][BoardQuery::LIST_DATE_LAST_POST] = time();
+$list[0][BoardQuery::LIST_CREATOR_ID] = 0;
+$list[0][BoardQuery::LIST_CREATOR_NAME] = "color scheme";
+$list[0][BoardQuery::LIST_LAST_POSTER_ID] = 0;
+$list[0][BoardQuery::LIST_LAST_POSTER_NAME] = "color scheme";
+$list[0][BoardQuery::LIST_SUBJECT] = "color schemer";
+$list[0][BoardQuery::LIST_POSTS] = "5";
+$list[0][BoardQuery::LIST_VIEWS] = "5";
+$list[0][BoardQuery::LIST_FIRSTPOST_BODY] = "test";
+$list[0][BoardQuery::LIST_LAST_VIEW_POSTS] = "";
+$list[0][BoardQuery::LIST_DOTFLAG] = "";
+$list[0][BoardQuery::LIST_STICKY] = "";
+$list[0][BoardQuery::LIST_LOCKED] = "";
+$list[0][BoardQuery::LIST_LEGENDARY] = "";
 $list[1] = $list[0];
 $list[2] = $list[0];
-$list[2][LIST_CREATOR_ID] = session('id');
-$list[2][LIST_CREATOR_NAME] = $Core->namefromid(session('id'));
+$list[2][BoardQuery::LIST_CREATOR_ID] = session('id');
+$list[2][BoardQuery::LIST_CREATOR_NAME] = $Core->namefromid(session('id'));
 $list[3] = $list[0];
-$List = new BoardList;
-$List->type(LIST_THREAD);
+$List = BoardList::init();
+$List->type(Base::LIST_THREAD);
 $List->data($list);
 $List->thread();
 
 print "<br/>";
 
-$view = array();
-$view[0][VIEW_ID] = "";
-$view[0][VIEW_DATE_POSTED] = time();
-$view[0][VIEW_CREATOR_ID] = 0;
-$view[0][VIEW_CREATOR_NAME] = "color scheme";
-$view[0][VIEW_BODY] = "color scheme post text";
-$view[0][VIEW_CREATOR_IP] = "";
-$view[0][VIEW_SUBJECT] = "";
-$view[0][VIEW_THREAD_ID] = "";
-$view[0][VIEW_CREATOR_IS_ADMIN] = 'f';
+$view                         = array();
+$view[0][BoardQuery::VIEW_ID] = "";
+$view[0][BoardQuery::VIEW_DATE_POSTED]    = time();
+$view[0][BoardQuery::VIEW_CREATOR_ID] = 0;
+$view[0][BoardQuery::VIEW_CREATOR_NAME] = "color scheme";
+$view[0][BoardQuery::VIEW_BODY] = "color scheme post text";
+$view[0][BoardQuery::VIEW_CREATOR_IP] = "";
+$view[0][BoardQuery::VIEW_SUBJECT] = "";
+$view[0][BoardQuery::VIEW_THREAD_ID] = "";
+$view[0][BoardQuery::VIEW_CREATOR_IS_ADMIN] = 'f';
 
 $view[1] = $view[0];
 $view[2] = $view[0];
-$view[2][VIEW_CREATOR_ID] = session('id');
-$view[2][VIEW_CREATOR_NAME] = $Core->namefromid(session('id'));
+$view[2][BoardQuery::VIEW_CREATOR_ID] = session('id');
+$view[2][BoardQuery::VIEW_CREATOR_NAME] = $Core->namefromid(session('id'));
 $view[3] = $view[0];
 
 // use standard board display to build preview
-$View = new BoardView;
-$View->type(VIEW_THREAD_PREVIEW);
+$View = BoardView::init();
+$View->type(Base::VIEW_THREAD_PREVIEW);
 $View->data($view);
 $View->thread();
 
 $Base->footer();
-?>

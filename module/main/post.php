@@ -5,8 +5,8 @@ function login_post()
 
   if(!$Security->login(post('name'),post('pass')))
   {
-    $Base = new Base;
-    $Base->type(ERROR);
+    $Base = Base::init();
+    $Base->type(Base::ERROR);
     $Base->title(ERROR_AUTH);
     $Base->header();
     $Base->footer();

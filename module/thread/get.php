@@ -9,8 +9,8 @@ function list_get()
   $xmldata = '';
 
   $Query = new BoardQuery;
-  $List = new BoardList;
-  $List->type(LIST_THREAD);
+  $List = BoardList::init();
+  $List->type(Base::LIST_THREAD);
 
   $_title_ = TITLE_BOARD;
 
@@ -67,8 +67,8 @@ function view_get()
   if(!id(true)) return to_index();
 
   $Query = new BoardQuery;
-  $View = new BoardView;
-  $View->type(VIEW_THREAD);
+  $View = BoardView::init();
+  $View->type(Base::VIEW_THREAD);
   $View->increment_views();
 
   $subtitle="";
@@ -119,7 +119,7 @@ function view_get()
 
   if(session('admin'))
   {
-    $Admin = new BoardAdmin;
+    $Admin = new BoardAdmin($DB);
     $sticky = $Admin->check_flag("thread","sticky",id());
     $locked = $Admin->check_flag("thread","locked",id());
     $subtitle .= SPACE.ARROW_RIGHT.SPACE."<a href=\"/admin/togglesticky/".id()."/".md5(session_id())."/\">".($sticky ? "unsticky" :"sticky")."</a>";
@@ -179,8 +179,8 @@ function listbymember_get()
   if(!$id || !$name) return to_index();
 
   $Query = new BoardQuery;
-  $List = new BoardList;
-  $List->type(LIST_THREAD_HISTORY);
+  $List = BoardList::init();
+  $List->type(Base::LIST_THREAD_HISTORY);
 
   $List->title("Threads Created: $name");
   $List->subtitle("page: $page");
@@ -223,8 +223,8 @@ function listbymemberposted_get()
   if (!$threads) $threads = array(0);
 
   $Query = new BoardQuery;
-  $List = new BoardList;
-  $List->type(LIST_THREAD_HISTORY);
+  $List = BoardList::init();
+  $List->type(Base::LIST_THREAD_HISTORY);
 
   $List->title("Threads Participated: $name");
   $List->subtitle("page: $page");
@@ -266,8 +266,8 @@ function listfavoritesbymember_get()
   if (!$threads) $threads = array(0);
 
   $Query = new BoardQuery;
-  $List = new BoardList;
-  $List->type(LIST_THREAD_HISTORY);
+  $List = BoardList::init();
+  $List->type(Base::LIST_THREAD_HISTORY);
 
   $List->title("Favorites: $name");
   $List->subtitle("page: $page");
@@ -309,8 +309,8 @@ function listignoredthreadsbymember_get()
   if (!$threads) $threads = array(0);
 
   $Query = new BoardQuery;
-  $List = new BoardList;
-  $List->type(LIST_THREAD_HISTORY);
+  $List = BoardList::init();
+  $List->type(Base::LIST_THREAD_HISTORY);
 
   $List->title("Ignored threads: $name");
   $List->subtitle("page: $page");
@@ -335,8 +335,8 @@ function viewbymember_get()
   if(!$id || !$name) return to_index();
 
   $Query = new BoardQuery;
-  $View = new BoardView;
-  $View->type(VIEW_THREAD_HISTORY);
+  $View = BoardView::init();
+  $View->type(Base::VIEW_THREAD_HISTORY);
 
   $View->title("Posts Created: $name");
   $View->subtitle("page $page");

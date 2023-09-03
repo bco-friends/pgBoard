@@ -1,11 +1,11 @@
 <?php
 function togglesticky_get()
 {
-  global $Security;
+  global $DB, $Security;
 
   if(id() && $Security->is_admin(session('id')) && md5(session_id()) == cmd(3))
   {
-    $Admin = new BoardAdmin;
+    $Admin = new BoardAdmin($DB);
     $Admin->toggle_flag("thread","sticky",id());
   }
   return to_index();
@@ -13,10 +13,10 @@ function togglesticky_get()
 
 function togglelocked_get()
 {
-  global $Security;
+  global $DB, $Security;
   if(id() && $Security->is_admin(session('id')) && md5(session_id()) == cmd(3))
   {
-    $Admin = new BoardAdmin;
+    $Admin = new BoardAdmin($DB);
     $Admin->toggle_flag("thread","locked",id());
   }
   return to_index();
@@ -24,10 +24,10 @@ function togglelocked_get()
 
 function togglelegendary_get()
 {
-  global $Security;
+  global $DB, $Security;
   if(id() && $Security->is_admin(session('id')) && md5(session_id()) == cmd(3))
   {
-    $Admin = new BoardAdmin;
+    $Admin = new BoardAdmin($DB);
     $Admin->toggle_flag("thread","legendary",id());
   }
   return to_index();
@@ -38,7 +38,7 @@ function togglebanned_get()
   global $Security,$DB;
   if(id() && $Security->is_admin(session('id')) && md5(session_id()) == cmd(3))
   {
-    $Admin = new BoardAdmin;
+    $Admin = new BoardAdmin($DB);
     $Admin->toggle_flag("member","banned",id());
     $DB->update("member","id",id(),array("cookie"=>""));
   }
@@ -57,4 +57,3 @@ function resetlink_get()
   }
   exit_clean();
 }
-?>

@@ -48,9 +48,9 @@ function view_get()
 
   $pref = $DB->load_all_key();
 
-  $Base = new Base;
+  $Base = Base::init();
   $Base->title($member['name']);
-  $Base->type(VIEW_MEMBER);
+  $Base->type(Base::VIEW_MEMBER);
 
   $Base->header();
 
@@ -133,7 +133,7 @@ function view_get()
       print "  <div class=\"prefdata\">$ignoring</div>\n";
       print "</li>\n";
     }
-    
+
     if(IGNORE_PUBLIC)
     {
       // ignored by
@@ -162,11 +162,11 @@ function ignore_get()
   if(cmd(3) != MD5(session_id()) || !IGNORE_ENABLED) return to_index();
   if($Core->idfromname(id()) == session('id')) return to_index();
   if(!$Core->can_ignore(session('id'))) return to_index();
-  
+
   if(!$listen = $Core->idfromname(id()))
   {
-    $Base = new Base;
-    $Base->type(ERROR);
+    $Base = Base::init();
+    $Base->type(Base::ERROR);
     $Base->title(ERROR_MEMBER_NOTFOUND);
     $Base->header();
     $Base->footer();
@@ -188,11 +188,11 @@ function listen_get()
   global $Security,$Core,$DB;
 
   if(cmd(3) != MD5(session_id())) return to_index();
-  
+
   if(!$listen = $Core->idfromname(id()))
   {
-    $Base = new Base;
-    $Base->type(ERROR);
+    $Base = Base::init();
+    $Base->type(Base::ERROR);
     $Base->title(ERROR_MEMBER_NOTFOUND);
     $Base->header();
     $Base->footer();
@@ -214,7 +214,7 @@ function reset_get()
   global $DB;
   $DB->query("SELECT id,reset FROM member WHERE reset=$1",array(id()));
   if($data = $DB->load_array())
-  { 
+  {
     $pass = md5($data['reset']);
     $update = array("reset"=>null,"pass"=>md5($pass));
     $DB->update("member","id",$data['id'],$update);

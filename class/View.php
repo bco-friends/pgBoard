@@ -8,10 +8,9 @@ class BoardView extends Base
 
   function increment_views()
   {
-    global $DB;
-    if(!$this->ajax && $this->type == VIEW_THREAD || $this->type == VIEW_MESSAGE)
+    if(!$this->ajax && $this->type == Base::VIEW_THREAD || $this->type == Base::VIEW_MESSAGE)
     {
-      $DB->query("UPDATE {$this->table} SET views=views+1 WHERE id=$1",array(id(true)));
+      $this->DB->query("UPDATE {$this->table} SET views=views+1 WHERE id=$1",array(id(true)));
     }
   }
 
@@ -20,28 +19,28 @@ class BoardView extends Base
     global $Parse;
 
     $data = array_values($row);
-    $data['date'] = date(VIEW_DATE_FORMAT,(int)$data[VIEW_DATE_POSTED]);
+    $data['date'] = date(VIEW_DATE_FORMAT,(int)$data[BoardQuery::VIEW_DATE_POSTED]);
 
     $data['me'] = $data['quote'] = $data['admin'] = "";
     if(session('id'))
     {
-      if($data[VIEW_CREATOR_ID] == session('id')) $data['me'] = SPACE.CSS_ME;
+      if($data[BoardQuery::VIEW_CREATOR_ID] == session('id')) $data['me'] = SPACE.CSS_ME;
     }
 
-    $data['body'] = $Parse->run($data[VIEW_BODY]);
+    $data['body'] = $Parse->run($data[BoardQuery::VIEW_BODY]);
     switch($this->type)
     {
-      case VIEW_THREAD_SEARCH:
-      case VIEW_THREAD_HISTORY:
-        $data['body'] = "<strong>thread:</strong> <a href=\"/thread/view/{$data[VIEW_THREAD_ID]}/\">".htmlentities($data[VIEW_SUBJECT],ENT_QUOTES,'UTF-8')."</a><br/><br/>\n".$data['body'];
+      case Base::VIEW_THREAD_SEARCH:
+      case Base::VIEW_THREAD_HISTORY:
+        $data['body'] = "<strong>thread:</strong> <a href=\"/thread/view/{$data[BoardQuery::VIEW_THREAD_ID]}/\">".htmlentities($data[BoardQuery::VIEW_SUBJECT],ENT_QUOTES,'UTF-8')."</a><br/><br/>\n". $data['body'];
         break;
 
-      case VIEW_THREAD:
-      case VIEW_MESSAGE:
-        $data['quote'] = NON_BREAKING_SPACE.ARROW_RIGHT." <a href=\"javascript:;\" onclick=\"quote_post({$data[VIEW_ID]})\"\">quote</a>";
+      case Base::VIEW_THREAD:
+      case Base::VIEW_MESSAGE:
+        $data['quote'] = NON_BREAKING_SPACE.ARROW_RIGHT." <a href=\"javascript:;\" onclick=\"quote_post({$data[BoardQuery::VIEW_ID]})\"\">quote</a>";
     }
 
-    if(session('admin')) $data['admin'] = NON_BREAKING_SPACE.ARROW_RIGHT." <a href=\"/admin/editpost/{$data[VIEW_ID]}/\">edit</a>";
+    if(session('admin')) $data['admin'] = NON_BREAKING_SPACE.ARROW_RIGHT." <a href=\"/admin/editpost/{$data[BoardQuery::VIEW_ID]}/\">edit</a>";
 
     // Start Parsing Override
     $Plugin = new BoardPlugin;
@@ -53,21 +52,20 @@ class BoardView extends Base
 
   function subject($id)
   {
-    global $DB;
-    $DB->query("SELECT
+    $this->DB->query("SELECT
                   subject,
                   views
                 FROM
                   {$this->table}
                 WHERE
                   id=$1",array($id));
-    $data = $DB->load_array();
+    $data = $this->DB->load_array();
     return htmlentities($data['subject'])." <span class=\"smaller\">($data[views] views)</span>";
   }
 
   function thread()
   {
-    global $DB,$Core;
+    global $Core;
 
     if(!isset($this->data))
     {
@@ -77,7 +75,7 @@ class BoardView extends Base
     if(!$this->data) $this->data = array();
 
     $uncollapsecount = UNCOLLAPSE_COUNT_DEFAULT;
-    if(session('id') && ($this->type == VIEW_THREAD || $this->type == VIEW_MESSAGE) && !$this->ajax)
+    if(session('id') && ($this->type == Base::VIEW_THREAD || $this->type == Base::VIEW_MESSAGE) && !$this->ajax)
     {
       if (intval(session('uncollapsecount')) >= 1)
         $uncollapsecount = intval(session('uncollapsecount'));
@@ -94,9 +92,9 @@ class BoardView extends Base
       if($collapseopen < 1) $collapseopen = 1;
 
       // offset collapsing by the number of people ignored
-      $offsetignores = $DB->value("SELECT count(*) FROM {$this->table}_post WHERE {$this->table}_id=$1 AND member_id IN ($list)",array(id()));
+      $offsetignores = $this->DB->value("SELECT count(*) FROM {$this->table}_post WHERE {$this->table}_id=$1 AND member_id IN ($list)",array(id()));
 
-      $this->collapse($DB->value("SELECT COALESCE(last_view_posts,0)-$offsetignores-$collapseopen FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2",array(id(),session('id'))));
+      $this->collapse($this->DB->value("SELECT COALESCE(last_view_posts,0)-$offsetignores-$collapseopen FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2",array(id(),session('id'))));
 
       // don't collapse if there aren't new posts or if we are offsetting/limiting
       if(cmd(3,true) ||
@@ -114,7 +112,7 @@ class BoardView extends Base
       $hidemedia = get('media') ? "true" : "false";
 
       print "<div id=\"view_".id()."\">\n";
-      if($this->collapse && $this->type != VIEW_THREAD_PREVIEW && $this->type != VIEW_MESSAGE_PREVIEW)
+      if($this->collapse && $this->type != Base::VIEW_THREAD_PREVIEW && $this->type != Base::VIEW_MESSAGE_PREVIEW)
       {
         $uncollapsecount = min($this->collapse, $uncollapsecount);
         print "<div class=\"post clear\" id=\"uncollapse\">\n";
@@ -136,10 +134,10 @@ class BoardView extends Base
       $field = $this->prep_data($row);
       $count = "#{$i}";
       if(session('nopostnumber')) $count = "";
-      print "<div id=\"view_".id()."_{$field[VIEW_ID]}_{$i}\" class=\"post\">\n";
-      print "<ul class=\"view\" id=\"post_{$field[VIEW_ID]}\">\n";
+      print "<div id=\"view_".id()."_{$field[BoardQuery::VIEW_ID]}_{$i}\" class=\"post\">\n";
+      print "<ul class=\"view\" id=\"post_{$field[BoardQuery::VIEW_ID]}\">\n";
       print "  <li class=\"info even$field[me]\">\n";
-      print "    <div class=\"postinfo\">".$Core->member_link($field[VIEW_CREATOR_NAME])." posted this on $field[date]</div>\n";
+      print "    <div class=\"postinfo\">".$Core->member_link($field[BoardQuery::VIEW_CREATOR_NAME])." posted this on $field[date]</div>\n";
       print "    <div class=\"controls\">$field[quote]$field[admin]</div>\n";
       print "    <div class=\"count\"><a href=\"#{$i}\" name=\"$i\">{$count}</a></div>\n";
       print "    <div class=\"clear\"></div>\n";
@@ -163,7 +161,7 @@ class BoardView extends Base
 
   function thread_xml()
   {
-    global $DB,$Core;
+    global $Core;
 
     if(!isset($this->data))
     {
@@ -172,7 +170,7 @@ class BoardView extends Base
     }
     if(!$this->data) $this->data = array();
 
-    if(session('id') && ($this->type == VIEW_THREAD || $this->type == VIEW_MESSAGE) && !$this->ajax)
+    if(session('id') && ($this->type == Base::VIEW_THREAD || $this->type == Base::VIEW_MESSAGE) && !$this->ajax)
     {
       if($list = array_keys($Core->list_ignored(session('id')))) $list = implode(",",$list);
       else
@@ -186,9 +184,9 @@ class BoardView extends Base
       #if($collapseopen < 1) $collapseopen = 1;
 
       // offset collapsing by the number of people ignored
-      #$offsetignores = $DB->value("SELECT count(*) FROM {$this->table}_post WHERE {$this->table}_id=$1 AND member_id IN ($list)",array(id()));
+      #$offsetignores = $this->DB->value("SELECT count(*) FROM {$this->table}_post WHERE {$this->table}_id=$1 AND member_id IN ($list)",array(id()));
 
-      #$this->collapse($DB->value("SELECT COALESCE(last_view_posts,0)-$offsetignores-$collapseopen FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2",array(id(),session('id'))));
+      #$this->collapse($this->DB->value("SELECT COALESCE(last_view_posts,0)-$offsetignores-$collapseopen FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2",array(id(),session('id'))));
 
       // don't collapse if there aren't new posts or if we are offsetting/limiting
       #if(cmd(3,true) ||
@@ -206,7 +204,7 @@ class BoardView extends Base
       $hidemedia = get('media') ? "true" : "false";
 
       #print "<div id=\"view_".id()."\">\n";
-      if($this->collapse && $this->type != VIEW_THREAD_PREVIEW && $this->type != VIEW_MESSAGE_PREVIEW)
+      if($this->collapse && $this->type != Base::VIEW_THREAD_PREVIEW && $this->type != Base::VIEW_MESSAGE_PREVIEW)
       {
         print "<div class=\"post clear\" id=\"uncollapse\">\n";
         print "  <ul class=\"postbody odd collapse\">\n";
@@ -224,8 +222,8 @@ class BoardView extends Base
       $count = "#{$i}";
       #if(session('nopostnumber')) $count = "";
       print "<post number=\"$i\">";
-      print "<id>{$field[VIEW_ID]}</id>\n";
-      print "<member>{$field[VIEW_CREATOR_NAME]}</member>\n";
+      print "<id>{$field[BoardQuery::VIEW_ID]}</id>\n";
+      print "<member>{$field[BoardQuery::VIEW_CREATOR_NAME]}</member>\n";
       print "<date>{$field['date']}</date>\n";
       print "<body>{$field['body']}</body>\n";
       print "</post>\n";
@@ -257,20 +255,19 @@ class BoardView extends Base
 
   function member_update()
   {
-    global $DB;
     if(!session('id')) return;
 
-    if($DB->check("SELECT member_id FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2",array(id(),session('id'))))
+    if($this->DB->check("SELECT member_id FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2",array(id(),session('id'))))
     {
 /*
       if($this->type == VIEW_MESSAGE)
       {
-        print "number of posts on last view (cached): ".$DB->value("SELECT last_view_posts FROM {$this->table}_member WHERE message_id=$1",array(id()))."<br/>\n";
-        print "total number of posts total (cached): ".$DB->value("SELECT posts FROM {$this->table} WHERE id=$1",array(id()))."<br/>\n";
-        print "total number of posts with actual count: ".$DB->value("SELECT count(*) FROM {$this->table}_post WHERE message_id=$1",array(id()));
+        print "number of posts on last view (cached): ".$this->DB->value("SELECT last_view_posts FROM {$this->table}_member WHERE message_id=$1",array(id()))."<br/>\n";
+        print "total number of posts total (cached): ".$this->DB->value("SELECT posts FROM {$this->table} WHERE id=$1",array(id()))."<br/>\n";
+        print "total number of posts with actual count: ".$this->DB->value("SELECT count(*) FROM {$this->table}_post WHERE message_id=$1",array(id()));
       }
 */
-      $DB->query("UPDATE
+      $this->DB->query("UPDATE
                     {$this->table}_member
                   SET
                     last_view_posts=(SELECT posts FROM {$this->table} WHERE id=".id().")
@@ -281,9 +278,9 @@ class BoardView extends Base
 
     }
     else
-    if($this->type != VIEW_MESSAGE)
+    if($this->type != Base::VIEW_MESSAGE)
     {
-      $DB->query("INSERT INTO
+      $this->DB->query("INSERT INTO
                     {$this->table}_member ({$this->table}_id,member_id,last_view_posts)
                   VALUES
                     ($1,$2,(SELECT posts FROM {$this->table} WHERE id=$1))",array(id(),session('id')));

@@ -1,8 +1,8 @@
 <?php
 function number($str) { return str_replace(array("$",","),"",$str); }
 
-$Base = new Base;
-$Base->type(MISC);
+$Base = Base::init();
+$Base->type(Base::MISC);
 $Base->title("Donate");
 $Base->header();
 print "<div class=\"box clear\">\n";
