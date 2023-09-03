@@ -8,10 +8,9 @@ class BoardView extends Base
 
   function increment_views()
   {
-    global $DB;
     if(!$this->ajax && $this->type == Base::VIEW_THREAD || $this->type == Base::VIEW_MESSAGE)
     {
-      $DB->query("UPDATE {$this->table} SET views=views+1 WHERE id=$1",array(id(true)));
+      $this->DB->query("UPDATE {$this->table} SET views=views+1 WHERE id=$1",array(id(true)));
     }
   }
 
@@ -53,21 +52,20 @@ class BoardView extends Base
 
   function subject($id)
   {
-    global $DB;
-    $DB->query("SELECT
+    $this->DB->query("SELECT
                   subject,
                   views
                 FROM
                   {$this->table}
                 WHERE
                   id=$1",array($id));
-    $data = $DB->load_array();
+    $data = $this->DB->load_array();
     return htmlentities($data['subject'])." <span class=\"smaller\">($data[views] views)</span>";
   }
 
   function thread()
   {
-    global $DB,$Core;
+    global $Core;
 
     if(!isset($this->data))
     {
@@ -94,9 +92,9 @@ class BoardView extends Base
       if($collapseopen < 1) $collapseopen = 1;
 
       // offset collapsing by the number of people ignored
-      $offsetignores = $DB->value("SELECT count(*) FROM {$this->table}_post WHERE {$this->table}_id=$1 AND member_id IN ($list)",array(id()));
+      $offsetignores = $this->DB->value("SELECT count(*) FROM {$this->table}_post WHERE {$this->table}_id=$1 AND member_id IN ($list)",array(id()));
 
-      $this->collapse($DB->value("SELECT COALESCE(last_view_posts,0)-$offsetignores-$collapseopen FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2",array(id(),session('id'))));
+      $this->collapse($this->DB->value("SELECT COALESCE(last_view_posts,0)-$offsetignores-$collapseopen FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2",array(id(),session('id'))));
 
       // don't collapse if there aren't new posts or if we are offsetting/limiting
       if(cmd(3,true) ||
@@ -163,7 +161,7 @@ class BoardView extends Base
 
   function thread_xml()
   {
-    global $DB,$Core;
+    global $Core;
 
     if(!isset($this->data))
     {
@@ -186,9 +184,9 @@ class BoardView extends Base
       #if($collapseopen < 1) $collapseopen = 1;
 
       // offset collapsing by the number of people ignored
-      #$offsetignores = $DB->value("SELECT count(*) FROM {$this->table}_post WHERE {$this->table}_id=$1 AND member_id IN ($list)",array(id()));
+      #$offsetignores = $this->DB->value("SELECT count(*) FROM {$this->table}_post WHERE {$this->table}_id=$1 AND member_id IN ($list)",array(id()));
 
-      #$this->collapse($DB->value("SELECT COALESCE(last_view_posts,0)-$offsetignores-$collapseopen FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2",array(id(),session('id'))));
+      #$this->collapse($this->DB->value("SELECT COALESCE(last_view_posts,0)-$offsetignores-$collapseopen FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2",array(id(),session('id'))));
 
       // don't collapse if there aren't new posts or if we are offsetting/limiting
       #if(cmd(3,true) ||
@@ -257,20 +255,19 @@ class BoardView extends Base
 
   function member_update()
   {
-    global $DB;
     if(!session('id')) return;
 
-    if($DB->check("SELECT member_id FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2",array(id(),session('id'))))
+    if($this->DB->check("SELECT member_id FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2",array(id(),session('id'))))
     {
 /*
       if($this->type == VIEW_MESSAGE)
       {
-        print "number of posts on last view (cached): ".$DB->value("SELECT last_view_posts FROM {$this->table}_member WHERE message_id=$1",array(id()))."<br/>\n";
-        print "total number of posts total (cached): ".$DB->value("SELECT posts FROM {$this->table} WHERE id=$1",array(id()))."<br/>\n";
-        print "total number of posts with actual count: ".$DB->value("SELECT count(*) FROM {$this->table}_post WHERE message_id=$1",array(id()));
+        print "number of posts on last view (cached): ".$this->DB->value("SELECT last_view_posts FROM {$this->table}_member WHERE message_id=$1",array(id()))."<br/>\n";
+        print "total number of posts total (cached): ".$this->DB->value("SELECT posts FROM {$this->table} WHERE id=$1",array(id()))."<br/>\n";
+        print "total number of posts with actual count: ".$this->DB->value("SELECT count(*) FROM {$this->table}_post WHERE message_id=$1",array(id()));
       }
 */
-      $DB->query("UPDATE
+      $this->DB->query("UPDATE
                     {$this->table}_member
                   SET
                     last_view_posts=(SELECT posts FROM {$this->table} WHERE id=".id().")
@@ -283,7 +280,7 @@ class BoardView extends Base
     else
     if($this->type != Base::VIEW_MESSAGE)
     {
-      $DB->query("INSERT INTO
+      $this->DB->query("INSERT INTO
                     {$this->table}_member ({$this->table}_id,member_id,last_view_posts)
                   VALUES
                     ($1,$2,(SELECT posts FROM {$this->table} WHERE id=$1))",array(id(),session('id')));
