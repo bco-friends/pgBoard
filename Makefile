@@ -29,7 +29,7 @@ php-shell:
 	docker exec -it pgb-php /bin/bash
 
 phpstan:
-	./vendor/bin/phpstan analyse index.php config.php error.php core.php class module
+	docker exec -it pgb-php vendor/bin/phpstan analyse index.php config.php error.php core.php class module
 
 phpunit:
 	docker exec -it pgb-php vendor/bin/phpunit
