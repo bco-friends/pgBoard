@@ -5,7 +5,8 @@
     "require-dev": {
         "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^10.3",
-        "fakerphp/faker": "^1.23"
+        "fakerphp/faker": "^1.23",
+        "symfony/console": "^6.3"
     },
     "autoload": {
         "classmap": ["class/"]
