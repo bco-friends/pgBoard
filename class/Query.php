@@ -1,36 +1,4 @@
 <?php
-/*
-* list_query constants
-**/
-define("LIST_ID",0);
-define("LIST_DATE_LAST_POST",1);
-define("LIST_CREATOR_ID",2);
-define("LIST_CREATOR_NAME",3);
-define("LIST_LAST_POSTER_ID",4);
-define("LIST_LAST_POSTER_NAME",5);
-define("LIST_SUBJECT",6);
-define("LIST_POSTS",7);
-define("LIST_VIEWS",8);
-define("LIST_FIRSTPOST_BODY",9);
-define("LIST_LAST_VIEW_POSTS",10);
-define("LIST_DOTFLAG",11);
-define("LIST_STICKY",12);
-define("LIST_LOCKED",13);
-define("LIST_LEGENDARY",14);
-
-/*
-* view_query constants
-**/
-define("VIEW_ID",0);
-define("VIEW_DATE_POSTED",1);
-define("VIEW_CREATOR_ID",2);
-define("VIEW_CREATOR_NAME",3);
-define("VIEW_BODY",4);
-define("VIEW_CREATOR_IP",5);
-define("VIEW_SUBJECT",6);
-define("VIEW_THREAD_ID",7);
-define("VIEW_CREATOR_IS_ADMIN",8);
-
 /**
 * Builds SQL queries for board usage
 *
@@ -41,6 +9,38 @@ define("VIEW_CREATOR_IS_ADMIN",8);
 */
 class BoardQuery
 {
+  /**
+  * list_query constants
+  **/
+  public const LIST_ID = 0;
+  public const LIST_DATE_LAST_POST = 1;
+  public const LIST_CREATOR_ID = 2;
+  public const LIST_CREATOR_NAME = 3;
+  public const LIST_LAST_POSTER_ID = 4;
+  public const LIST_LAST_POSTER_NAME = 5;
+  public const LIST_SUBJECT = 6;
+  public const LIST_POSTS = 7;
+  public const LIST_VIEWS = 8;
+  public const LIST_FIRSTPOST_BODY = 9;
+  public const LIST_LAST_VIEW_POSTS = 10;
+  public const LIST_DOTFLAG = 11;
+  public const LIST_STICKY = 12;
+  public const LIST_LOCKED = 13;
+  public const LIST_LEGENDARY = 14;
+
+  /**
+  * view_query constants
+  **/
+  public const VIEW_ID = 0;
+  public const VIEW_DATE_POSTED = 1;
+  public const VIEW_CREATOR_ID = 2;
+  public const VIEW_CREATOR_NAME = 3;
+  public const VIEW_BODY = 4;
+  public const VIEW_CREATOR_IP = 5;
+  public const VIEW_SUBJECT = 6;
+  public const VIEW_THREAD_ID = 7;
+  public const VIEW_CREATOR_IS_ADMIN = 8;
+
   /**
   * build thread listing query
   */
@@ -80,9 +80,9 @@ class BoardQuery
       $where = "WHERE t.id in ($threads)";
       $order = "ORDER BY indexOf(t.id,ARRAY[$threads])";
     }
-    
+
     if($cond) $where = $cond;
-    
+
     return "SELECT
               t.id as thread,
               extract(epoch from t.date_last_posted) as date_last_posted,
@@ -281,7 +281,7 @@ class BoardQuery
             $limit
             $offset";
   }
-  
+
   /**
   * build thread view query
   */

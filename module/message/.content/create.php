@@ -1,6 +1,6 @@
 <?php
-$Base = new Base;
-$Base->type(CREATE);
+$Base = Base::init();
+$Base->type(Base::CREATE);
 $Base->title("Create New Message");
 $Base->header();
 
