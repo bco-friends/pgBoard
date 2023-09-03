@@ -10,12 +10,14 @@ class BoardStyle
     public BoardCore $Core,
     public DB $DB,
     public $session_id,
-  )
-  {
-    if(!$this->theme)
-    {
-      if(session('id')) $this->set_theme($Core->member_pref(session('id'),"theme"));
-      if(!$this->theme) $this->load_default();
+  ) {
+    if (!$this->theme) {
+      if ($session_id) {
+        $this->set_theme($Core->member_pref($session_id, "theme"));
+      }
+      if (!$this->theme) {
+        $this->load_default();
+      }
     }
   }
 
