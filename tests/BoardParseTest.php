@@ -81,6 +81,10 @@ class BoardParseTest extends TestCase
       'youtube' => [
         '[youtube]https://youtu.be/VbhZZnIRPOI?si=x7H3P2hdz4LmJRef[/youtube]',
         '<a href="https://youtu.be/VbhZZnIRPOI?si=x7H3P2hdz4LmJRef" onclick="window.open(this.href); return false;">YOUTUBE REMOVED CLICK TO VIEW</a>'
+      ],
+      'vimeo' => [
+        '[vimeo]https://vimeo.com/15262898[/vimeo]',
+        '<a href="https://vimeo.com/15262898" onclick="window.open(this.href); return false;">VIMEO REMOVED CLICK TO VIEW</a>'
       ]
     ];
   }
