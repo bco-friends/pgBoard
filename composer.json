@@ -15,6 +15,10 @@
     "autoload-dev": {
         "psr-4": {
             "PgBoard\\PgBoard\\Tests\\": "tests/"
-        }
+        },
+        "files": [
+            "constants.php",
+            "lang/en.default.php"
+        ]
     }
 }

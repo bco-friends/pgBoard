@@ -1,38 +1,9 @@
 <?php
-define("LANG","en");
-
-define("ADMIN_EMAIL","admin@domain.com");
-define("DB","dbname=board user=board password=board");
-define("DIR","/path/to/board/www/");
-define("SPHINX_HOST","localhost");
-define("SPHINX_PORT",3312);
-
-define("REGISTRATION_OPEN",true);
-define("REGISTRATION_PASSWORD","membersonly"); // set to false to disable this feature
-define("MEMBER_REGEXP","|^[a-z0-9_-]{3,15}$|"); // regexp to define valid member name
-define("INACTIVITY_LOCK_INTERVAL", "1 year"); // the amount of time a member can only read the board
-define("INACTIVITY_WARNING_INTERVAL", "9 months"); // the amount of time before a warning is displayed for inactivity
-
-define("IGNORE_ENABLED",true); // if you disable this be sure to DELETE * FROM member_ignore
-define("IGNORE_PUBLIC",true); // set to false to make ignoring private
-define("IGNORE_BUFFER","1 year"); // how long from first post until ignore can be used (set false to disable)
-
-define("IGNORED_THREADS_PUBLIC",true); // set to false to make thread ignoring private
-define("FAVORITES_PUBLIC",true); // set to false to make favorite threads private
-
-define("LIST_DEFAULT_LIMIT",100); // number of threads per page
-define("COLLAPSE_DEFAULT",25); // default value to collapse at
-define("COLLAPSE_OPEN_DEFAULT",5); // default number of posts to leave open after collapse
-define("UNCOLLAPSE_COUNT_DEFAULT",15); // number of additional posts to show when showing "more"
-
-define("FUNDRAISER_ID",-1); // id of fundraiser record in database
-define("FUNDRAISER_ITEM_NAME","Board Hosting"); // item name for paypal ipn to recognize payment
-define("FUNDRAISER_EMAIL","adminpaypal@domain.com"); // email address for paypal payments
-
-define("VIEW_DATE_FORMAT","F jS, Y @ g:i:s a");
-define("LIST_DATE_FORMAT","D\&\\n\b\s\p\;M\&\\n\b\s\p\;d\&\\n\b\s\p;Y&\\n\b\s\p\;h:i\&\\n\b\s\p\;a");
-
-define("FORM_SALT","aksjdsa9*^&*@&(@*22@*1");
+if (is_readable(__DIR__ . '/constants.override.php')) {
+  require_once __DIR__ . '/constants.override.php';
+} else {
+  require_once __DIR__ . '/constants.default.php';
+}
 
 // functions allowed no matter what your login state
 $_allowed_ = array("threadmain","threadlist","threadview","threadviewpost",
