@@ -161,7 +161,7 @@ require_once("class/Plugin.php");    // plugins
 
 $DB = new DB(DB,true);
 $Security = new BoardSecurity($DB, $_allowed_);
-$Parse = new BoardParse($_bbc_,$_rep_);
+$Parse = BoardParse::init($_bbc_,$_rep_);
 if(!session('id') && cookie('board')) $Security->login_cookie();
 $Core = new BoardCore($DB, $Security, $Parse);
 $Style = new BoardStyle($Core, $DB, session('id'));

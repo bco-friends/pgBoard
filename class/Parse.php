@@ -1,19 +1,33 @@
 <?php
 class BoardParse
 {
-  private $bbc;
-  private $rep;
-  private $imgsuffix = array("jpg","gif","png");
-  private $hidemedia = false;
+  private $imgsuffix = ["jpg", "gif", "png"];
 
-  function __construct($bbc,$rep)
-  {
-    $this->bbc = $bbc;
-    $this->rep = $rep;
-    $this->hidemedia = session('hidemedia');
-    if(get('media')=='enabled') $this->hidemedia=false;
-    else if(get('media')=='disabled') $this->hidemedia=true;
-    else if(get('media')) $this->hidemedia = !$this->hidemedia;
+  public function __construct(
+    private $bbc,
+    private $rep,
+    private bool $hidemedia
+  ) {}
+
+  public static function init($bbc, $rep): self {
+      $hidemedia = function()
+      {
+        if (get('media') == 'enabled') {
+          return false;
+        }
+
+        if (get('media') == 'disabled') {
+          return true;
+        }
+
+        if (get('media')) {
+          return !session('hidemedia');
+        }
+
+        return false;
+      };
+
+      return new self($bbc, $rep, $hidemedia());
   }
 
   // prepare urls (so hack)
