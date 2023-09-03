@@ -1,9 +1,5 @@
 <?php
-if (is_readable(__DIR__ . '/constants.override.php')) {
-  require_once __DIR__ . '/constants.override.php';
-} else {
-  require_once __DIR__ . '/constants.default.php';
-}
+require_once __DIR__ . '/constants.php';
 
 // functions allowed no matter what your login state
 $_allowed_ = array("threadmain","threadlist","threadview","threadviewpost",
