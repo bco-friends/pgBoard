@@ -72,6 +72,15 @@ class BoardParseTest extends TestCase
     return new BoardParse($this->bbc, $this->rep, false);
   }
 
+  public static function getHideMediaEmbeds(): array {
+    return [
+      'youtube' => [
+        '[youtube]https://youtu.be/VbhZZnIRPOI?si=x7H3P2hdz4LmJRef[/youtube]',
+        '<a href="https://youtu.be/VbhZZnIRPOI?si=x7H3P2hdz4LmJRef" onclick="window.open(this.href); return false;">YOUTUBE REMOVED CLICK TO VIEW</a>'
+      ]
+    ];
+  }
+
   /**
    * @covers BoardParse::__construct
    * @test
@@ -108,5 +117,15 @@ class BoardParseTest extends TestCase
       '<object width="425" height="355"><param name="movie" value="https://youtube.com/v/VbhZZnIRPOI?si=x7H3P2hdz4LmJRef"></param><param name="wmode" value="transparent"></param><embed src="https://youtube.com/v/VbhZZnIRPOI?si=x7H3P2hdz4LmJRef" type="application/x-shockwave-flash" wmode="transparent" width="425" height="355"></embed></object>',
       $parse->run('[youtube]https://youtu.be/VbhZZnIRPOI?si=x7H3P2hdz4LmJRef[/youtube]')
     );
+  }
+
+  /**
+   * @covers BoardParse::run
+   * @dataProvider getHideMediaEmbeds
+   * @test
+   */
+  public function it_creates_links_when_media_is_hidden(string $link_text, string $expected_html)
+  {
+    self::assertSame($expected_html, (new BoardParse($this->bbc, $this->rep, true))->run($link_text));
   }
 }
