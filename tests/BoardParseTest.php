@@ -74,6 +74,10 @@ class BoardParseTest extends TestCase
 
   public static function getHideMediaEmbeds(): array {
     return [
+      'img' => [
+        '[img]https://i.pinimg.com/originals/24/01/ed/2401ed63791dcbafdd7f5fd9a3d07c75.jpg[/img]',
+        '<a href="https://i.pinimg.com/originals/24/01/ed/2401ed63791dcbafdd7f5fd9a3d07c75.jpg" class="link" onclick="$(this).after(\'<img src=\\\'\'+this.href+\'\\\' ondblclick=\\\'window.open(this.src);return false\\\'/>\');$(this).remove();return false;">IMAGE REMOVED CLICK TO VIEW</a>'
+      ],
       'youtube' => [
         '[youtube]https://youtu.be/VbhZZnIRPOI?si=x7H3P2hdz4LmJRef[/youtube]',
         '<a href="https://youtu.be/VbhZZnIRPOI?si=x7H3P2hdz4LmJRef" onclick="window.open(this.href); return false;">YOUTUBE REMOVED CLICK TO VIEW</a>'
