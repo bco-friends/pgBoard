@@ -89,6 +89,10 @@ class BoardParseTest extends TestCase
       'soundcloud' => [
         '[soundcloud]https://soundcloud.com/subpop/pissed-jeans-false-jesii-part?utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing[/soundcloud]',
         '<a href="https://soundcloud.com/subpop/pissed-jeans-false-jesii-part?utm_source=clipboard&amp;utm_medium=text&amp;utm_campaign=social_sharing" onclick="window.open(this.href); return false;">SOUNDCLOUD REMOVED CLICK TO VIEW</a>'
+      ],
+      'twitter' => [
+        '[tweet]https://twitter.com/somebadideas/status/1588876465915166721[/tweet]',
+        '<a href="https://twitter.com/somebadideas/status/1588876465915166721" onclick="window.open(this.href); return false;">TWEET REMOVED CLICK TO VIEW</a>'
       ]
     ];
   }
