@@ -11,9 +11,9 @@ function thread_get()
   $page = cmd(3,true)+1;
 
   $Query = new BoardQuery;
-  $List = new BoardList;
-  $List->type(LIST_THREAD_SEARCH);
-  
+  $List = BoardList::init();
+  $List->type(Base::LIST_THREAD_SEARCH);
+
   $List->title("Search Threads: ".htmlentities(cmd(2)));
   $List->subtitle(number_format($res['total'])." results found showing ".($offset?$offset:1)."-".($offset+100).SPACE.ARROW_RIGHT.SPACE."page: $page");
   $List->header(false);
@@ -40,9 +40,9 @@ function thread_post_get()
   $page = cmd(3,true)+1;
 
   $Query = new BoardQuery;
-  $View = new BoardView;
-  $View->type(VIEW_THREAD_SEARCH);
-  
+  $View = BoardView::init();
+  $View->type(Base::VIEW_THREAD_SEARCH);
+
   $View->title("Search Thread Posts: ".htmlentities(cmd(2)));
   $View->subtitle(number_format($res['total'])." results found showing ".($offset?$offset:1)."-".($offset+100).SPACE.ARROW_RIGHT.SPACE."page: $page");
   $View->header(false);
