@@ -33,3 +33,9 @@ phpstan:
 
 phpunit:
 	docker exec -it pgb-php vendor/bin/phpunit
+
+xdebug-on:
+	docker exec -it pgb-php cp /var/www/html/docker/php/conf/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+		&& docker restart pgb-php
+xdebug-off:
+	docker exec -it pgb-php rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && docker restart pgb-php
