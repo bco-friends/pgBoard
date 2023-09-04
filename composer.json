@@ -3,13 +3,16 @@
     "description": "A pretty good board.",
     "type": "project",
     "require-dev": {
+        "fakerphp/faker": "^1.23",
         "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^10.3",
-        "fakerphp/faker": "^1.23",
         "symfony/console": "^6.3"
     },
     "autoload": {
-        "classmap": ["class/"]
+        "classmap": ["class/"],
+        "psr-4": {
+            "PgBoard\\PgBoard\\": "class/src"
+        }
     },
     "autoload-dev": {
         "psr-4": {
@@ -18,5 +21,8 @@
     },
     "require": {
         "symfony/dotenv": "^6.3"
+    },
+    "config": {
+        "sort-packages": true
     }
 }
