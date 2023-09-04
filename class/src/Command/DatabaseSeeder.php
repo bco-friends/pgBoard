@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace PgBoard\PgBoard\Command;
 
+use DB;
 use Faker\Factory;
+use Faker\Generator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -14,6 +16,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'db:seed')]
 class DatabaseSeeder extends Command
 {
+  private DB $DB;
+  private Generator $faker;
+
   protected function configure()
   {
     $this
@@ -31,24 +36,47 @@ class DatabaseSeeder extends Command
   {
     global $DB;
 
-    $faker = Factory::create();
-    $count = $input->getOption('count') ?? 1;
+    $this->DB = $DB;
+    $this->faker = Factory::create();
+
+    $this->generateMembers($input, $output);
+
+    return Command::SUCCESS;
+  }
+
+  private function generateMembers(InputInterface $input, OutputInterface $output)
+  {
+    $count = $input->getOption('count') ?? 1000;
+    $failures = 0;
 
     for ($i = 0; $i < $count; $i++) {
-      $DB->insert(
+      $result = $this->DB->insert(
         'member',
         [
-          'name'         => $faker->userName(),
-          'email_signup' => $faker->safeEmail(),
-          'pass'         => md5($faker->password()),
-          'postalcode'   => $faker->postcode(),
-          'secret'       => md5($faker->word()),
-          'ip'           => $faker->ipv4(),
+          'name'         => $this->faker->userName(),
+          'email_signup' => $this->faker->safeEmail(),
+          'pass'         => md5($this->faker->password()),
+          'postalcode'   => $this->faker->postcode(),
+          'secret'       => md5($this->faker->word()),
+          'ip'           => $this->faker->ipv4(),
         ]
       );
+
+      /*
+       * Because database inserts fail silently, we don't know what specifically caused the error with the
+       * insert query. For now, increment the failure and deduct it from the total requested so we can report
+       * back the number of records that were added.
+       */
+      if (is_bool($result)) {
+        $failures++;
+      }
     }
 
-    $output->writeln("Seeded {$count} records.");
-    return Command::SUCCESS;
+    $output->writeln(
+      sprintf(
+        "Successfully generated %d member records.",
+        $count - $failures,
+      )
+    );
   }
 }
