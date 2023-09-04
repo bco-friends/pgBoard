@@ -7,5 +7,3 @@ RUN docker-php-ext-install pgsql pdo_pgsql
 
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug
-
-COPY ./conf/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
