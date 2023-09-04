@@ -39,3 +39,6 @@ xdebug-on:
 		&& docker restart pgb-php
 xdebug-off:
 	docker exec -it pgb-php rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && docker restart pgb-php
+
+db-seed:
+	docker exec -it pgb-php php index.php db:seed
