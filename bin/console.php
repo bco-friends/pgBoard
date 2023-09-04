@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 $baseDir = dirname(__DIR__);
 

@@ -16,10 +16,12 @@ class CommandService
     private readonly Application $application
   ) {}
 
-  public static function load() {
+  public static function load(): Application {
     $application = new Application();
     $service = new self($application);
     $service->load_commands();
+
+    return $application;
   }
 
   public function load_commands()
