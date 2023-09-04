@@ -18,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'db:seed')]
 class DatabaseSeeder extends Command
 {
+  private const TEST_PASSWORD = 'testing123';
   private DB $DB;
   private Data $Data;
   private Generator $faker;
@@ -60,7 +61,7 @@ class DatabaseSeeder extends Command
         [
           'name'         => $this->faker->userName(),
           'email_signup' => $this->faker->safeEmail(),
-          'pass'         => md5('testing123'),
+          'pass'         => md5(self::TEST_PASSWORD),
           'postalcode'   => $this->faker->postcode(),
           'secret'       => md5($this->faker->word()),
           'ip'           => $this->faker->ipv4(),
@@ -121,7 +122,7 @@ class DatabaseSeeder extends Command
         ob_start();
         $result                 = $this->Data->thread_insert([
           'name' => $memberName,
-          'pass' => 'testing123',
+          'pass' => self::TEST_PASSWORD,
           'subject' => $this->faker->text(),
           'body' => $this->faker->paragraphs(rand(1, 10), true)
         ]);
