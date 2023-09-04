@@ -39,7 +39,7 @@ class DatabaseSeeder extends Command
         'member',
         [
           'name'         => $faker->userName(),
-          'email_signup' => $faker->email(),
+          'email_signup' => $faker->safeEmail(),
           'pass'         => md5($faker->password()),
           'postalcode'   => $faker->postcode(),
           'secret'       => md5($faker->word()),
