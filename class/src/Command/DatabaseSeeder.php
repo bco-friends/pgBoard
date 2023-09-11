@@ -10,10 +10,12 @@ use Faker\Generator;
 use PgSql\Result;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
 
 #[AsCommand(name: 'db:seed')]
 class DatabaseSeeder extends Command
@@ -44,15 +46,23 @@ class DatabaseSeeder extends Command
     $this->Data = new Data($DB, $Security);
     $this->faker = Factory::create();
 
-    $this->generateMembers($input, $output);
-    $this->generateThreads($input, $output);
+    $helper = $this->getHelper('question');
+
+    $this->generateMembers($helper, $input, $output);
+    $this->generateThreads($helper, $input, $output);
 
     return Command::SUCCESS;
   }
 
-  private function generateMembers(InputInterface $input, OutputInterface $output)
+  private function generateMembers(QuestionHelper $helper, InputInterface $input, OutputInterface $output)
   {
-    $count = $input->getOption('count') ?? 1000;
+    $question = new Question('How many members would you like to generate? ');
+    $count = $helper->ask($input, $output, $question);
+
+    if (!is_numeric($count)) {
+      $count = $input->getOption('count') ?? 1000;
+    }
+
     $failures = 0;
 
     for ($i = 0; $i < $count; $i++) {
@@ -86,9 +96,15 @@ class DatabaseSeeder extends Command
     );
   }
 
-  private function generateThreads(InputInterface $input, OutputInterface $output)
+  private function generateThreads(QuestionHelper $helper, InputInterface $input, OutputInterface $output)
   {
-    $count = $input->getOption('count') ?? 1000;
+    $question = new Question('How many threads would you like to generate? ');
+    $count = $helper->ask($input, $output, $question);
+
+    if (!is_numeric($count)) {
+      $count = $input->getOption('count') ?? 1000;
+    }
+
     $failures = 0;
 
     $indexQuery = <<<SQL
