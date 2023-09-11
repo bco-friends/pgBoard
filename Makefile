@@ -7,7 +7,8 @@ help:
 	"\n" start: "\t" Start the Docker container \
 	"\n" stop: "\t\t" Stop the Docker container \
 	"\n" refresh: "\t" Stop, rebuild, and restart the Docker container \
-	"\n" php-shell: "\t" Open a shell session into the PHP container
+	"\n" php-shell: "\t" Open a shell session into the PHP container \
+	"\n" db-seed: "\t" Seed the database with sample data. \
 
 # Starts the Docker container.
 start:
