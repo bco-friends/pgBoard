@@ -52,6 +52,12 @@ class DatabaseSeeder extends Command
 
     $helper = $this->getHelper('question');
 
+    try {
+      $this->createRandomizationQuery();
+    } catch (\Exception $e) {
+      $output->writeln($e->getMessage());
+    }
+
     $this->generateMembers($helper, $input, $output);
     $this->generateThreads($helper, $input, $output);
     $this->generateReplies($helper, $input, $output);
@@ -61,16 +67,17 @@ class DatabaseSeeder extends Command
 
   private function generateMembers(QuestionHelper $helper, InputInterface $input, OutputInterface $output)
   {
-    $question = new Question('How many members would you like to generate? ');
+    $default = 1000;
+    $question = new Question("How many members would you like to generate? (Default: {$default}): ");
     $count = $helper->ask($input, $output, $question);
 
     if (!is_numeric($count)) {
-      $count = $input->getOption('count') ?? 1000;
+      $count = $input->getOption('count') ?? $default;
     }
 
     $failures = 0;
 
-    $progressBar = new ProgressBar($output, (int) $count);
+    $progressBar = new ProgressBar($output, $count);
     $progressBar->start();
 
     for ($i = 0; $i < $count; $i++) {
@@ -149,21 +156,15 @@ class DatabaseSeeder extends Command
 
   private function generateThreads(QuestionHelper $helper, InputInterface $input, OutputInterface $output)
   {
-    $question = new Question('How many threads would you like to generate? ');
+    $default = 1000;
+    $question = new Question("How many threads would you like to generate? (Default: {$default}): ");
     $count = $helper->ask($input, $output, $question);
 
     if (!is_numeric($count)) {
-      $count = $input->getOption('count') ?? 1000;
+      $count = $input->getOption('count') ?? $default;
     }
 
     $failures = 0;
-
-    try {
-      $this->createRandomizationQuery();
-    } catch (\Exception $e) {
-      $output->writeln($e->getMessage());
-    }
-
     $progressBar = new ProgressBar($output, (int) $count);
     $progressBar->start();
 
@@ -203,12 +204,13 @@ class DatabaseSeeder extends Command
 
   public function generateReplies(QuestionHelper $helper, InputInterface $input, OutputInterface $output): void
   {
-    $question = new Question('How many thread replies would you like to generate? ');
+    $default = 1000;
+    $question = new Question("How many thread replies would you like to generate? (Default: {$default}): ");
     $count    = $helper->ask($input, $output, $question);
     $failures = 0;
 
     if (!is_numeric($count)) {
-      $count = $input->getOption('count') ?? 1000;
+      $count = $input->getOption('count') ?? $default;
     }
 
     $progressBar = new ProgressBar($output, (int) $count);
