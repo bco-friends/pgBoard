@@ -54,6 +54,7 @@ class DatabaseSeeder extends Command
 
     $this->generateMembers($helper, $input, $output);
     $this->generateThreads($helper, $input, $output);
+    $this->generateReplies($helper, $input, $output);
 
     return Command::SUCCESS;
   }
@@ -107,17 +108,8 @@ class DatabaseSeeder extends Command
     $progressBar->finish();
   }
 
-  private function generateThreads(QuestionHelper $helper, InputInterface $input, OutputInterface $output)
+  private function createRandomizationQuery(): void
   {
-    $question = new Question('How many threads would you like to generate? ');
-    $count = $helper->ask($input, $output, $question);
-
-    if (!is_numeric($count)) {
-      $count = $input->getOption('count') ?? 1000;
-    }
-
-    $failures = 0;
-
     $indexQuery = <<<SQL
         CREATE OR REPLACE FUNCTION random_between(low integer, high integer)
                RETURNS integer
@@ -133,7 +125,43 @@ class DatabaseSeeder extends Command
     $result = $this->DB->query($indexQuery);
 
     if (is_bool($result)) {
-      $output->writeln("Failed to create random_between function.");
+      throw new \Exception("Failed to create random_between function.");
+    }
+  }
+
+  private function getRandomMemberId(): int
+  {
+    return (int)pg_fetch_result(
+      $this->DB->query("SELECT random_between(min(id), max(id)) from member"),
+      0,
+      0
+    );
+  }
+
+  private function getRandomThreadId(): int
+  {
+    return (int)pg_fetch_result(
+      $this->DB->query("SELECT random_between(min(id), max(id)) from thread"),
+      0,
+      0
+    );
+  }
+
+  private function generateThreads(QuestionHelper $helper, InputInterface $input, OutputInterface $output)
+  {
+    $question = new Question('How many threads would you like to generate? ');
+    $count = $helper->ask($input, $output, $question);
+
+    if (!is_numeric($count)) {
+      $count = $input->getOption('count') ?? 1000;
+    }
+
+    $failures = 0;
+
+    try {
+      $this->createRandomizationQuery();
+    } catch (\Exception $e) {
+      $output->writeln($e->getMessage());
     }
 
     $progressBar = new ProgressBar($output, (int) $count);
@@ -142,11 +170,7 @@ class DatabaseSeeder extends Command
     for ($i = 0; $i < $count; $i++) {
       try {
         $_SERVER['REMOTE_ADDR'] = $this->faker->ipv4();
-        $memberId = pg_fetch_result(
-          $this->DB->query("SELECT random_between(min(id), max(id)) from member"),
-          0,
-          0
-        );
+        $memberId = $this->getRandomMemberId();
         $memberName = pg_fetch_result($this->DB->query("SELECT name FROM member WHERE id = $1", [$memberId]), 0, 0);
 
         ob_start();
@@ -159,6 +183,7 @@ class DatabaseSeeder extends Command
         ob_end_clean();
       } catch (\Throwable $e) {
         $failures++;
+        $output->writeln($e->getMessage());
         continue;
       } finally {
         $progressBar->advance();
@@ -174,6 +199,35 @@ class DatabaseSeeder extends Command
         $count,
       )
     );
+  }
 
+  public function generateReplies(QuestionHelper $helper, InputInterface $input, OutputInterface $output): void
+  {
+    $question = new Question('How many thread replies would you like to generate? ');
+    $count    = $helper->ask($input, $output, $question);
+    $failures = 0;
+
+    if (!is_numeric($count)) {
+      $count = $input->getOption('count') ?? 1000;
+    }
+
+    $progressBar = new ProgressBar($output, (int) $count);
+    $progressBar->start();
+
+    for ($i = 0; $i < $count; $i++) {
+      $_SERVER['REMOTE_ADDR'] = $this->faker->ipv4();
+
+      $this->Data->thread_post_insert(
+        [
+          'thread_id' => $this->getRandomThreadId(),
+          'body' => $this->faker->paragraphs(rand(1, 10), true)
+        ],
+        $this->getRandomMemberId()
+      );
+
+      $progressBar->advance();
+    }
+
+    $progressBar->finish();
   }
 }
