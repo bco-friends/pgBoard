@@ -9,6 +9,7 @@ services:
     links:
       - postgres
   composer:
+    container_name: pgb-composer
     image: composer:latest
     volumes:
       - ./:/var/www/html
