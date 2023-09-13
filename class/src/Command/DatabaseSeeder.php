@@ -10,6 +10,7 @@ use Faker\Generator;
 use PgSql\Result;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,6 +25,7 @@ class DatabaseSeeder extends Command
   private DB $DB;
   private Data $Data;
   private Generator $faker;
+  private ProgressBar $progressBar;
 
   protected function configure()
   {
@@ -40,7 +42,9 @@ class DatabaseSeeder extends Command
 
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    global $DB, $Security;
+    global $DB, $Security, $commandline;
+
+    $commandline = true;
 
     $this->DB = $DB;
     $this->Data = new Data($DB, $Security);
@@ -65,6 +69,9 @@ class DatabaseSeeder extends Command
 
     $failures = 0;
 
+    $progressBar = new ProgressBar($output, (int) $count);
+    $progressBar->start();
+
     for ($i = 0; $i < $count; $i++) {
       $result = $this->DB->insert(
         'member',
@@ -86,14 +93,18 @@ class DatabaseSeeder extends Command
       if (is_bool($result)) {
         $failures++;
       }
+
+      $progressBar->advance();
     }
 
     $output->writeln(
       sprintf(
-        "Successfully generated %d member records.",
+        "\nSuccessfully generated %d member records.",
         $count - $failures,
       )
     );
+
+    $progressBar->finish();
   }
 
   private function generateThreads(QuestionHelper $helper, InputInterface $input, OutputInterface $output)
@@ -125,6 +136,9 @@ class DatabaseSeeder extends Command
       $output->writeln("Failed to create random_between function.");
     }
 
+    $progressBar = new ProgressBar($output, (int) $count);
+    $progressBar->start();
+
     for ($i = 0; $i < $count; $i++) {
       try {
         $_SERVER['REMOTE_ADDR'] = $this->faker->ipv4();
@@ -146,15 +160,20 @@ class DatabaseSeeder extends Command
       } catch (\Throwable $e) {
         $failures++;
         continue;
+      } finally {
+        $progressBar->advance();
       }
     }
 
+    $progressBar->finish();
+
     $output->writeln(
       sprintf(
-        "Successfully generated %d new threads out of %d requested.",
+        "\nSuccessfully generated %d new threads out of %d requested.",
         $count - $failures,
         $count,
       )
     );
+
   }
 }
