@@ -29,6 +29,9 @@ refresh: stop build-up
 php-shell:
 	docker exec -it pgb-php /bin/bash
 
+db-shell:
+	docker exec -it pgb-postgres psql -U postgres -w
+
 phpstan:
 	docker exec -it pgb-php vendor/bin/phpstan analyse index.php config.php error.php core.php class module
 
