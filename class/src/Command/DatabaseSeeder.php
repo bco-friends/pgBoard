@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace PgBoard\PgBoard\Command;
@@ -34,11 +35,16 @@ class DatabaseSeeder extends Command
     $this
       ->setDescription('Populates the database with fake data to support pgBoard application development.')
       ->setDefinition(
-          new InputDefinition([
-            new InputOption('all', null, InputOption::VALUE_OPTIONAL, 'Seed the entire application with a sample amount of data.'),
-            new InputOption('table', 't', InputOption::VALUE_OPTIONAL, 'Seed a specific database table with data.'),
-            new InputOption('count', 'c', InputOption::VALUE_OPTIONAL, 'Set the number of records to generate.'),
-          ])
+        new InputDefinition([
+          new InputOption(
+            'all',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Seed the entire application with a sample amount of data.'
+          ),
+          new InputOption('table', 't', InputOption::VALUE_OPTIONAL, 'Seed a specific database table with data.'),
+          new InputOption('count', 'c', InputOption::VALUE_OPTIONAL, 'Set the number of records to generate.'),
+        ])
       );
   }
 
@@ -48,8 +54,8 @@ class DatabaseSeeder extends Command
 
     $commandline = true;
 
-    $this->DB = $DB;
-    $this->Data = new Data($DB, $Security);
+    $this->DB    = $DB;
+    $this->Data  = new Data($DB, $Security);
     $this->faker = Factory::create();
 
     $helper = $this->getHelper('question');
@@ -63,6 +69,7 @@ class DatabaseSeeder extends Command
     $this->generateMembers($helper, $input, $output);
     $this->generateThreads($helper, $input, $output);
     $this->generateReplies($helper, $input, $output);
+    $this->generateMessages($helper, $input, $output);
 
     return Command::SUCCESS;
   }
@@ -73,7 +80,7 @@ class DatabaseSeeder extends Command
 
     if (!$input->getOption(self::NON_INTERACTIVE)) {
       $question = new Question("How many members would you like to generate? (Default: {$default}): ");
-      $count = $helper->ask($input, $output, $question);
+      $count    = $helper->ask($input, $output, $question);
     }
 
     if (!is_numeric($count)) {
@@ -144,10 +151,15 @@ class DatabaseSeeder extends Command
   private function getRandomMemberId(): int
   {
     return (int)pg_fetch_result(
-      $this->DB->query("SELECT random_between(min(id), max(id)) from member"),
+      $this->DB->query("SELECT random_between(min(id), max(id)) from member LIMIT 1"),
       0,
       0
     );
+  }
+
+  private function getMemberNameById($memberId)
+  {
+    return pg_fetch_result($this->DB->query("SELECT name FROM member WHERE id = $1", [$memberId]), 0, 0);
   }
 
   private function getRandomThreadId(): int
@@ -165,30 +177,31 @@ class DatabaseSeeder extends Command
 
     if (!$input->getOption(self::NON_INTERACTIVE)) {
       $question = new Question("How many threads would you like to generate? (Default: {$default}): ");
-      $count = $helper->ask($input, $output, $question);
+      $count    = $helper->ask($input, $output, $question);
     }
 
     if (!is_numeric($count)) {
       $count = $input->getOption('count') ?? $default;
     }
 
-    $failures = 0;
-    $progressBar = new ProgressBar($output, (int) $count);
+    $failures    = 0;
+    $progressBar = new ProgressBar($output, (int)$count);
     $progressBar->start();
 
     for ($i = 0; $i < $count; $i++) {
       try {
         $_SERVER['REMOTE_ADDR'] = $this->faker->ipv4();
-        $memberId = $this->getRandomMemberId();
-        $memberName = pg_fetch_result($this->DB->query("SELECT name FROM member WHERE id = $1", [$memberId]), 0, 0);
+        $memberId               = $this->getRandomMemberId();
+        $memberName             = $this->getMemberNameById($memberId);
 
         ob_start();
-        $result                 = $this->Data->thread_insert([
-          'name' => $memberName,
-          'pass' => self::TEST_PASSWORD,
+        $result = $this->Data->thread_insert([
+          'name'    => $memberName,
+          'pass'    => self::TEST_PASSWORD,
           'subject' => $this->faker->text(),
-          'body' => $this->faker->paragraphs(rand(1, 10), true)
+          'body'    => $this->faker->paragraphs(rand(1, 10), true),
         ]);
+
         ob_end_clean();
       } catch (\Throwable $e) {
         $failures++;
@@ -225,7 +238,7 @@ class DatabaseSeeder extends Command
       $count = $input->getOption('count') ?? $default;
     }
 
-    $progressBar = new ProgressBar($output, (int) $count);
+    $progressBar = new ProgressBar($output, (int)$count);
     $progressBar->start();
 
     for ($i = 0; $i < $count; $i++) {
@@ -234,7 +247,7 @@ class DatabaseSeeder extends Command
       $this->Data->thread_post_insert(
         [
           'thread_id' => $this->getRandomThreadId(),
-          'body' => $this->faker->paragraphs(rand(1, 10), true)
+          'body'      => $this->faker->paragraphs(rand(1, 10), true),
         ],
         $this->getRandomMemberId()
       );
@@ -243,5 +256,79 @@ class DatabaseSeeder extends Command
     }
 
     $progressBar->finish();
+  }
+
+  private function generateMessages(QuestionHelper $helper, InputInterface $input, OutputInterface $output): void
+  {
+    $default  = 1000;
+    $failures = 0;
+
+    if (!$input->getOption(self::NON_INTERACTIVE)) {
+      $question = new Question("How many messages would you like to generate? (Default: {$default}): ");
+      $count    = $helper->ask($input, $output, $question);
+    }
+
+    if (!is_numeric($count)) {
+      $count = $input->getOption('count') ?? $default;
+    }
+
+    $progressBar = new ProgressBar($output, $count);
+    $progressBar->start();
+
+
+    for ($i = 0; $i < $count; $i++) {
+      $memberCount  = rand(1, 5);
+      $member = $this->getRandomMember();
+      $recipientIds = [];
+
+      for ($k = 0; $k < $memberCount; $k++) {
+        $recipientIds[] = $this->getRandomMemberId();
+      }
+
+      if (!in_array($member['id'], $recipientIds, true)) {
+        $recipientIds[] = $member['id'];
+      }
+
+      $_SERVER['REMOTE_ADDR'] = $this->faker->ipv4();
+
+      ob_start();
+      if (!$this->Data->message_insert(
+        [
+          'name'            => $member['name'],
+          'pass'            => self::TEST_PASSWORD,
+          'thread_id'       => $this->getRandomThreadId(),
+          'subject'         => $this->faker->text(),
+          'body'            => $this->faker->paragraphs(rand(1, 10), true),
+          'message_members' => implode(',', array_unique(array_filter($recipientIds))),
+        ],
+        $member['id'],
+      )
+    ) {
+        ob_end_clean();
+        $failures++;
+        $progressBar->advance();
+        continue;
+    }
+
+      ob_end_clean();
+      $progressBar->advance();
+    }
+
+    $successes = $count - $failures;
+    $output->writeln(PHP_EOL . "Successfully generated {$successes} messages out of {$count} requested.");
+
+    $progressBar->finish();
+  }
+
+  /**
+   * Get a random user from the database.
+   *
+   * @return array
+   */
+  private function getRandomMember(): array
+  {
+    $result = pg_fetch_all($this->DB->query('SELECT * FROM member WHERE id IN (SELECT random_between(min(id), max(id)) FROM member LIMIT 1)'));
+
+    return !empty($result) ? array_pop($result) : [];
   }
 }
