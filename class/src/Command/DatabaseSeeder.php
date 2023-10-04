@@ -261,7 +261,7 @@ class DatabaseSeeder extends Command
 
     for ($i = 0; $i < $count; $i++) {
       $memberCount  = rand(1, 5);
-      $member       = $this->getRandomMember();
+      $member       = $this->query->getRandomMember();
       $recipientIds = [];
 
       for ($k = 0; $k < $memberCount; $k++) {
@@ -335,19 +335,5 @@ class DatabaseSeeder extends Command
 
     $successCount = $count - $failures;
     $output->writeln("\nSuccessfully generated {$successCount} chat messages out of {$count} requested.");
-  }
-
-  /**
-   * Get a random user from the database.
-   *
-   * @return array
-   */
-  private function getRandomMember(): array
-  {
-    $result = pg_fetch_all(
-      $this->db->query('SELECT * FROM member WHERE id IN (SELECT random_between(min(id), max(id)) FROM member LIMIT 1)')
-    );
-
-    return !empty($result) ? array_pop($result) : [];
   }
 }

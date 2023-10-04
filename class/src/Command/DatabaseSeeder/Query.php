@@ -31,4 +31,18 @@ class Query
       throw new \Exception("Failed to create random_between function.");
     }
   }
+
+  /**
+   * Get a random user from the database.
+   *
+   * @return array
+   */
+  public function getRandomMember(): array
+  {
+    $result = pg_fetch_all(
+      $this->db->query('SELECT * FROM member WHERE id IN (SELECT random_between(min(id), max(id)) FROM member LIMIT 1)')
+    );
+
+    return !empty($result) ? array_pop($result) : [];
+  }
 }
