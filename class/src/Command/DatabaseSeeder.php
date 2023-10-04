@@ -99,12 +99,6 @@ class DatabaseSeeder extends Command
     return Command::SUCCESS;
   }
 
-  private function getMemberNameById($memberId)
-  {
-    return pg_fetch_result($this->db->query("SELECT name FROM member WHERE id = $1", [$memberId]), 0, 0);
-  }
-
-
   public function generateReplies(QuestionHelper $helper, InputInterface $input, OutputInterface $output): void
   {
     $default = 1000;
