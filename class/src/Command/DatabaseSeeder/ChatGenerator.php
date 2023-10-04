@@ -23,6 +23,13 @@ class ChatGenerator extends DataGenerator
       $count = $this->input->getOption('count') ?? $default;
     }
 
+    $this->output->writeln(
+      sprintf(
+        "\nAttempting to generate %d chat posts...",
+        $count
+      )
+    );
+
     $progressBar = new ProgressBar($this->output, (int)$count);
     $progressBar->start();
 
@@ -39,7 +46,11 @@ class ChatGenerator extends DataGenerator
 
     $progressBar->finish();
 
-    $successCount = $count - $failures;
-    $this->output->writeln("\nSuccessfully generated {$successCount} chat messages out of {$count} requested.");
+    $this->output->writeln(
+      sprintf(
+        "\nSuccessfully generated %d chat posts.",
+        $count - $failures
+      )
+    );
   }
 }
