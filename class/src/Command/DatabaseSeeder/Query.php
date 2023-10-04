@@ -45,4 +45,13 @@ class Query
 
     return !empty($result) ? array_pop($result) : [];
   }
+
+  public function getRandomMemberId(): int
+  {
+    return (int)pg_fetch_result(
+      $this->db->query("SELECT random_between(min(id), max(id)) from member LIMIT 1"),
+      0,
+      0
+    );
+  }
 }

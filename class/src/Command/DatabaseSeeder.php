@@ -131,15 +131,6 @@ class DatabaseSeeder extends Command
     $progressBar->finish();
   }
 
-  private function getRandomMemberId(): int
-  {
-    return (int)pg_fetch_result(
-      $this->db->query("SELECT random_between(min(id), max(id)) from member LIMIT 1"),
-      0,
-      0
-    );
-  }
-
   private function getMemberNameById($memberId)
   {
     return pg_fetch_result($this->db->query("SELECT name FROM member WHERE id = $1", [$memberId]), 0, 0);
@@ -174,7 +165,7 @@ class DatabaseSeeder extends Command
     for ($i = 0; $i < $count; $i++) {
       try {
         $_SERVER['REMOTE_ADDR'] = $this->faker->ipv4();
-        $memberId               = $this->getRandomMemberId();
+        $memberId               = $this->query->getRandomMemberId();
         $memberName             = $this->getMemberNameById($memberId);
 
         ob_start();
@@ -232,7 +223,7 @@ class DatabaseSeeder extends Command
           'thread_id' => $this->getRandomThreadId(),
           'body'      => $this->faker->paragraphs(rand(1, 10), true),
         ],
-        $this->getRandomMemberId()
+        $this->query->getRandomMemberId()
       );
 
       $progressBar->advance();
@@ -265,7 +256,7 @@ class DatabaseSeeder extends Command
       $recipientIds = [];
 
       for ($k = 0; $k < $memberCount; $k++) {
-        $recipientIds[] = $this->getRandomMemberId();
+        $recipientIds[] = $this->query->getRandomMemberId();
       }
 
       if (!in_array($member['id'], $recipientIds, true)) {
@@ -322,7 +313,7 @@ class DatabaseSeeder extends Command
 
     for ($i = 0; $i < $count; $i++) {
       if (!$this->db->insert('chat', [
-        'member_id' => $this->getRandomMemberId(),
+        'member_id' => $this->query->getRandomMemberId(),
         'chat'      => $this->faker->realTextBetween(50, 400),
       ])) {
         $failures++;
