@@ -128,42 +128,47 @@ class Data
     if(!isset($data['name'])) $data['name'] = "";
     if(!isset($data['pass'])) $data['pass'] = "";
 
-    if($member_id = $this->Security->form_login($data['name'],$data['pass']))
-    {
-      $this->set_value("member_id",$member_id);
-      $this->set_value("last_member_id",$member_id);
-
-      $this->DB->begin();
-      if($this->DB->insert("message",$this->insert,array_keys($this->insert)))
-      {
-        $post = array();
-        $post['message_id'] = $this->DB->value("SELECT currval('message_id_seq')");
-        $post['body'] = $data['body'];
-
-        $members = explode(",",$data['message_members']);
-        $members[] = session('id');
-        foreach($members as $member_id)
-        {
-          $mm = array();
-          $mm['message_id'] = $post['message_id'];
-          $mm['member_id'] = $member_id;
-          $this->DB->insert("message_member",$mm);
-        }
-
-        if($this->message_post_insert($post,$member_id))
-        {
-          $this->DB->commit();
-          return true;
-        }
-        else
-        $this->DB->rollback();
-      }
+    if(!$member_id = $this->Security->form_login($data['name'],$data['pass'])) {
+      return false;
     }
-    else
-    {
+
+    $this->set_value("member_id",$member_id);
+    $this->set_value("last_member_id",$member_id);
+
+    $this->DB->begin();
+    if (!$this->DB->insert("message", $this->insert, array_keys($this->insert))) {
       $this->DB->rollback();
       return false;
     }
+
+    $post = [
+      'message_id' => $this->DB->value("SELECT currval('message_id_seq')"),
+      'body'       => $data['body'],
+    ];
+
+    $members = explode(",", $data['message_members']);
+
+    if (!in_array($member_id, $members)) {
+      $members[] = session('id') ?: $member_id;
+    }
+
+    foreach ($members as $recipient_id) {
+      $mm               = [];
+      $mm['message_id'] = $post['message_id'];
+      $mm['member_id']  = $recipient_id;
+      if (!$this->DB->insert("message_member", $mm)) {
+        $this->DB->rollback();
+        return false;
+      }
+    }
+
+    if (!$this->message_post_insert($post, $member_id)) {
+      $this->DB->rollback();
+      return false;
+    }
+
+    $this->DB->commit();
+    return true;
   }
 
   function message_post_insert($data,$member_id=false)
@@ -174,8 +179,11 @@ class Data
     $this->set_value("member_ip",$_SERVER['REMOTE_ADDR']);
 
     // if no member id defined auth from form
-    if(!$member_id)
-    if(!$member_id = $this->Security->form_login($data['name'],$data['pass'])) return false;
+    if (!$member_id) {
+      if (!$member_id = $this->Security->form_login($data['name'], $data['pass'])) {
+        return false;
+      }
+    }
 
     $this->set_value("member_id",$member_id);
 

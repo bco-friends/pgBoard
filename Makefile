@@ -7,7 +7,8 @@ help:
 	"\n" start: "\t" Start the Docker container \
 	"\n" stop: "\t\t" Stop the Docker container \
 	"\n" refresh: "\t" Stop, rebuild, and restart the Docker container \
-	"\n" php-shell: "\t" Open a shell session into the PHP container
+	"\n" php-shell: "\t" Open a shell session into the PHP container \
+	"\n" db-seed: "\t" Seed the database with sample data. \
 
 # Starts the Docker container.
 start:
@@ -28,6 +29,9 @@ refresh: stop build-up
 php-shell:
 	docker exec -it pgb-php /bin/bash
 
+db-shell:
+	docker exec -it pgb-postgres psql -U postgres -w
+
 phpstan:
 	docker exec -it pgb-php vendor/bin/phpstan analyse index.php config.php error.php core.php class module
 
@@ -39,3 +43,6 @@ xdebug-on:
 		&& docker restart pgb-php
 xdebug-off:
 	docker exec -it pgb-php rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && docker restart pgb-php
+
+db-seed:
+	docker exec -it pgb-php php bin/console.php db:seed --no-interaction
