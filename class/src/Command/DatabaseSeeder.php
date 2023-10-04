@@ -8,6 +8,7 @@ use DB;
 use Data;
 use Faker\Factory;
 use Faker\Generator;
+use PgBoard\PgBoard\Command\DatabaseSeeder\ChatGenerator;
 use PgBoard\PgBoard\Command\DatabaseSeeder\DataGenerator;
 use PgBoard\PgBoard\Command\DatabaseSeeder\MemberGenerator;
 use PgBoard\PgBoard\Command\DatabaseSeeder\MessageGenerator;
@@ -43,6 +44,7 @@ class DatabaseSeeder extends Command
     MemberGenerator::class,
     ThreadGenerator::class,
     MessageGenerator::class,
+    ChatGenerator::class,
   ];
 
   protected function configure()
@@ -94,42 +96,6 @@ class DatabaseSeeder extends Command
       ))->generate();
     }
 
-    $this->generateChat($helper, $input, $output);
-
     return Command::SUCCESS;
-  }
-
-  private function generateChat(QuestionHelper $helper, InputInterface $input, OutputInterface $output)
-  {
-    $default  = 1000;
-    $failures = 0;
-
-    if (!$input->getOption(self::NON_INTERACTIVE)) {
-      $question = new Question("How many chat messages would you like to generate? (Default: {$default}): ");
-      $count    = $helper->ask($input, $output, $question);
-    }
-
-    if (!is_numeric($count)) {
-      $count = $input->getOption('count') ?? $default;
-    }
-
-    $progressBar = new ProgressBar($output, (int)$count);
-    $progressBar->start();
-
-    for ($i = 0; $i < $count; $i++) {
-      if (!$this->db->insert('chat', [
-        'member_id' => $this->query->getRandomMemberId(),
-        'chat'      => $this->faker->realTextBetween(50, 400),
-      ])) {
-        $failures++;
-      };
-
-      $progressBar->advance();
-    }
-
-    $progressBar->finish();
-
-    $successCount = $count - $failures;
-    $output->writeln("\nSuccessfully generated {$successCount} chat messages out of {$count} requested.");
   }
 }
