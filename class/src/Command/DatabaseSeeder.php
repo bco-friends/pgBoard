@@ -339,15 +339,20 @@ class DatabaseSeeder extends Command
     $progressBar->start();
 
     for ($i = 0; $i < $count; $i++) {
-      $this->DB->insert('chat', [
+      if(!$this->DB->insert('chat', [
         'member_id' => $this->getRandomMemberId(),
         'chat' => $this->faker->realTextBetween(50, 400)
-      ]);
+      ])) {
+        $failures++;
+      };
 
       $progressBar->advance();
     }
 
     $progressBar->finish();
+
+    $successCount = $count - $failures;
+    $output->writeln("\nSuccessfully generated {$successCount} chat messages out of {$count} requested.");
   }
 
   /**
