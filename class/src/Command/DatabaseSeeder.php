@@ -8,12 +8,7 @@ use DB;
 use Data;
 use Faker\Factory;
 use Faker\Generator;
-use PgBoard\PgBoard\Command\DatabaseSeeder\ChatGenerator;
-use PgBoard\PgBoard\Command\DatabaseSeeder\DataGenerator;
-use PgBoard\PgBoard\Command\DatabaseSeeder\MemberGenerator;
-use PgBoard\PgBoard\Command\DatabaseSeeder\MessageGenerator;
-use PgBoard\PgBoard\Command\DatabaseSeeder\Query;
-use PgBoard\PgBoard\Command\DatabaseSeeder\ThreadGenerator;
+use PgBoard\PgBoard\Command\DatabaseSeeder as Seeder;
 use PgSql\Result;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -33,7 +28,7 @@ class DatabaseSeeder extends Command
 
   private DB $db;
   private Data $data;
-  private Query $query;
+  private Seeder\Query $query;
   private Generator $faker;
   private ProgressBar $progressBar;
 
@@ -41,10 +36,10 @@ class DatabaseSeeder extends Command
    * @var DataGenerator[]
    */
   private array $generators = [
-    MemberGenerator::class,
-    ThreadGenerator::class,
-    MessageGenerator::class,
-    ChatGenerator::class,
+    Seeder\MemberGenerator::class,
+    Seeder\ThreadGenerator::class,
+    Seeder\MessageGenerator::class,
+    Seeder\ChatGenerator::class,
   ];
 
   protected function configure()
@@ -73,7 +68,7 @@ class DatabaseSeeder extends Command
 
     $this->db    = $DB;
     $this->data  = new Data($DB, $Security);
-    $this->query = new Query($DB);
+    $this->query = new Seeder\Query($DB);
     $this->faker = Factory::create();
 
     $helper = $this->getHelper('question');
