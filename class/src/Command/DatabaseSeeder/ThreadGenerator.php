@@ -17,6 +17,7 @@ class ThreadGenerator extends DataGenerator
 
   private function generateThreads(): void {
     $default = 1000;
+    $failures    = 0;
 
     if (!$this->input->getOption(DatabaseSeeder::NON_INTERACTIVE)) {
       $question = new Question("How many threads would you like to generate? (Default: {$default}): ");
@@ -27,7 +28,13 @@ class ThreadGenerator extends DataGenerator
       $count = $this->input->getOption('count') ?? $default;
     }
 
-    $failures    = 0;
+    $this->output->writeln(
+      sprintf(
+        "\nAttempting to generate %d new threads...",
+        $count
+      )
+    );
+
     $progressBar = new ProgressBar($this->output, (int)$count);
     $progressBar->start();
 
@@ -58,9 +65,8 @@ class ThreadGenerator extends DataGenerator
 
     $this->output->writeln(
       sprintf(
-        "\nSuccessfully generated %d new threads out of %d requested.",
+        "\nSuccessfully generated %d new threads.",
         $count - $failures,
-        $count,
       )
     );
   }
@@ -80,23 +86,39 @@ class ThreadGenerator extends DataGenerator
       $count = $this->input->getOption('count') ?? $default;
     }
 
+    $this->output->writeln(
+      sprintf(
+        "\nAttempting to generate %d thread replies...",
+        $count
+      )
+    );
+
     $progressBar = new ProgressBar($this->output, (int)$count);
     $progressBar->start();
 
     for ($i = 0; $i < $count; $i++) {
       $_SERVER['REMOTE_ADDR'] = $this->faker->ipv4();
 
-      $this->data->thread_post_insert(
+      if(!$this->data->thread_post_insert(
         [
           'thread_id' => $this->query->getRandomThreadId(),
           'body'      => $this->faker->paragraphs(rand(1, 10), true),
         ],
         $this->query->getRandomMemberId()
-      );
+      )) {
+        $failures++;
+      };
 
       $progressBar->advance();
     }
 
     $progressBar->finish();
+
+    $this->output->writeln(
+      sprintf(
+        "\nSuccessfully generated %d thread replies.",
+        $count - $failures,
+      )
+    );
   }
 }

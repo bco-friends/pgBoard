@@ -23,9 +23,15 @@ class MessageGenerator extends DataGenerator
       $count = $this->input->getOption('count') ?? $default;
     }
 
+    $this->output->writeln(
+      sprintf(
+        "\nAttempting to generate %d member messages...",
+        $count
+      )
+    );
+
     $progressBar = new ProgressBar($this->output, (int)$count);
     $progressBar->start();
-
 
     for ($i = 0; $i < $count; $i++) {
       $memberCount  = rand(1, 5);
@@ -65,8 +71,12 @@ class MessageGenerator extends DataGenerator
       $progressBar->advance();
     }
 
-    $successes = $count - $failures;
-    $this->output->writeln(PHP_EOL . "Successfully generated {$successes} messages out of {$count} requested.");
+    $this->output->writeln(
+      sprintf(
+        "\nSuccessfully generated %d messages.",
+        $count - $failures
+      )
+    );
 
     $progressBar->finish();
   }

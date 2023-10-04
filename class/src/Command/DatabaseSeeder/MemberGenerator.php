@@ -12,6 +12,7 @@ class MemberGenerator extends DataGenerator
   public function generate(): void
   {
     $default = 1000;
+    $failures = 0;
 
     if (!$this->input->getOption(DatabaseSeeder::NON_INTERACTIVE)) {
       $question = new Question("How many members would you like to generate? (Default: {$default}): ");
@@ -22,7 +23,12 @@ class MemberGenerator extends DataGenerator
       $count = $this->input->getOption('count') ?? $default;
     }
 
-    $failures = 0;
+    $this->output->writeln(
+      sprintf(
+        "\nAttempting to generate %d members...",
+        $count
+      )
+    );
 
     $progressBar = new ProgressBar($this->output, (int)$count);
     $progressBar->start();
