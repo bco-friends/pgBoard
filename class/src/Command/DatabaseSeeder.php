@@ -10,6 +10,7 @@ use Faker\Factory;
 use Faker\Generator;
 use PgBoard\PgBoard\Command\DatabaseSeeder\DataGenerator;
 use PgBoard\PgBoard\Command\DatabaseSeeder\MemberGenerator;
+use PgBoard\PgBoard\Command\DatabaseSeeder\MessageGenerator;
 use PgBoard\PgBoard\Command\DatabaseSeeder\Query;
 use PgBoard\PgBoard\Command\DatabaseSeeder\ThreadGenerator;
 use PgSql\Result;
@@ -41,6 +42,7 @@ class DatabaseSeeder extends Command
   private array $generators = [
     MemberGenerator::class,
     ThreadGenerator::class,
+    MessageGenerator::class,
   ];
 
   protected function configure()
@@ -92,72 +94,9 @@ class DatabaseSeeder extends Command
       ))->generate();
     }
 
-    $this->generateMessages($helper, $input, $output);
     $this->generateChat($helper, $input, $output);
 
     return Command::SUCCESS;
-  }
-
-  private function generateMessages(QuestionHelper $helper, InputInterface $input, OutputInterface $output): void
-  {
-    $default  = 1000;
-    $failures = 0;
-
-    if (!$input->getOption(self::NON_INTERACTIVE)) {
-      $question = new Question("How many messages would you like to generate? (Default: {$default}): ");
-      $count    = $helper->ask($input, $output, $question);
-    }
-
-    if (!is_numeric($count)) {
-      $count = $input->getOption('count') ?? $default;
-    }
-
-    $progressBar = new ProgressBar($output, (int)$count);
-    $progressBar->start();
-
-
-    for ($i = 0; $i < $count; $i++) {
-      $memberCount  = rand(1, 5);
-      $member       = $this->query->getRandomMember();
-      $recipientIds = [];
-
-      for ($k = 0; $k < $memberCount; $k++) {
-        $recipientIds[] = $this->query->getRandomMemberId();
-      }
-
-      if (!in_array($member['id'], $recipientIds, true)) {
-        $recipientIds[] = $member['id'];
-      }
-
-      $_SERVER['REMOTE_ADDR'] = $this->faker->ipv4();
-
-      ob_start();
-      if (!$this->data->message_insert(
-        [
-          'name'            => $member['name'],
-          'pass'            => self::TEST_PASSWORD,
-          'thread_id'       => $this->query->getRandomThreadId(),
-          'subject'         => $this->faker->text(),
-          'body'            => $this->faker->paragraphs(rand(1, 10), true),
-          'message_members' => implode(',', array_unique(array_filter($recipientIds))),
-        ],
-        $member['id'],
-      )
-      ) {
-        ob_end_clean();
-        $failures++;
-        $progressBar->advance();
-        continue;
-      }
-
-      ob_end_clean();
-      $progressBar->advance();
-    }
-
-    $successes = $count - $failures;
-    $output->writeln(PHP_EOL . "Successfully generated {$successes} messages out of {$count} requested.");
-
-    $progressBar->finish();
   }
 
   private function generateChat(QuestionHelper $helper, InputInterface $input, OutputInterface $output)
