@@ -11,6 +11,7 @@ use Faker\Generator;
 use PgBoard\PgBoard\Command\DatabaseSeeder\DataGenerator;
 use PgBoard\PgBoard\Command\DatabaseSeeder\MemberGenerator;
 use PgBoard\PgBoard\Command\DatabaseSeeder\Query;
+use PgBoard\PgBoard\Command\DatabaseSeeder\ThreadGenerator;
 use PgSql\Result;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -39,6 +40,7 @@ class DatabaseSeeder extends Command
    */
   private array $generators = [
     MemberGenerator::class,
+    ThreadGenerator::class,
   ];
 
   protected function configure()
@@ -90,7 +92,6 @@ class DatabaseSeeder extends Command
       ))->generate();
     }
 
-    $this->generateThreads($helper, $input, $output);
     $this->generateReplies($helper, $input, $output);
     $this->generateMessages($helper, $input, $output);
     $this->generateChat($helper, $input, $output);
@@ -103,56 +104,6 @@ class DatabaseSeeder extends Command
     return pg_fetch_result($this->db->query("SELECT name FROM member WHERE id = $1", [$memberId]), 0, 0);
   }
 
-  private function generateThreads(QuestionHelper $helper, InputInterface $input, OutputInterface $output)
-  {
-    $default = 1000;
-
-    if (!$input->getOption(self::NON_INTERACTIVE)) {
-      $question = new Question("How many threads would you like to generate? (Default: {$default}): ");
-      $count    = $helper->ask($input, $output, $question);
-    }
-
-    if (!is_numeric($count)) {
-      $count = $input->getOption('count') ?? $default;
-    }
-
-    $failures    = 0;
-    $progressBar = new ProgressBar($output, (int)$count);
-    $progressBar->start();
-
-    for ($i = 0; $i < $count; $i++) {
-      try {
-        $_SERVER['REMOTE_ADDR'] = $this->faker->ipv4();
-        $member = $this->query->getRandomMember();
-
-        ob_start();
-        $result = $this->data->thread_insert([
-          'name'    => $member['name'],
-          'pass'    => self::TEST_PASSWORD,
-          'subject' => $this->faker->text(),
-          'body'    => $this->faker->paragraphs(rand(1, 10), true),
-        ]);
-
-        ob_end_clean();
-      } catch (\Throwable $e) {
-        $failures++;
-        $output->writeln($e->getMessage());
-        continue;
-      } finally {
-        $progressBar->advance();
-      }
-    }
-
-    $progressBar->finish();
-
-    $output->writeln(
-      sprintf(
-        "\nSuccessfully generated %d new threads out of %d requested.",
-        $count - $failures,
-        $count,
-      )
-    );
-  }
 
   public function generateReplies(QuestionHelper $helper, InputInterface $input, OutputInterface $output): void
   {
