@@ -93,7 +93,7 @@ class DatabaseSeeder extends Command
 
     $failures = 0;
 
-    $progressBar = new ProgressBar($output, $count);
+    $progressBar = new ProgressBar($output, (int)$count);
     $progressBar->start();
 
     for ($i = 0; $i < $count; $i++) {
@@ -236,7 +236,7 @@ class DatabaseSeeder extends Command
       $count = $input->getOption('count') ?? $default;
     }
 
-    $progressBar = new ProgressBar($output, $count);
+    $progressBar = new ProgressBar($output, (int)$count);
     $progressBar->start();
 
 
@@ -298,7 +298,7 @@ class DatabaseSeeder extends Command
       $count = $input->getOption('count') ?? $default;
     }
 
-    $progressBar = new ProgressBar($output, $count);
+    $progressBar = new ProgressBar($output, (int)$count);
     $progressBar->start();
 
     for ($i = 0; $i < $count; $i++) {
