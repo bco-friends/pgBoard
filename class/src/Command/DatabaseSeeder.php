@@ -92,46 +92,10 @@ class DatabaseSeeder extends Command
       ))->generate();
     }
 
-    $this->generateReplies($helper, $input, $output);
     $this->generateMessages($helper, $input, $output);
     $this->generateChat($helper, $input, $output);
 
     return Command::SUCCESS;
-  }
-
-  public function generateReplies(QuestionHelper $helper, InputInterface $input, OutputInterface $output): void
-  {
-    $default = 1000;
-
-    if (!$input->getOption(self::NON_INTERACTIVE)) {
-      $question = new Question("How many thread replies would you like to generate? (Default: {$default}): ");
-      $count    = $helper->ask($input, $output, $question);
-    }
-
-    $failures = 0;
-
-    if (!is_numeric($count)) {
-      $count = $input->getOption('count') ?? $default;
-    }
-
-    $progressBar = new ProgressBar($output, (int)$count);
-    $progressBar->start();
-
-    for ($i = 0; $i < $count; $i++) {
-      $_SERVER['REMOTE_ADDR'] = $this->faker->ipv4();
-
-      $this->data->thread_post_insert(
-        [
-          'thread_id' => $this->query->getRandomThreadId(),
-          'body'      => $this->faker->paragraphs(rand(1, 10), true),
-        ],
-        $this->query->getRandomMemberId()
-      );
-
-      $progressBar->advance();
-    }
-
-    $progressBar->finish();
   }
 
   private function generateMessages(QuestionHelper $helper, InputInterface $input, OutputInterface $output): void
