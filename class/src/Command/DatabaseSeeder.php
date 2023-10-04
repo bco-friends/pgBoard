@@ -136,15 +136,6 @@ class DatabaseSeeder extends Command
     return pg_fetch_result($this->db->query("SELECT name FROM member WHERE id = $1", [$memberId]), 0, 0);
   }
 
-  private function getRandomThreadId(): int
-  {
-    return (int)pg_fetch_result(
-      $this->db->query("SELECT random_between(min(id), max(id)) from thread"),
-      0,
-      0
-    );
-  }
-
   private function generateThreads(QuestionHelper $helper, InputInterface $input, OutputInterface $output)
   {
     $default = 1000;
@@ -165,12 +156,11 @@ class DatabaseSeeder extends Command
     for ($i = 0; $i < $count; $i++) {
       try {
         $_SERVER['REMOTE_ADDR'] = $this->faker->ipv4();
-        $memberId               = $this->query->getRandomMemberId();
-        $memberName             = $this->getMemberNameById($memberId);
+        $member = $this->query->getRandomMember();
 
         ob_start();
         $result = $this->data->thread_insert([
-          'name'    => $memberName,
+          'name'    => $member['name'],
           'pass'    => self::TEST_PASSWORD,
           'subject' => $this->faker->text(),
           'body'    => $this->faker->paragraphs(rand(1, 10), true),
@@ -220,7 +210,7 @@ class DatabaseSeeder extends Command
 
       $this->data->thread_post_insert(
         [
-          'thread_id' => $this->getRandomThreadId(),
+          'thread_id' => $this->query->getRandomThreadId(),
           'body'      => $this->faker->paragraphs(rand(1, 10), true),
         ],
         $this->query->getRandomMemberId()
@@ -270,7 +260,7 @@ class DatabaseSeeder extends Command
         [
           'name'            => $member['name'],
           'pass'            => self::TEST_PASSWORD,
-          'thread_id'       => $this->getRandomThreadId(),
+          'thread_id'       => $this->query->getRandomThreadId(),
           'subject'         => $this->faker->text(),
           'body'            => $this->faker->paragraphs(rand(1, 10), true),
           'message_members' => implode(',', array_unique(array_filter($recipientIds))),
