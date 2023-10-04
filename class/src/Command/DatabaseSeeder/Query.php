@@ -54,4 +54,13 @@ class Query
       0
     );
   }
+
+  public function getRandomThreadId(): int
+  {
+    return (int)pg_fetch_result(
+      $this->db->query("SELECT random_between(min(id), max(id)) from thread"),
+      0,
+      0
+    );
+  }
 }
