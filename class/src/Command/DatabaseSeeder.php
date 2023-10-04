@@ -70,6 +70,7 @@ class DatabaseSeeder extends Command
     $this->generateThreads($helper, $input, $output);
     $this->generateReplies($helper, $input, $output);
     $this->generateMessages($helper, $input, $output);
+    $this->generateChat($helper, $input, $output);
 
     return Command::SUCCESS;
   }
@@ -316,6 +317,35 @@ class DatabaseSeeder extends Command
 
     $successes = $count - $failures;
     $output->writeln(PHP_EOL . "Successfully generated {$successes} messages out of {$count} requested.");
+
+    $progressBar->finish();
+  }
+
+  private function generateChat(QuestionHelper $helper, InputInterface $input, OutputInterface $output)
+  {
+    $default = 1000;
+    $failures = 0;
+
+    if (!$input->getOption(self::NON_INTERACTIVE)) {
+      $question = new Question("How many chat messages would you like to generate? (Default: {$default}): ");
+      $count    = $helper->ask($input, $output, $question);
+    }
+
+    if (!is_numeric($count)) {
+      $count = $input->getOption('count') ?? $default;
+    }
+
+    $progressBar = new ProgressBar($output, $count);
+    $progressBar->start();
+
+    for ($i = 0; $i < $count; $i++) {
+      $this->DB->insert('chat', [
+        'member_id' => $this->getRandomMemberId(),
+        'chat' => $this->faker->realTextBetween(50, 400)
+      ]);
+
+      $progressBar->advance();
+    }
 
     $progressBar->finish();
   }
