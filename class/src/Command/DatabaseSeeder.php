@@ -8,6 +8,8 @@ use DB;
 use Data;
 use Faker\Factory;
 use Faker\Generator;
+use PgBoard\PgBoard\Command\DatabaseSeeder\DataGenerator;
+use PgBoard\PgBoard\Command\DatabaseSeeder\MemberGenerator;
 use PgBoard\PgBoard\Command\DatabaseSeeder\Query;
 use PgSql\Result;
 use Symfony\Component\Console\Command\Command;
@@ -23,14 +25,21 @@ use Symfony\Component\Console\Question\Question;
 #[AsCommand(name: 'db:seed')]
 class DatabaseSeeder extends Command
 {
-  private const TEST_PASSWORD = 'testing123';
+  public const TEST_PASSWORD = 'testing123';
+  public const NON_INTERACTIVE = 'no-interaction';
+
   private DB $db;
   private Data $data;
   private Query $query;
   private Generator $faker;
   private ProgressBar $progressBar;
 
-  private const NON_INTERACTIVE = 'no-interaction';
+  /**
+   * @var DataGenerator[]
+   */
+  private array $generators = [
+    MemberGenerator::class,
+  ];
 
   protected function configure()
   {
@@ -69,66 +78,24 @@ class DatabaseSeeder extends Command
       $output->writeln($e->getMessage());
     }
 
-    $this->generateMembers($helper, $input, $output);
+    foreach ($this->generators as $generator) {
+      (new $generator(
+        $this->db,
+        $this->data,
+        $this->query,
+        $this->faker,
+        $helper,
+        $input,
+        $output
+      ))->generate();
+    }
+
     $this->generateThreads($helper, $input, $output);
     $this->generateReplies($helper, $input, $output);
     $this->generateMessages($helper, $input, $output);
     $this->generateChat($helper, $input, $output);
 
     return Command::SUCCESS;
-  }
-
-  private function generateMembers(QuestionHelper $helper, InputInterface $input, OutputInterface $output)
-  {
-    $default = 1000;
-
-    if (!$input->getOption(self::NON_INTERACTIVE)) {
-      $question = new Question("How many members would you like to generate? (Default: {$default}): ");
-      $count    = $helper->ask($input, $output, $question);
-    }
-
-    if (!is_numeric($count)) {
-      $count = $input->getOption('count') ?? $default;
-    }
-
-    $failures = 0;
-
-    $progressBar = new ProgressBar($output, (int)$count);
-    $progressBar->start();
-
-    for ($i = 0; $i < $count; $i++) {
-      $result = $this->db->insert(
-        'member',
-        [
-          'name'         => $this->faker->userName(),
-          'email_signup' => $this->faker->safeEmail(),
-          'pass'         => md5(self::TEST_PASSWORD),
-          'postalcode'   => $this->faker->postcode(),
-          'secret'       => md5($this->faker->word()),
-          'ip'           => $this->faker->ipv4(),
-        ]
-      );
-
-      /*
-       * Because database inserts fail silently, we don't know what specifically caused the error with the
-       * insert query. For now, increment the failure and deduct it from the total requested so we can report
-       * back the number of records that were added.
-       */
-      if (is_bool($result)) {
-        $failures++;
-      }
-
-      $progressBar->advance();
-    }
-
-    $output->writeln(
-      sprintf(
-        "\nSuccessfully generated %d member records.",
-        $count - $failures,
-      )
-    );
-
-    $progressBar->finish();
   }
 
   private function getMemberNameById($memberId)
