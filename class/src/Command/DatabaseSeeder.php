@@ -8,6 +8,7 @@ use DB;
 use Data;
 use Faker\Factory;
 use Faker\Generator;
+use PgBoard\PgBoard\Command\DatabaseSeeder\Query;
 use PgSql\Result;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -23,8 +24,9 @@ use Symfony\Component\Console\Question\Question;
 class DatabaseSeeder extends Command
 {
   private const TEST_PASSWORD = 'testing123';
-  private DB $DB;
-  private Data $Data;
+  private DB $db;
+  private Data $data;
+  private Query $query;
   private Generator $faker;
   private ProgressBar $progressBar;
 
@@ -54,14 +56,15 @@ class DatabaseSeeder extends Command
 
     $commandline = true;
 
-    $this->DB    = $DB;
-    $this->Data  = new Data($DB, $Security);
+    $this->db    = $DB;
+    $this->data  = new Data($DB, $Security);
+    $this->query = new Query($DB);
     $this->faker = Factory::create();
 
     $helper = $this->getHelper('question');
 
     try {
-      $this->createRandomizationQuery();
+      $this->query->createRandomizationQuery();
     } catch (\Exception $e) {
       $output->writeln($e->getMessage());
     }
@@ -94,7 +97,7 @@ class DatabaseSeeder extends Command
     $progressBar->start();
 
     for ($i = 0; $i < $count; $i++) {
-      $result = $this->DB->insert(
+      $result = $this->db->insert(
         'member',
         [
           'name'         => $this->faker->userName(),
@@ -128,31 +131,10 @@ class DatabaseSeeder extends Command
     $progressBar->finish();
   }
 
-  private function createRandomizationQuery(): void
-  {
-    $indexQuery = <<<SQL
-        CREATE OR REPLACE FUNCTION random_between(low integer, high integer)
-               RETURNS integer
-               LANGUAGE plpgsql
-               STRICT
-               AS \$function\$
-               BEGIN
-                RETURN floor(random()* (high-low +1) + low);
-               END;
-              \$function\$;
-    SQL;
-
-    $result = $this->DB->query($indexQuery);
-
-    if (is_bool($result)) {
-      throw new \Exception("Failed to create random_between function.");
-    }
-  }
-
   private function getRandomMemberId(): int
   {
     return (int)pg_fetch_result(
-      $this->DB->query("SELECT random_between(min(id), max(id)) from member LIMIT 1"),
+      $this->db->query("SELECT random_between(min(id), max(id)) from member LIMIT 1"),
       0,
       0
     );
@@ -160,13 +142,13 @@ class DatabaseSeeder extends Command
 
   private function getMemberNameById($memberId)
   {
-    return pg_fetch_result($this->DB->query("SELECT name FROM member WHERE id = $1", [$memberId]), 0, 0);
+    return pg_fetch_result($this->db->query("SELECT name FROM member WHERE id = $1", [$memberId]), 0, 0);
   }
 
   private function getRandomThreadId(): int
   {
     return (int)pg_fetch_result(
-      $this->DB->query("SELECT random_between(min(id), max(id)) from thread"),
+      $this->db->query("SELECT random_between(min(id), max(id)) from thread"),
       0,
       0
     );
@@ -196,7 +178,7 @@ class DatabaseSeeder extends Command
         $memberName             = $this->getMemberNameById($memberId);
 
         ob_start();
-        $result = $this->Data->thread_insert([
+        $result = $this->data->thread_insert([
           'name'    => $memberName,
           'pass'    => self::TEST_PASSWORD,
           'subject' => $this->faker->text(),
@@ -245,7 +227,7 @@ class DatabaseSeeder extends Command
     for ($i = 0; $i < $count; $i++) {
       $_SERVER['REMOTE_ADDR'] = $this->faker->ipv4();
 
-      $this->Data->thread_post_insert(
+      $this->data->thread_post_insert(
         [
           'thread_id' => $this->getRandomThreadId(),
           'body'      => $this->faker->paragraphs(rand(1, 10), true),
@@ -279,7 +261,7 @@ class DatabaseSeeder extends Command
 
     for ($i = 0; $i < $count; $i++) {
       $memberCount  = rand(1, 5);
-      $member = $this->getRandomMember();
+      $member       = $this->getRandomMember();
       $recipientIds = [];
 
       for ($k = 0; $k < $memberCount; $k++) {
@@ -293,7 +275,7 @@ class DatabaseSeeder extends Command
       $_SERVER['REMOTE_ADDR'] = $this->faker->ipv4();
 
       ob_start();
-      if (!$this->Data->message_insert(
+      if (!$this->data->message_insert(
         [
           'name'            => $member['name'],
           'pass'            => self::TEST_PASSWORD,
@@ -304,12 +286,12 @@ class DatabaseSeeder extends Command
         ],
         $member['id'],
       )
-    ) {
+      ) {
         ob_end_clean();
         $failures++;
         $progressBar->advance();
         continue;
-    }
+      }
 
       ob_end_clean();
       $progressBar->advance();
@@ -323,7 +305,7 @@ class DatabaseSeeder extends Command
 
   private function generateChat(QuestionHelper $helper, InputInterface $input, OutputInterface $output)
   {
-    $default = 1000;
+    $default  = 1000;
     $failures = 0;
 
     if (!$input->getOption(self::NON_INTERACTIVE)) {
@@ -339,9 +321,9 @@ class DatabaseSeeder extends Command
     $progressBar->start();
 
     for ($i = 0; $i < $count; $i++) {
-      if(!$this->DB->insert('chat', [
+      if (!$this->db->insert('chat', [
         'member_id' => $this->getRandomMemberId(),
-        'chat' => $this->faker->realTextBetween(50, 400)
+        'chat'      => $this->faker->realTextBetween(50, 400),
       ])) {
         $failures++;
       };
@@ -362,7 +344,9 @@ class DatabaseSeeder extends Command
    */
   private function getRandomMember(): array
   {
-    $result = pg_fetch_all($this->DB->query('SELECT * FROM member WHERE id IN (SELECT random_between(min(id), max(id)) FROM member LIMIT 1)'));
+    $result = pg_fetch_all(
+      $this->db->query('SELECT * FROM member WHERE id IN (SELECT random_between(min(id), max(id)) FROM member LIMIT 1)')
+    );
 
     return !empty($result) ? array_pop($result) : [];
   }
