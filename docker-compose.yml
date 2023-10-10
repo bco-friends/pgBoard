@@ -41,6 +41,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - postgres:/var/lib/postgresql/data
+      - ./doc:/etc/data
 volumes:
   postgres:
     external: false

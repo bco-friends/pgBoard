@@ -1,4 +1,4 @@
-CREATE LANGUAGE plpgsql;
+CREATE OR REPLACE LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION indexOf(anyelement,anyarray) RETURNS integer AS $$
 DECLARE
