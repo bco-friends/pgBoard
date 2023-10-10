@@ -11,7 +11,7 @@ class BoardCore
 
   function command_parse()
   {
-    global $Base;
+    global $DB, $Base;
     if(!$this->Security->allowed()) return;
 
     $include = implode("/",module());
