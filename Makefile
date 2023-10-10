@@ -44,5 +44,15 @@ xdebug-on:
 xdebug-off:
 	docker exec -it pgb-php rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && docker restart pgb-php
 
+db-init: db-reset db-seed
+db-reset: db-drop db-create
+
+db-drop:
+	docker exec -it pgb-postgres psql -U postgres -w -c "DROP DATABASE board;";
+
+db-create:
+	docker exec -it pgb-postgres psql -U postgres -w -c "CREATE DATABASE board;" && \
+	docker exec -it pgb-postgres psql -U postgres -w -d board -f ./etc/data/1-Schema.sql ./etc/data/2-Functions.sql ./etc/data/3-Indexes-FKeys-Triggers.sql
+
 db-seed:
 	docker exec -it pgb-php php bin/console.php db:seed --no-interaction
