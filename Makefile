@@ -22,7 +22,7 @@ stop:
 build-up:
 	docker-compose up --build -d
 
-init: init-files refresh db-drop db-create db-seed
+init: init-files build-up db-drop db-create db-seed
 
 init-files:
 	cp config.default.php config.php && \
