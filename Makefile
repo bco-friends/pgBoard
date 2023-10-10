@@ -12,7 +12,7 @@ help:
 
 # Starts the Docker container.
 start:
-	docker-compose up
+	docker-compose up -d
 
 # Stops the Docker container.
 stop:
@@ -20,9 +20,9 @@ stop:
 
 # Builds the Docker container and starts it.
 build-up:
-	docker-compose up --build
+	docker-compose up --build -d
 
-init: init-files refresh db-init
+init: init-files refresh db-drop db-create db-seed
 
 init-files:
 	cp config.default.php config.php && \
@@ -52,11 +52,8 @@ xdebug-on:
 xdebug-off:
 	docker exec -it pgb-php rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && docker restart pgb-php
 
-db-init: db-reset db-seed
-db-reset: db-drop db-create
-
 db-drop:
-	docker exec -it pgb-postgres psql -U postgres -w -c "DROP DATABASE board;";
+	docker exec -it pgb-postgres psql -U postgres -w -c "DROP DATABASE IF EXISTS board;"
 
 db-create:
 	docker exec -it pgb-postgres psql -U postgres -w -c "CREATE DATABASE board;" && \
