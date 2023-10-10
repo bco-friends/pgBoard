@@ -22,6 +22,14 @@ stop:
 build-up:
 	docker-compose up --build
 
+init: init-files refresh db-init
+
+init-files:
+	cp config.default.php config.php && \
+	cp .example.env .env && \
+	cp lang/en.default.php lang/en.php && \
+	cp class/Plugin.default.php class/Plugin.php
+
 # Stops the Docker container if it's running, the rebuilds and restarts it.
 refresh: stop build-up
 
