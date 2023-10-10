@@ -12,7 +12,7 @@ help:
 
 # Starts the Docker container.
 start:
-	docker-compose up
+	docker-compose up -d
 
 # Stops the Docker container.
 stop:
@@ -20,7 +20,18 @@ stop:
 
 # Builds the Docker container and starts it.
 build-up:
-	docker-compose up --build
+	docker-compose up --build -d
+
+composer-init:
+	docker exec -it pgb-php /usr/bin/composer install
+
+init: init-files build-up composer-init db-drop db-create db-seed
+
+init-files:
+	cp config.default.php config.php && \
+	cp .example.env .env && \
+	cp lang/en.default.php lang/en.php && \
+	cp class/Plugin.default.php class/Plugin.php
 
 # Stops the Docker container if it's running, the rebuilds and restarts it.
 refresh: stop build-up
@@ -43,6 +54,15 @@ xdebug-on:
 		&& docker restart pgb-php
 xdebug-off:
 	docker exec -it pgb-php rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && docker restart pgb-php
+
+db-drop:
+	docker exec -it pgb-postgres psql -U postgres -w -c "DROP DATABASE IF EXISTS board;"
+
+db-create:
+	docker exec -it pgb-postgres psql -U postgres -w -c "CREATE DATABASE board;" && \
+	docker exec -it pgb-postgres psql -U postgres -w -d board -f ./etc/data/1-Schema.sql && \
+	docker exec -it pgb-postgres psql -U postgres -w -d board -f ./etc/data/2-Functions.sql && \
+	docker exec -it pgb-postgres psql -U postgres -w -d board -f ./etc/data/3-Indexes-FKeys-Triggers.sql
 
 db-seed:
 	docker exec -it pgb-php php bin/console.php db:seed --no-interaction
