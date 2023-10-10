@@ -57,7 +57,9 @@ db-drop:
 
 db-create:
 	docker exec -it pgb-postgres psql -U postgres -w -c "CREATE DATABASE board;" && \
-	docker exec -it pgb-postgres psql -U postgres -w -d board -f ./etc/data/1-Schema.sql ./etc/data/2-Functions.sql ./etc/data/3-Indexes-FKeys-Triggers.sql
+	docker exec -it pgb-postgres psql -U postgres -w -d board -f ./etc/data/1-Schema.sql && \
+	docker exec -it pgb-postgres psql -U postgres -w -d board -f ./etc/data/2-Functions.sql && \
+	docker exec -it pgb-postgres psql -U postgres -w -d board -f ./etc/data/3-Indexes-FKeys-Triggers.sql
 
 db-seed:
 	docker exec -it pgb-php php bin/console.php db:seed --no-interaction
