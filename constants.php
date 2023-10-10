@@ -24,7 +24,7 @@ if (!defined('SPHINX_HOST')) {
 }
 
 if (!defined('SPHINX_PORT')) {
-  define("SPHINX_PORT", $_ENV['SPHINX_PORT'] ?? 3312);
+  define("SPHINX_PORT", (int) $_ENV['SPHINX_PORT'] ?? 3312);
 }
 
 if (!defined('REGISTRATION_OPEN')) {
