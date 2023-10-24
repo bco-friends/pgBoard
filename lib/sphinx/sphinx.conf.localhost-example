@@ -1,0 +1,60 @@
+# Copy this file into the same directory and name it sphinx.conf for local development only.
+
+searchd
+{
+  read_timeout = 5
+  max_children = 300
+  seamless_rotate = 1
+  pid_file = /opt/sphinx/index/searchd.pid
+}
+
+indexer
+{
+  mem_limit = 900M
+}
+
+common {
+    datadir = /opt/sphinx/index/
+}
+
+source main
+{
+  type = pgsql
+  sql_host =  pgb-postgres
+  sql_port = 5432
+  sql_user = postgres
+  sql_db = board
+  sql_pass =
+}
+
+source thread : main
+{
+  sql_query = SELECT id, subject, member_id, date_posted FROM thread
+  sql_attr_uint = member_id
+  #sql_attr_timestamp = date_posted
+}
+
+source thread_post : main
+{
+  sql_range_step = 100000
+  sql_query_range = SELECT min(id),max(id) FROM thread_post WHERE length(body) < 64000
+  sql_query = SELECT id, body, member_id, date_posted FROM thread_post WHERE length(body) < 64000 AND id BETWEEN $start AND $end
+  sql_attr_uint = member_id
+  #sql_attr_timestamp = date_posted
+}
+
+index thread
+{
+  source = thread
+  #path = /opt/sphinx/thread/thread
+  morphology = stem_en
+  #charset_type = utf-8
+}
+
+index thread_post
+{
+  source = thread_post
+  #path = /opt/sphinx/thread_post/thread_post
+  morphology = stem_en
+  #charset_type = utf-8
+}
