@@ -25,7 +25,7 @@ build-up:
 composer-init:
 	docker exec -it pgb-php /usr/bin/composer install
 
-init: init-files build-up composer-init db-drop db-create db-seed
+init: init-files build-up composer-init db-drop db-create db-seed search-init
 
 init-files:
 	cp config.default.php config.php && \
