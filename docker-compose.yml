@@ -47,4 +47,5 @@ volumes:
     external: false
 networks:
   app-network:
+    name: pgboard
     driver: bridge
