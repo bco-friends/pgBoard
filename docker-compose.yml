@@ -56,11 +56,11 @@ services:
     restart: always
     ports:
       - 9306:9306
-    mem_limit: 512m
+    mem_limit: 900M
     depends_on:
       - postgres
     volumes:
-      - ./docker/data/sphinx/:/mnt/search/
+      - ./docker/data/sphinx/data/:/opt/sphinx/index
       - ./lib/sphinx/sphinx.conf:/opt/sphinx/conf/sphinx.conf
     networks:
       - app-network
