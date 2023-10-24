@@ -7,8 +7,8 @@ class Search
     $sphinx = new SphinxClient();
     $sphinx->setServer(SPHINX_HOST,SPHINX_PORT);
     $sphinx->SetLimits($offset,100,10000000);
-    $sphinx->SetMatchMode(SPH_MATCH_EXTENDED);
-    $sphinx->SetSortMode(SPH_SORT_ATTR_DESC,'date_posted');
+    $sphinx->SetMatchMode($sphinx::SPH_MATCH_EXTENDED);
+    $sphinx->SetSortMode($sphinx::SPH_SORT_ATTR_DESC,'date_posted');
     $res = $sphinx->Query($query,$index);
 
     if (is_bool($res)) {
