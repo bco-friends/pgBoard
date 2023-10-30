@@ -24,3 +24,8 @@ docker-compose.override.yml
 
 # Ignore cache directories in root.
 /*cache*/
+
+# Ignore Sphinx data and configuration.
+/lib/sphinx/sphinx.conf
+/docker/data/sphinx/data/*
+!/docker/data/sphinx/data/.gitkeep
