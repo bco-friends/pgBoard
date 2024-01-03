@@ -1,12 +1,12 @@
 .DEFAULT: help
-.PHONY: start stop build-up refresh php-shell
+.PHONY: start stop build-up rebuild php-shell
 
 # Outputs list of available commands.
 help:
 	@echo The following commands are available: \
 	"\n" start: "\t" Start the Docker container \
 	"\n" stop: "\t\t" Stop the Docker container \
-	"\n" refresh: "\t" Stop, rebuild, and restart the Docker container \
+	"\n" rebuild: "\t" Stop, rebuild, and restart the Docker container \
 	"\n" php-shell: "\t" Open a shell session into the PHP container \
 	"\n" db-seed: "\t" Seed the database with sample data. \
 
@@ -34,7 +34,7 @@ init-files:
 	cp class/Plugin.default.php class/Plugin.php
 
 # Stops the Docker container if it's running, the rebuilds and restarts it.
-refresh: stop build-up
+rebuild: stop build-up
 
 # Opens a Bash session within the PHP container.
 php-shell:
@@ -54,6 +54,11 @@ xdebug-on:
 		&& docker restart pgb-php
 xdebug-off:
 	docker exec -it pgb-php rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && docker restart pgb-php
+
+# Drop the existing database and create a fresh install.
+db-refresh: db-drop db-create
+
+db-reseed: db-refresh db-seed
 
 db-drop:
 	docker exec -it pgb-postgres psql -U postgres -w -c "DROP DATABASE IF EXISTS board;"
