@@ -41,7 +41,7 @@ php-shell:
 	docker exec -it pgb-php /bin/bash
 
 db-shell:
-	docker exec -it pgb-postgres psql -U postgres -w
+	docker exec -it pgb-postgres psql -U postgres -d board -w
 
 phpstan:
 	docker exec -it pgb-php vendor/bin/phpstan analyse index.php config.php error.php core.php class module
