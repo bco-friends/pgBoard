@@ -58,7 +58,7 @@ xdebug-off:
 # Drop the existing database and create a fresh install.
 db-refresh: db-drop db-create
 
-db-reseed: db-refresh db-seed
+db-reseed: db-refresh db-seed search-init
 
 db-drop:
 	docker exec -it pgb-postgres psql -U postgres -w -c "DROP DATABASE IF EXISTS board;"
@@ -73,4 +73,7 @@ db-seed:
 	docker exec -it pgb-php php bin/console.php db:seed --no-interaction
 
 search-init:
-	docker exec -it pgb-sphinx indexer --config /opt/sphinx/conf/sphinx.conf --all --rotate
+	docker exec -it pgb-sphinx indexer --config /opt/sphinx/conf/sphinx.conf --all --rotate --verbose
+
+search-cli:
+	docker exec -it pgb-postgres mysql -h pgb-sphinx -P9306
