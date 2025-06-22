@@ -116,22 +116,31 @@ if(!isset($commandline))
   session_start();
 }
 
-require_once("error.php");          // error handler
-require_once("lang/".LANG.".php");  // language file
-require_once("class/Security.php"); // security
-require_once("class/Core.php");     // common commands
-require_once("class/DB.php");       // database
-require_once("class/Query.php");    // query creation
-require_once("class/Style.php");    // color themes, dynamic styling
-require_once("class/Base.php");     // base layout
-require_once("class/List.php");     // display for lists
-require_once("class/View.php");     // display for views
-require_once("class/Parse.php");    // bbcode parser
-require_once("class/Form.php");     // forms
-require_once("class/Data.php");     // data management
-require_once("class/Search.php");   // search management
-require_once("class/Admin.php");    // search management
-require_once("class/Plugin.php");    // plugins
+foreach ([
+  'error.php',          // error handler
+  'lang/'.LANG.'.php',  // language file
+  'class/Security.php', // security
+  'class/Core.php',     // common commands
+  'class/DB.php',       // database
+  'class/Query.php',    // query creation
+  'class/Style.php',    // color themes, dynamic styling
+  'class/Base.php',     // query creation
+  'class/List.php',     // display for lists
+  'class/View.php',     // display for views
+  'class/Parse.php',    // bbcode parser
+  'class/Form.php',     // forms
+  'class/Data.php',     // data management
+  'class/Search.php',   // search management
+  'class/Admin.php',    // admin management
+  'class/Plugin.php',   // plugins
+  ] as $includePath
+) {
+  if (is_readable('config/'.$includePath)) {
+    $includePath = 'config/'.$includePath;
+  }
+
+  require_once($includePath);
+}
 
 $DB = new DB(DB,true);
 $Security = new BoardSecurity($DB, $_allowed_);
