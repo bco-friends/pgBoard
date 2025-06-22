@@ -20,7 +20,7 @@ $Style->display($Style->get_theme());
 <!-- Start Error Display -->
 <?php error_display(); ?>
 <!-- End Error Display -->
-<?php if(!get('ajax') && file_exists(DIR."/lang/".LANG."_header.php")) require(DIR."/lang/".LANG."_header.php"); ?>
+<?php if(!get('ajax') && file_exists(DIR."/config/lang/".LANG."_header.php")) require(DIR."/config/lang/".LANG."_header.php"); ?>
 <!-- Start Content Display -->
 <div id="content">
 <div class="pad">
@@ -31,6 +31,6 @@ $Style->display($Style->get_theme());
 </div>
 <div id="bottom"></div>
 <!-- End Content Display -->
-<?php if(!get('ajax') && file_exists(DIR."/lang/".LANG."_footer.php")) require(DIR."/lang/".LANG."_footer.php"); ?>
+<?php if(!get('ajax') && file_exists(DIR."/config/lang/".LANG."_footer.php")) require(DIR."/config/lang/".LANG."_footer.php"); ?>
 </body>
 </html>
