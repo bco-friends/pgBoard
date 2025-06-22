@@ -2,10 +2,11 @@
 $baseDir = dirname(__DIR__);
 
 require_once $baseDir . '/vendor/autoload.php';
-require_once $baseDir . '/constants.php';
 
 $dotenv = new \Symfony\Component\Dotenv\Dotenv();
 $dotenv->load($baseDir . '/.env');
+
+require_once $baseDir . '/constants.php';
 
 // functions allowed no matter what your login state
 $_allowed_ = array("threadmain","threadlist","threadview","threadviewpost",
