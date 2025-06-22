@@ -32,8 +32,8 @@ init-files:
 	cp "./.example.env" "./.env" && \
 	[ ! -f "./config/config.php" ] && cp "./config.default.php" "./config/config.php" || true && \
 	[ ! -f "./config/lang/en.php" ] && cp "./lang/en.default.php" "./config/lang/en.php" || true && \
-	[ ! -f "./config/lang/en_header.php" ] && cp "./lang/en_header.php" "./config/lang/en_header.php" || true && \
-	[ ! -f "./config/lang/en_footer.php" ] && cp "./lang/en_footer.php" "./config/lang/en_footer.php" || true && \
+	[ ! -f "./config/lang/en_header.php" ] && cp "./lang/en_header.default.php" "./config/lang/en_header.php" || true && \
+	[ ! -f "./config/lang/en_footer.php" ] && cp "./lang/en_footer.default.php" "./config/lang/en_footer.php" || true && \
 	[ ! -f "./config/class/Plugin.php" ] && cp "./class/Plugin.default.php" "./config/class/Plugin.php" || true
 
 
