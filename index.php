@@ -14,7 +14,7 @@ if(session('externalcss')) $Style->external_css(session('externalcss'));
 $Style->display($Style->get_theme());
 ?>
 </style>
-<script type="text/javascript" src="/js/core.js"></script>
+<script type="text/javascript" src="/js/core.js?scroll"></script>
 </head>
 <body lang="en">
 <!-- Start Error Display -->
