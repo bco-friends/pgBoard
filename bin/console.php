@@ -8,6 +8,6 @@ if (!is_readable($baseDir . '/vendor/autoload.php')) {
 }
 
 require_once "{$baseDir}/vendor/autoload.php";
-require_once "{$baseDir}/config.php";
+require_once "{$baseDir}/config/config.php";
 
 $app = \PgBoard\PgBoard\CommandService::load();

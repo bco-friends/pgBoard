@@ -28,10 +28,14 @@ composer-init:
 init: init-files build-up composer-init db-drop db-create db-seed
 
 init-files:
-	cp config.default.php config.php && \
-	cp .example.env .env && \
-	cp lang/en.default.php lang/en.php && \
-	cp class/Plugin.default.php class/Plugin.php
+	@mkdir -p "./config/lang" "./config/class" && \
+	cp "./.example.env" "./.env" && \
+	[ ! -f "./config/config.php" ] && cp "./config.default.php" "./config/config.php" || true && \
+	[ ! -f "./config/lang/en.php" ] && cp "./lang/en.default.php" "./config/lang/en.php" || true && \
+	[ ! -f "./config/lang/en_header.php" ] && cp "./lang/en_header.php" "./config/lang/en_header.php" || true && \
+	[ ! -f "./config/lang/en_footer.php" ] && cp "./lang/en_footer.php" "./config/lang/en_footer.php" || true && \
+	[ ! -f "./config/class/Plugin.php" ] && cp "./class/Plugin.default.php" "./config/class/Plugin.php" || true
+
 
 # Stops the Docker container if it's running, the rebuilds and restarts it.
 rebuild: stop build-up

@@ -1,14 +1,11 @@
 <?php
-try {
-  require_once __DIR__ . '/vendor/autoload.php';
+$baseDir = dirname(__DIR__);
 
-  $dotenv = new \Symfony\Component\Dotenv\Dotenv();
-  $dotenv->load(__DIR__ . '/.env');
-} catch (Throwable $e) {
-  //
-}
+require_once $baseDir . '/vendor/autoload.php';
+require_once $baseDir . '/constants.php';
 
-require_once __DIR__ . '/constants.php';
+$dotenv = new \Symfony\Component\Dotenv\Dotenv();
+$dotenv->load($baseDir . '/.env');
 
 // functions allowed no matter what your login state
 $_allowed_ = array("threadmain","threadlist","threadview","threadviewpost",
