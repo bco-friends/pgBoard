@@ -4,11 +4,7 @@
 
 ### 1. Copy Production Config Files
 
-First, copy the production configuration files from your backup:
-
-```bash
-./docker/copy-config.sh
-```
+First, create or copy the configuration files required to run the board:
 
 This will copy:
 - `config.php`
@@ -19,7 +15,7 @@ This will copy:
 
 ### 2. Update Database Configuration
 
-Edit `config.php` and update the database connection string:
+If necessary, edit `config.php` and update the database connection string:
 
 ```php
 define("DB", "dbname=board user=board password=board host=db");
@@ -46,20 +42,6 @@ On first run, the SQL scripts in `/doc` will automatically run to initialize the
 ### 5. Access the Application
 
 Open your browser to: http://localhost:8080
-
-## Working Inside the Container
-
-To run Claude Code inside the container:
-
-```bash
-# Enter the web container
-docker exec -it pgboard_web bash
-
-# Inside the container, navigate to the app directory
-cd /var/www/html
-
-# Run Claude Code here
-```
 
 ## Common Commands
 
