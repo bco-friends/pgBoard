@@ -28,6 +28,9 @@ RUN chown -R www-data:www-data /var/www/html \
 # Copy nginx configuration
 COPY docker/nginx/default.conf /etc/nginx/sites-available/default
 
+# Copy PHP configuration
+COPY docker/php/timezone.ini /usr/local/etc/php/conf.d/timezone.ini
+
 # Copy startup script
 COPY docker/start.sh /start.sh
 RUN chmod +x /start.sh
