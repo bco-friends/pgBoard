@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y --allow-unauthenticated \
     nginx \
     git \
     unzip \
+    procps \
+    net-tools \
     && docker-php-ext-install pdo pdo_pgsql pgsql \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
