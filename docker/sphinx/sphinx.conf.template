@@ -1,0 +1,43 @@
+source thread_posts
+{
+    type            = pgsql
+    sql_host        = ${DB_HOST}
+    sql_user        = ${DB_USER}
+    sql_pass        = ${DB_PASS}
+    sql_db          = ${DB_NAME}
+    sql_port        = ${DB_PORT}
+
+    sql_query       = \
+        SELECT \
+            id, \
+            member_id, \
+            thread_id, \
+            body, \
+            EXTRACT(EPOCH FROM date_posted) AS date_posted \
+        FROM thread_post
+
+    sql_attr_uint   = member_id
+    sql_attr_uint   = thread_id
+    sql_attr_timestamp = date_posted
+}
+
+index thread_posts
+{
+    source          = thread_posts
+    path            = /opt/sphinx/index/thread_posts
+}
+
+searchd
+{
+    listen          = 9312
+    listen          = 9306:mysql41
+    log             = /var/log/searchd.log
+    query_log       = /var/log/query.log
+    read_timeout    = 5
+    max_children    = 30
+    pid_file        = /var/run/searchd.pid
+    seamless_rotate = 1
+    preopen_indexes = 1
+    unlink_old      = 1
+    binlog_path     = /opt/sphinx/index
+}
