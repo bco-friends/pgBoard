@@ -29,6 +29,12 @@ services:
       - pgboard_network
     depends_on:
       - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=board
+      - DB_PASS=board
+      - DB_NAME=board
+      - DB_PORT=5432
     command: /bin/sh /opt/sphinx/conf/start-sphinx.sh
 
   web:
