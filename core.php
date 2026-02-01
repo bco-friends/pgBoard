@@ -108,7 +108,7 @@ function url($s=false,$e=false)
   foreach($segs as $seg)
   {
     if($seg == "") continue;
-    $url .= $seg."/";
+    $url .= rawurlencode($seg)."/";
   }
   return $url;
 }
