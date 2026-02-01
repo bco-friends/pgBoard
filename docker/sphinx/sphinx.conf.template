@@ -1,4 +1,4 @@
-source thread_posts
+source main
 {
     type            = pgsql
     sql_host        = ${DB_HOST}
@@ -6,25 +6,49 @@ source thread_posts
     sql_pass        = ${DB_PASS}
     sql_db          = ${DB_NAME}
     sql_port        = ${DB_PORT}
+}
 
+source thread : main
+{
     sql_query       = \
         SELECT \
             id, \
+            subject, \
             member_id, \
-            thread_id, \
-            body, \
             EXTRACT(EPOCH FROM date_posted) AS date_posted \
-        FROM thread_post
+        FROM thread
 
     sql_attr_uint   = member_id
-    sql_attr_uint   = thread_id
     sql_attr_timestamp = date_posted
 }
 
-index thread_posts
+source thread_post : main
 {
-    source          = thread_posts
-    path            = /opt/sphinx/index/thread_posts
+    sql_query       = \
+        SELECT \
+            id, \
+            body, \
+            member_id, \
+            EXTRACT(EPOCH FROM date_posted) AS date_posted \
+        FROM thread_post \
+        WHERE length(body) < 64000
+
+    sql_attr_uint   = member_id
+    sql_attr_timestamp = date_posted
+}
+
+index thread
+{
+    source          = thread
+    path            = /opt/sphinx/index/thread
+    morphology      = stem_en
+}
+
+index thread_post
+{
+    source          = thread_post
+    path            = /opt/sphinx/index/thread_post
+    morphology      = stem_en
 }
 
 searchd
