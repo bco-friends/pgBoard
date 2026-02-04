@@ -18,6 +18,7 @@ services:
       - pgboard_network
 
   sphinx:
+    platform: linux/amd64
     image: macbre/sphinxsearch:3.1.1
     container_name: pgboard_sphinx
     volumes:
