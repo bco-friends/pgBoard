@@ -42,7 +42,7 @@ services:
     container_name: pgboard_web
     volumes:
       - .:/var/www/html
-      - ./docker/nginx/default.conf:/etc/nginx/sites-available/default
+      - ./docker/nginx/default.local.conf:/etc/nginx/sites-available/default
     ports:
       - "8080:80"
     depends_on:
