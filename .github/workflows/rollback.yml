@@ -70,7 +70,7 @@ jobs:
             fi
 
             # Restore from backup (excluding production-specific files)
-            rsync -av --delete \
+            rsync -av --no-g --delete \
               --exclude='config.php' \
               --exclude='.env' \
               --exclude='docker/sphinx/sphinx.conf' \
@@ -79,6 +79,9 @@ jobs:
               --exclude='lang/en_header.php' \
               --exclude='class/Plugin.php' \
               --exclude='lib/gif/partyshark.gif' \
+              --exclude='favicon.ico' \
+              --exclude='robots.txt' \
+              --exclude='start-sphinx.sh' \
               /var/backups/boardcrewcial/${BACKUP_NAME}/ \
               /var/www/boardcrewcial/
 

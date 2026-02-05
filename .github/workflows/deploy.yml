@@ -34,7 +34,7 @@ jobs:
             mkdir -p /var/backups/boardcrewcial/${BACKUP_NAME}
 
             # Backup current production files (fast, uses hard links)
-            rsync -a --link-dest=/var/www/boardcrewcial/ \
+            rsync -a --no-g --link-dest=/var/www/boardcrewcial/ \
               /var/www/boardcrewcial/ \
               /var/backups/boardcrewcial/${BACKUP_NAME}/
 
@@ -56,7 +56,7 @@ jobs:
         run: |
           echo "🚀 Deploying code to production"
 
-          rsync -avz -e "ssh -i ~/.ssh/deploy_key -p ${SSH_PORT}" \
+          rsync -avz --no-g -e "ssh -i ~/.ssh/deploy_key -p ${SSH_PORT}" \
             --delete \
             `# Repository metadata (don't deploy)` \
             --exclude='.git' \
@@ -73,6 +73,10 @@ jobs:
             --exclude='class/Plugin.php' \
             `# Production-specific assets (don't overwrite)` \
             --exclude='lib/gif/partyshark.gif' \
+            --exclude='favicon.ico' \
+            --exclude='robots.txt' \
+            `# Docker runtime files (generated on server)` \
+            --exclude='start-sphinx.sh' \
             ./ ${SSH_USER}@${SSH_HOST}:/var/www/boardcrewcial/
 
           echo "✅ Code deployed successfully"
@@ -153,7 +157,7 @@ jobs:
             echo "🔙 Rolling back to backup: ${BACKUP_NAME}"
 
             # Restore from backup
-            rsync -a --delete \
+            rsync -a --no-g --delete \
               --exclude='config.php' \
               --exclude='.env' \
               --exclude='docker/sphinx/sphinx.conf' \
@@ -162,6 +166,9 @@ jobs:
               --exclude='lang/en_header.php' \
               --exclude='class/Plugin.php' \
               --exclude='lib/gif/partyshark.gif' \
+              --exclude='favicon.ico' \
+              --exclude='robots.txt' \
+              --exclude='start-sphinx.sh' \
               /var/backups/boardcrewcial/${BACKUP_NAME}/ \
               /var/www/boardcrewcial/
 
