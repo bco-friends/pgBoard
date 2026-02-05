@@ -70,7 +70,7 @@ jobs:
             fi
 
             # Restore from backup (excluding production-specific files)
-            rsync -av --delete \
+            rsync -av --no-g --no-perms --no-owner --omit-dir-times --delete \
               --exclude='config.php' \
               --exclude='.env' \
               --exclude='docker/sphinx/sphinx.conf' \
@@ -79,6 +79,8 @@ jobs:
               --exclude='lang/en_header.php' \
               --exclude='class/Plugin.php' \
               --exclude='lib/gif/partyshark.gif' \
+              --exclude='favicon.ico' \
+              --exclude='robots.txt' \
               /var/backups/boardcrewcial/${BACKUP_NAME}/ \
               /var/www/boardcrewcial/
 
@@ -96,8 +98,7 @@ jobs:
           ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} << 'EOF'
             cd /var/www/boardcrewcial
             docker compose -f docker-compose.prod.yml restart
-            echo "Waiting for containers to stabilize..."
-            sleep 15
+            docker compose -f docker-compose.prod.yml up -d --wait
 
             echo ""
             echo "=== Container Status ==="

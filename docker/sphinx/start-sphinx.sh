@@ -21,9 +21,16 @@ sleep 10
 # Create index directory if it doesn't exist
 mkdir -p /opt/sphinx/index
 
-# Build indexes
-echo "Building Sphinx indexes..."
-indexer --config /opt/sphinx/conf/sphinx.conf --all
+# Check if indexes already exist
+if [ -z "$(ls -A /opt/sphinx/index)" ]; then
+  # Directory is empty - do initial indexing
+  echo "No existing indexes found. Building Sphinx indexes (this may take a while)..."
+  indexer --config /opt/sphinx/conf/sphinx.conf --all
+else
+  # Indexes exist - just start daemon (indexes can be updated via cron/manual trigger)
+  echo "Existing indexes found. Skipping initial indexing..."
+  echo "Note: Use 'docker exec boardcrewcial_sphinx indexer --all --rotate' to rebuild indexes"
+fi
 
 # Start searchd
 echo "Starting Sphinx daemon..."

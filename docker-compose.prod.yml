@@ -18,6 +18,12 @@ services:
       - DB_NAME=${DB_NAME}
       - DB_PORT=${DB_PORT:-25060}
     command: /bin/sh /opt/sphinx/conf/start-sphinx.sh
+    healthcheck:
+      test: ["CMD-SHELL", "searchd --status || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   web:
     build: .
@@ -44,6 +50,12 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_PORT=${DB_PORT:-25060}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 volumes:
   sphinx_data:

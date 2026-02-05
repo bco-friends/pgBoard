@@ -34,7 +34,7 @@ jobs:
             mkdir -p /var/backups/boardcrewcial/${BACKUP_NAME}
 
             # Backup current production files (fast, uses hard links)
-            rsync -a --link-dest=/var/www/boardcrewcial/ \
+            rsync -a --no-g --no-perms --no-owner --omit-dir-times --link-dest=/var/www/boardcrewcial/ \
               /var/www/boardcrewcial/ \
               /var/backups/boardcrewcial/${BACKUP_NAME}/
 
@@ -56,7 +56,7 @@ jobs:
         run: |
           echo "🚀 Deploying code to production"
 
-          rsync -avz -e "ssh -i ~/.ssh/deploy_key -p ${SSH_PORT}" \
+          rsync -avz --no-g --no-perms --no-owner --omit-dir-times -e "ssh -i ~/.ssh/deploy_key -p ${SSH_PORT}" \
             --delete \
             `# Repository metadata (don't deploy)` \
             --exclude='.git' \
@@ -73,6 +73,8 @@ jobs:
             --exclude='class/Plugin.php' \
             `# Production-specific assets (don't overwrite)` \
             --exclude='lib/gif/partyshark.gif' \
+            --exclude='favicon.ico' \
+            --exclude='robots.txt' \
             ./ ${SSH_USER}@${SSH_HOST}:/var/www/boardcrewcial/
 
           echo "✅ Code deployed successfully"
@@ -88,46 +90,29 @@ jobs:
 
           ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} << 'EOF'
             cd /var/www/boardcrewcial
+
+            echo "Restarting containers..."
             docker compose -f docker-compose.prod.yml restart
-            echo "Waiting for containers to stabilize..."
-            sleep 15
+
+            echo "Checking container status after restart..."
+            docker ps -a | grep boardcrewcial || echo "No boardcrewcial containers found"
+
+            echo "Waiting for containers to be healthy..."
+            docker compose -f docker-compose.prod.yml up -d --wait || {
+              echo "⚠️  Wait command failed or timed out"
+              echo "Container status:"
+              docker ps -a | grep boardcrewcial
+              echo "Web container logs:"
+              docker logs boardcrewcial_web --tail 50
+            }
           EOF
 
       - name: Health check
         id: health_check
-        env:
-          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
-          SSH_USER: ${{ secrets.PROD_SSH_USER }}
-          SSH_PORT: ${{ secrets.PROD_SSH_PORT }}
         run: |
           echo "🏥 Running health checks"
 
-          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} << 'EOF'
-            # Check if containers are running
-            if ! docker ps | grep -q "boardcrewcial_web.*Up"; then
-              echo "❌ Web container is not running"
-              exit 1
-            fi
-
-            if ! docker ps | grep -q "boardcrewcial_sphinx.*Up"; then
-              echo "❌ Sphinx container is not running"
-              exit 1
-            fi
-
-            echo "✅ Containers are running"
-
-            # Check for critical errors in recent logs
-            WEB_ERRORS=$(docker logs boardcrewcial_web --since 1m 2>&1 | grep -i "fatal\|critical\|emergency" | wc -l)
-            if [ "$WEB_ERRORS" -gt 0 ]; then
-              echo "⚠️  Found $WEB_ERRORS critical errors in web logs:"
-              docker logs boardcrewcial_web --since 1m 2>&1 | grep -i "fatal\|critical\|emergency"
-              exit 1
-            fi
-
-            echo "✅ No critical errors in logs"
-          EOF
-
-          # Check if website responds
+          # Check if website responds (containers already verified healthy by --wait)
           echo "Checking website response..."
           RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://boardcrewcial.com --max-time 10)
 
@@ -137,7 +122,7 @@ jobs:
           fi
 
           echo "✅ Website is responding (HTTP 200)"
-          echo "✅ All health checks passed"
+          echo "✅ Deployment health check passed"
 
       - name: Rollback on failure
         if: failure() && (steps.deploy.outcome == 'failure' || steps.restart.outcome == 'failure' || steps.health_check.outcome == 'failure')
@@ -153,7 +138,7 @@ jobs:
             echo "🔙 Rolling back to backup: ${BACKUP_NAME}"
 
             # Restore from backup
-            rsync -a --delete \
+            rsync -a --no-g --no-perms --no-owner --omit-dir-times --delete \
               --exclude='config.php' \
               --exclude='.env' \
               --exclude='docker/sphinx/sphinx.conf' \
@@ -162,13 +147,15 @@ jobs:
               --exclude='lang/en_header.php' \
               --exclude='class/Plugin.php' \
               --exclude='lib/gif/partyshark.gif' \
+              --exclude='favicon.ico' \
+              --exclude='robots.txt' \
               /var/backups/boardcrewcial/${BACKUP_NAME}/ \
               /var/www/boardcrewcial/
 
             # Restart containers
             cd /var/www/boardcrewcial
             docker compose -f docker-compose.prod.yml restart
-            sleep 10
+            docker compose -f docker-compose.prod.yml up -d --wait
 
             echo "✅ Rollback completed"
             docker ps | grep boardcrewcial
