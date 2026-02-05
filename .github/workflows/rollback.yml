@@ -1,0 +1,167 @@
+name: Manual Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      backup_name:
+        description: 'Backup to restore (e.g., backup-release-20260204-2048)'
+        required: true
+        type: string
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.PROD_SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: List available backups
+        env:
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          SSH_USER: ${{ secrets.PROD_SSH_USER }}
+          SSH_PORT: ${{ secrets.PROD_SSH_PORT }}
+        run: |
+          echo "📦 Available backups on server:"
+          echo ""
+
+          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} << 'EOF'
+            cd /var/backups/boardcrewcial
+            if [ -d "${{ github.event.inputs.backup_name }}" ]; then
+              echo "✅ Backup found: ${{ github.event.inputs.backup_name }}"
+              echo ""
+              echo "Backup info:"
+              cat ${{ github.event.inputs.backup_name }}/BACKUP_INFO 2>/dev/null || echo "No backup info available"
+            else
+              echo "❌ Backup not found: ${{ github.event.inputs.backup_name }}"
+              echo ""
+              echo "Available backups:"
+              ls -lth backup-* 2>/dev/null || echo "No backups found"
+              exit 1
+            fi
+          EOF
+
+      - name: Confirm rollback
+        run: |
+          echo "⚠️  WARNING: This will restore production to backup: ${{ github.event.inputs.backup_name }}"
+          echo "Current production code will be replaced with the backup version."
+          echo ""
+          echo "Proceeding with rollback in 5 seconds..."
+          sleep 5
+
+      - name: Restore from backup
+        env:
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          SSH_USER: ${{ secrets.PROD_SSH_USER }}
+          SSH_PORT: ${{ secrets.PROD_SSH_PORT }}
+          BACKUP_NAME: ${{ github.event.inputs.backup_name }}
+        run: |
+          echo "🔙 Restoring from backup: ${BACKUP_NAME}"
+
+          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} << EOF
+            # Verify backup exists
+            if [ ! -d "/var/backups/boardcrewcial/${BACKUP_NAME}" ]; then
+              echo "❌ Backup directory not found: /var/backups/boardcrewcial/${BACKUP_NAME}"
+              exit 1
+            fi
+
+            # Restore from backup (excluding production-specific files)
+            rsync -av --delete \
+              --exclude='config.php' \
+              --exclude='.env' \
+              --exclude='docker/sphinx/sphinx.conf' \
+              --exclude='lang/en.php' \
+              --exclude='lang/en_footer.php' \
+              --exclude='lang/en_header.php' \
+              --exclude='class/Plugin.php' \
+              --exclude='lib/gif/partyshark.gif' \
+              /var/backups/boardcrewcial/${BACKUP_NAME}/ \
+              /var/www/boardcrewcial/
+
+            echo "✅ Files restored from backup"
+          EOF
+
+      - name: Restart containers
+        env:
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          SSH_USER: ${{ secrets.PROD_SSH_USER }}
+          SSH_PORT: ${{ secrets.PROD_SSH_PORT }}
+        run: |
+          echo "🔄 Restarting containers"
+
+          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} << 'EOF'
+            cd /var/www/boardcrewcial
+            docker compose -f docker-compose.prod.yml restart
+            echo "Waiting for containers to stabilize..."
+            sleep 15
+
+            echo ""
+            echo "=== Container Status ==="
+            docker ps | grep boardcrewcial
+          EOF
+
+      - name: Verify rollback
+        env:
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          SSH_USER: ${{ secrets.PROD_SSH_USER }}
+          SSH_PORT: ${{ secrets.PROD_SSH_PORT }}
+        run: |
+          echo "🏥 Verifying rollback"
+
+          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} << 'EOF'
+            # Check if containers are running
+            if ! docker ps | grep -q "boardcrewcial_web.*Up"; then
+              echo "❌ Web container is not running"
+              docker logs boardcrewcial_web --tail 30
+              exit 1
+            fi
+
+            if ! docker ps | grep -q "boardcrewcial_sphinx.*Up"; then
+              echo "❌ Sphinx container is not running"
+              docker logs boardcrewcial_sphinx --tail 30
+              exit 1
+            fi
+
+            echo "✅ All containers are running"
+
+            echo ""
+            echo "=== Recent Web Logs ==="
+            docker logs boardcrewcial_web --tail 10
+
+            echo ""
+            echo "=== Recent Sphinx Logs ==="
+            docker logs boardcrewcial_sphinx --tail 10
+          EOF
+
+          # Check if website responds
+          echo ""
+          echo "Checking website response..."
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://boardcrewcial.com --max-time 10)
+
+          if [ "$RESPONSE" = "200" ]; then
+            echo "✅ Website is responding (HTTP 200)"
+          else
+            echo "⚠️  Website returned HTTP $RESPONSE"
+          fi
+
+      - name: Rollback summary
+        if: success()
+        run: |
+          echo ""
+          echo "✅ Rollback completed successfully!"
+          echo ""
+          echo "📋 Rollback Summary:"
+          echo "  Restored backup: ${{ github.event.inputs.backup_name }}"
+          echo "  Containers: Restarted"
+          echo "  Website: Online"
+          echo ""
+          echo "⚠️  Note: This rollback restored application code only."
+          echo "   Production config files (.env, config.php, etc.) were preserved."
+
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

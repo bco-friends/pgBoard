@@ -1,0 +1,236 @@
+name: Deploy to Production
+
+on:
+  push:
+    tags:
+      - 'release-*'  # Triggers on tags like release-20260204-2048
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.PROD_SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Create backup of current production
+        env:
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          SSH_USER: ${{ secrets.PROD_SSH_USER }}
+          SSH_PORT: ${{ secrets.PROD_SSH_PORT }}
+          BACKUP_NAME: backup-${{ github.ref_name }}
+        run: |
+          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} << EOF
+            echo "📦 Creating backup: ${BACKUP_NAME}"
+
+            # Create backup directory
+            mkdir -p /var/backups/boardcrewcial/${BACKUP_NAME}
+
+            # Backup current production files (fast, uses hard links)
+            rsync -a --link-dest=/var/www/boardcrewcial/ \
+              /var/www/boardcrewcial/ \
+              /var/backups/boardcrewcial/${BACKUP_NAME}/
+
+            # Store backup timestamp and tag info
+            echo "Tag: ${{ github.ref_name }}" > /var/backups/boardcrewcial/${BACKUP_NAME}/BACKUP_INFO
+            echo "Date: \$(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> /var/backups/boardcrewcial/${BACKUP_NAME}/BACKUP_INFO
+            echo "Commit: ${{ github.sha }}" >> /var/backups/boardcrewcial/${BACKUP_NAME}/BACKUP_INFO
+
+            echo "✅ Backup created at /var/backups/boardcrewcial/${BACKUP_NAME}"
+            du -sh /var/backups/boardcrewcial/${BACKUP_NAME}
+          EOF
+
+      - name: Deploy to production
+        id: deploy
+        env:
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          SSH_USER: ${{ secrets.PROD_SSH_USER }}
+          SSH_PORT: ${{ secrets.PROD_SSH_PORT }}
+        run: |
+          echo "🚀 Deploying code to production"
+
+          rsync -avz -e "ssh -i ~/.ssh/deploy_key -p ${SSH_PORT}" \
+            --delete \
+            `# Repository metadata (don't deploy)` \
+            --exclude='.git' \
+            --exclude='.gitignore' \
+            --exclude='.github' \
+            `# Production configuration files (don't overwrite)` \
+            --exclude='config.php' \
+            --exclude='.env' \
+            --exclude='docker/sphinx/sphinx.conf' \
+            `# Production customizations (don't overwrite)` \
+            --exclude='lang/en.php' \
+            --exclude='lang/en_footer.php' \
+            --exclude='lang/en_header.php' \
+            --exclude='class/Plugin.php' \
+            `# Production-specific assets (don't overwrite)` \
+            --exclude='lib/gif/partyshark.gif' \
+            ./ ${SSH_USER}@${SSH_HOST}:/var/www/boardcrewcial/
+
+          echo "✅ Code deployed successfully"
+
+      - name: Restart containers
+        id: restart
+        env:
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          SSH_USER: ${{ secrets.PROD_SSH_USER }}
+          SSH_PORT: ${{ secrets.PROD_SSH_PORT }}
+        run: |
+          echo "🔄 Restarting containers"
+
+          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} << 'EOF'
+            cd /var/www/boardcrewcial
+            docker compose -f docker-compose.prod.yml restart
+            echo "Waiting for containers to stabilize..."
+            sleep 15
+          EOF
+
+      - name: Health check
+        id: health_check
+        env:
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          SSH_USER: ${{ secrets.PROD_SSH_USER }}
+          SSH_PORT: ${{ secrets.PROD_SSH_PORT }}
+        run: |
+          echo "🏥 Running health checks"
+
+          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} << 'EOF'
+            # Check if containers are running
+            if ! docker ps | grep -q "boardcrewcial_web.*Up"; then
+              echo "❌ Web container is not running"
+              exit 1
+            fi
+
+            if ! docker ps | grep -q "boardcrewcial_sphinx.*Up"; then
+              echo "❌ Sphinx container is not running"
+              exit 1
+            fi
+
+            echo "✅ Containers are running"
+
+            # Check for critical errors in recent logs
+            WEB_ERRORS=$(docker logs boardcrewcial_web --since 1m 2>&1 | grep -i "fatal\|critical\|emergency" | wc -l)
+            if [ "$WEB_ERRORS" -gt 0 ]; then
+              echo "⚠️  Found $WEB_ERRORS critical errors in web logs:"
+              docker logs boardcrewcial_web --since 1m 2>&1 | grep -i "fatal\|critical\|emergency"
+              exit 1
+            fi
+
+            echo "✅ No critical errors in logs"
+          EOF
+
+          # Check if website responds
+          echo "Checking website response..."
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://boardcrewcial.com --max-time 10)
+
+          if [ "$RESPONSE" != "200" ]; then
+            echo "❌ Website returned HTTP $RESPONSE"
+            exit 1
+          fi
+
+          echo "✅ Website is responding (HTTP 200)"
+          echo "✅ All health checks passed"
+
+      - name: Rollback on failure
+        if: failure() && (steps.deploy.outcome == 'failure' || steps.restart.outcome == 'failure' || steps.health_check.outcome == 'failure')
+        env:
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          SSH_USER: ${{ secrets.PROD_SSH_USER }}
+          SSH_PORT: ${{ secrets.PROD_SSH_PORT }}
+          BACKUP_NAME: backup-${{ github.ref_name }}
+        run: |
+          echo "⚠️  DEPLOYMENT FAILED - Initiating automatic rollback"
+
+          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} << EOF
+            echo "🔙 Rolling back to backup: ${BACKUP_NAME}"
+
+            # Restore from backup
+            rsync -a --delete \
+              --exclude='config.php' \
+              --exclude='.env' \
+              --exclude='docker/sphinx/sphinx.conf' \
+              --exclude='lang/en.php' \
+              --exclude='lang/en_footer.php' \
+              --exclude='lang/en_header.php' \
+              --exclude='class/Plugin.php' \
+              --exclude='lib/gif/partyshark.gif' \
+              /var/backups/boardcrewcial/${BACKUP_NAME}/ \
+              /var/www/boardcrewcial/
+
+            # Restart containers
+            cd /var/www/boardcrewcial
+            docker compose -f docker-compose.prod.yml restart
+            sleep 10
+
+            echo "✅ Rollback completed"
+            docker ps | grep boardcrewcial
+          EOF
+
+          echo "❌ Deployment was rolled back. Check logs above for errors."
+          exit 1
+
+      - name: Cleanup old backups
+        if: success()
+        env:
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          SSH_USER: ${{ secrets.PROD_SSH_USER }}
+          SSH_PORT: ${{ secrets.PROD_SSH_PORT }}
+        run: |
+          echo "🧹 Cleaning up old backups (keeping last 5)"
+
+          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} << 'EOF'
+            cd /var/backups/boardcrewcial
+
+            # List backups sorted by modification time
+            BACKUP_COUNT=$(ls -dt backup-* 2>/dev/null | wc -l)
+
+            if [ "$BACKUP_COUNT" -gt 5 ]; then
+              echo "Found $BACKUP_COUNT backups, removing oldest..."
+              ls -dt backup-* | tail -n +6 | xargs rm -rf
+              echo "✅ Old backups removed"
+            else
+              echo "✅ Only $BACKUP_COUNT backups exist, no cleanup needed"
+            fi
+
+            echo ""
+            echo "Current backups:"
+            ls -lth backup-* 2>/dev/null | head -10 || echo "No backups found"
+          EOF
+
+      - name: Deployment summary
+        if: success()
+        env:
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          SSH_USER: ${{ secrets.PROD_SSH_USER }}
+          SSH_PORT: ${{ secrets.PROD_SSH_PORT }}
+        run: |
+          echo "✅ Deployment successful!"
+          echo ""
+          echo "📋 Deployment Summary:"
+          echo "  Tag: ${{ github.ref_name }}"
+          echo "  Commit: ${{ github.sha }}"
+          echo "  Backup: /var/backups/boardcrewcial/backup-${{ github.ref_name }}"
+          echo ""
+
+          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} << 'EOF'
+            echo "=== Container Status ==="
+            docker ps | grep boardcrewcial
+            echo ""
+            echo "=== Recent Web Logs ==="
+            docker logs boardcrewcial_web --tail 10
+            echo ""
+            echo "=== Recent Sphinx Logs ==="
+            docker logs boardcrewcial_sphinx --tail 10
+          EOF
+
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
