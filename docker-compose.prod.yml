@@ -1,0 +1,53 @@
+services:
+  sphinx:
+    image: macbre/sphinxsearch:3.1.1
+    container_name: boardcrewcial_sphinx
+    volumes:
+      - ./docker/sphinx:/opt/sphinx/conf
+      - sphinx_data:/opt/sphinx/index
+    networks:
+      - boardcrewcial_network
+    restart: unless-stopped
+    dns:
+      - 67.207.67.3
+      - 67.207.67.2
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_PORT=${DB_PORT:-25060}
+    command: /bin/sh /opt/sphinx/conf/start-sphinx.sh
+
+  web:
+    build: .
+    container_name: boardcrewcial_web
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/production.conf:/etc/nginx/sites-available/default
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - sphinx
+    networks:
+      - boardcrewcial_network
+    restart: unless-stopped
+    dns:
+      - 67.207.67.3
+      - 67.207.67.2
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=${DB_PORT:-25060}
+
+volumes:
+  sphinx_data:
+
+networks:
+  boardcrewcial_network:
+    driver: bridge

@@ -1,5 +1,7 @@
 /* Start Container */
-#content
+#content,
+#header,
+#footer
 {
   clear: both;
   margin: 0px auto;
@@ -7,7 +9,9 @@
   max-width: 1400px;
   width: 99%;
 }
-#content .pad { padding: 10px; }
+#content .pad,
+#header .pad,
+#footer .pad { padding: 10px; }
 .title { float: left; }
 .subtitle { float: left; clear: left; }
 /* End Container */

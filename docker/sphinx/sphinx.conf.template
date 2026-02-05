@@ -1,0 +1,67 @@
+source main
+{
+    type            = pgsql
+    sql_host        = ${DB_HOST}
+    sql_user        = ${DB_USER}
+    sql_pass        = ${DB_PASS}
+    sql_db          = ${DB_NAME}
+    sql_port        = ${DB_PORT}
+}
+
+source thread : main
+{
+    sql_query       = \
+        SELECT \
+            id, \
+            subject, \
+            member_id, \
+            EXTRACT(EPOCH FROM date_posted) AS date_posted \
+        FROM thread
+
+    sql_attr_uint   = member_id
+    sql_attr_timestamp = date_posted
+}
+
+source thread_post : main
+{
+    sql_query       = \
+        SELECT \
+            id, \
+            body, \
+            member_id, \
+            EXTRACT(EPOCH FROM date_posted) AS date_posted \
+        FROM thread_post \
+        WHERE length(body) < 64000
+
+    sql_attr_uint   = member_id
+    sql_attr_timestamp = date_posted
+}
+
+index thread
+{
+    source          = thread
+    path            = /opt/sphinx/index/thread
+    morphology      = stem_en
+}
+
+index thread_post
+{
+    source          = thread_post
+    path            = /opt/sphinx/index/thread_post
+    morphology      = stem_en
+}
+
+searchd
+{
+    listen          = 9312
+    listen          = 9306:mysql41
+    log             = /var/log/searchd.log
+    query_log       = /var/log/query.log
+    read_timeout    = 5
+    max_children    = 30
+    pid_file        = /var/run/searchd.pid
+    seamless_rotate = 1
+    preopen_indexes = 1
+    unlink_old      = 1
+    binlog_path     = /opt/sphinx/index
+}

@@ -6,3 +6,13 @@ lang/en_footer.php
 lang/en_header.php
 
 class/Plugin.php
+
+# Docker
+.DS_Store
+.env
+docker/sphinx/sphinx.conf
+docker-compose.override.yml
+
+# IDE
+.idea/
+.vscode/
