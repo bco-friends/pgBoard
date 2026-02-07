@@ -87,17 +87,21 @@ jobs:
             echo "✅ Files restored from backup"
           EOF
 
-      - name: Restart containers
+      - name: Rebuild and restart containers
         env:
           SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
           SSH_USER: ${{ secrets.PROD_SSH_USER }}
           SSH_PORT: ${{ secrets.PROD_SSH_PORT }}
         run: |
-          echo "🔄 Restarting containers"
+          echo "🔄 Rebuilding and restarting containers"
 
           ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} << 'EOF'
             cd /var/www/boardcrewcial
-            docker compose -f docker-compose.prod.yml restart
+
+            echo "Building Docker images from rolled-back Dockerfile..."
+            docker compose -f docker-compose.prod.yml build --pull
+
+            echo "Starting containers with rebuilt images..."
             docker compose -f docker-compose.prod.yml up -d --wait
 
             echo ""
