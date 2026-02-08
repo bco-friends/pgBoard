@@ -38,6 +38,16 @@ services:
       - DB_PORT=5432
     command: /bin/sh /opt/sphinx/conf/start-sphinx.sh
 
+  composer:
+    container_name: pgboard_composer
+    image: composer:latest
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html
+    command: composer install
+    networks:
+      - pgboard_network
+
   web:
     build: .
     container_name: pgboard_web
@@ -47,6 +57,7 @@ services:
     ports:
       - "8080:80"
     depends_on:
+      - composer
       - db
       - sphinx
     networks:
