@@ -62,15 +62,10 @@ jobs:
             --exclude='.git' \
             --exclude='.gitignore' \
             --exclude='.github' \
-            `# Production configuration files (don't overwrite)` \
-            --exclude='config.php' \
+            `# Production configuration (don't overwrite)` \
+            --exclude='config/' \
             --exclude='.env' \
             --exclude='docker/sphinx/sphinx.conf' \
-            `# Production customizations (don't overwrite)` \
-            --exclude='lang/en.php' \
-            --exclude='lang/en_footer.php' \
-            --exclude='lang/en_header.php' \
-            --exclude='class/Plugin.php' \
             `# Production-specific assets (don't overwrite)` \
             --exclude='lib/gif/partyshark.gif' \
             --exclude='favicon.ico' \
@@ -142,13 +137,9 @@ jobs:
 
             # Restore from backup
             rsync -a --no-g --no-perms --no-owner --omit-dir-times --delete \
-              --exclude='config.php' \
+              --exclude='config/' \
               --exclude='.env' \
               --exclude='docker/sphinx/sphinx.conf' \
-              --exclude='lang/en.php' \
-              --exclude='lang/en_footer.php' \
-              --exclude='lang/en_header.php' \
-              --exclude='class/Plugin.php' \
               --exclude='lib/gif/partyshark.gif' \
               --exclude='favicon.ico' \
               --exclude='robots.txt' \
