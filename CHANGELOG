@@ -1,6 +1,11 @@
 pgBoard: it's pretty good v3.0.0
 --------------------------------
-version 3.0.0 (2026-02-08)
+version 3.0.1 (2026-02-08)
+  - update constant definitions in constants.php
+  - fix issue with escaped data in thread list
+  - fix float casting issue
+
+version 3.0.0 (2026-02-07)
   - upgrade platform dependencies (PHP 8.5+, Sphinx 3.1.1)
   - dockerize and composer-ify application
   - introduce testing suite

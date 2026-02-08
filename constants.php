@@ -3,6 +3,10 @@ if (is_readable(__DIR__ . '/constants.override.php')) {
   require_once __DIR__ . '/constants.override.php';
 }
 
+if (!defined('VERSION')) {
+  define('VERSION', '3.0.1');
+}
+
 if (!defined('LANG')) {
   define("LANG", $_ENV['LANG'] ?? "en");
 }
