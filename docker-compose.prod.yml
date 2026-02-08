@@ -5,7 +5,8 @@ services:
     volumes:
       - ./:/var/www/html
     working_dir: /var/www/html
-    command: composer install
+    entrypoint: /bin/sh
+    command: -c "composer install --no-interaction --no-dev --optimize-autoloader && chown -R $(stat -c '%u:%g' .) vendor/"
     networks:
       - boardcrewcial_network
 
