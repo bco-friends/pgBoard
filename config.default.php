@@ -6,6 +6,8 @@ require_once $baseDir . '/vendor/autoload.php';
 $dotenv = new \Symfony\Component\Dotenv\Dotenv();
 $dotenv->load($baseDir . '/.env');
 
+// Define any unique constants here before loading the constants file.
+
 require_once $baseDir . '/constants.php';
 
 // functions allowed no matter what your login state
