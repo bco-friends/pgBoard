@@ -7,7 +7,7 @@ function thread_get()
 
   $offset = cmd(3,true)?cmd(3,true)*100:0;
   $res = $Search->query(cmd(2),"thread",$offset);
-  $ids = array_keys($res['matches']);
+  $ids = (isset($res['matches']) && is_array($res['matches'])) ? array_keys($res['matches']) : array();
   $page = cmd(3,true)+1;
 
   $Query = new BoardQuery;
@@ -36,7 +36,7 @@ function thread_post_get()
 
   $offset = cmd(3,true)?cmd(3,true)*100:0;
   $res = $Search->query(cmd(2),"thread_post",$offset);
-  $ids = array_keys($res['matches']);
+  $ids = (isset($res['matches']) && is_array($res['matches'])) ? array_keys($res['matches']) : array();
   $page = cmd(3,true)+1;
 
   $Query = new BoardQuery;
