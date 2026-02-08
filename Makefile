@@ -12,18 +12,18 @@ help:
 
 # Starts the Docker container.
 start:
-	docker-compose up -d
+	docker compose up -d
 
 # Stops the Docker container.
 stop:
-	docker-compose down
+	docker compose down
 
 # Builds the Docker container and starts it.
 build-up:
-	docker-compose up --build -d
+	docker compose up --build -d
 
 composer-init:
-	docker exec -it pgb-php /usr/bin/composer install
+	docker exec -it pgboard_web /usr/bin/composer install
 
 init: init-files build-up composer-init db-drop db-create db-seed
 
@@ -42,22 +42,22 @@ rebuild: stop build-up
 
 # Opens a Bash session within the PHP container.
 php-shell:
-	docker exec -it pgb-php /bin/bash
+	docker exec -it pgboard_web /bin/bash
 
 db-shell:
-	docker exec -it pgb-postgres psql -U postgres -w
+	docker exec -it pgboard_db psql -U board -d board
 
 phpstan:
-	docker exec -it pgb-php vendor/bin/phpstan analyse index.php config.php error.php core.php class module
+	docker exec -it pgboard_web vendor/bin/phpstan analyse index.php config.php error.php core.php class module
 
 phpunit:
-	docker exec -it pgb-php vendor/bin/phpunit
+	docker exec -it pgboard_web vendor/bin/phpunit
 
 xdebug-on:
-	docker exec -it pgb-php cp /var/www/html/docker/php/conf/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-		&& docker restart pgb-php
+	docker exec -it pgboard_web cp /var/www/html/docker/php/conf/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+		&& docker restart pgboard_web
 xdebug-off:
-	docker exec -it pgb-php rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && docker restart pgb-php
+	docker exec -it pgboard_web rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && docker restart pgboard_web
 
 # Drop the existing database and create a fresh install.
 db-refresh: db-drop db-create
@@ -65,13 +65,13 @@ db-refresh: db-drop db-create
 db-reseed: db-refresh db-seed
 
 db-drop:
-	docker exec -it pgb-postgres psql -U postgres -w -c "DROP DATABASE IF EXISTS board;"
+	docker exec -it pgboard_db psql -U board -d postgres -c "DROP DATABASE IF EXISTS board;"
 
 db-create:
-	docker exec -it pgb-postgres psql -U postgres -w -c "CREATE DATABASE board;" && \
-	docker exec -it pgb-postgres psql -U postgres -w -d board -f ./etc/data/1-Schema.sql && \
-	docker exec -it pgb-postgres psql -U postgres -w -d board -f ./etc/data/2-Functions.sql && \
-	docker exec -it pgb-postgres psql -U postgres -w -d board -f ./etc/data/3-Indexes-FKeys-Triggers.sql
+	docker exec -it pgboard_db psql -U board -d postgres -c "CREATE DATABASE board;" && \
+	docker exec -it pgboard_db psql -U board -d board -f /docker-entrypoint-initdb.d/1-Schema.sql && \
+	docker exec -it pgboard_db psql -U board -d board -f /docker-entrypoint-initdb.d/2-Functions.sql && \
+	docker exec -it pgboard_db psql -U board -d board -f /docker-entrypoint-initdb.d/3-Indexes-FKeys-Triggers.sql
 
 db-seed:
-	docker exec -it pgb-php php bin/console.php db:seed --no-interaction
+	docker exec -it pgboard_web php bin/console.php db:seed --no-interaction
