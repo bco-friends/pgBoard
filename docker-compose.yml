@@ -36,6 +36,7 @@ services:
       - DB_PASS=board
       - DB_NAME=board
       - DB_PORT=5432
+      - DB_SSL_MODE=
     command: /bin/sh /opt/sphinx/conf/start-sphinx.sh
 
   composer:
@@ -67,6 +68,7 @@ services:
       - DB_NAME=board
       - DB_USER=board
       - DB_PASSWORD=board
+      - DB_SSL_MODE=
 
 volumes:
   postgres_data:
