@@ -1,6 +1,6 @@
 pgBoard: it's pretty good v3.0.0
 --------------------------------
-version 3.0.0 (2026-02-XX)
+version 3.0.0 (2026-02-08)
   - upgrade platform dependencies (PHP 8.5+, Sphinx 3.1.1)
   - dockerize and composer-ify application
   - introduce testing suite
