@@ -24,7 +24,7 @@ class BoardParse
           return !session('hidemedia');
         }
 
-        return false;
+        return session('hidemedia');
       };
 
       return new self($bbc, $rep, $hidemedia());
