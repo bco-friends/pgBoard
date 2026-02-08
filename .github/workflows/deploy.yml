@@ -66,6 +66,17 @@ jobs:
             --exclude='config/' \
             --exclude='.env' \
             --exclude='docker/sphinx/sphinx.conf' \
+            --exclude='docker-compose.override.yml' \
+            `# Development files (don't deploy)` \
+            --exclude='tests/' \
+            --exclude='phpunit.xml' \
+            --exclude='Makefile' \
+            --exclude='scripts/' \
+            --exclude='README.md' \
+            --exclude='CHANGELOG' \
+            --exclude='.example.env' \
+            --exclude='*.default.php' \
+            --exclude='docker-compose.yml' \
             `# Production-specific assets (don't overwrite)` \
             --exclude='lib/gif/partyshark.gif' \
             --exclude='favicon.ico' \
