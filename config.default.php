@@ -90,7 +90,7 @@ $_rep_ = array("","<span style=\"text-decoration:underline;\">","</span>",
 /*
 * Do not edit below this line unless you know what you're doing!
 **/
-define("VERSION","2.9.5");
+define("VERSION","3.0.0");
 
 require_once("core.php"); // framework
 ini_set("magic_gpc_quotes",false);
