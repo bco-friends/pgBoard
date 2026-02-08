@@ -12,7 +12,7 @@ if (!defined('ADMIN_EMAIL')) {
 }
 
 if (!defined('DB')) {
-  define("DB", $_ENV['DB'] ?? "dbname=board user=board password=board");
+  define("DB", $_ENV['DB'] ?? "host={$_ENV['DB_HOST']} dbname={$_ENV['DB_NAME']} user={$_ENV['DB_USER']} password={$_ENV['DB_PASS']} sslmode={$_ENV['DB_SSL_MODE']}");
 }
 
 if (!defined('DIR')) {
