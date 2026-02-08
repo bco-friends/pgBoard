@@ -1,5 +1,7 @@
 # Ignore config/user customized setup files since example versions are checked in
-config.php
+/config/**/*.php
+.env
+constants.override.php
 
 lang/en.php
 lang/en_footer.php
@@ -16,3 +18,14 @@ docker-compose.override.yml
 # IDE
 .idea/
 .vscode/
+
+# Composer
+/vendor/
+
+# Ignore cache directories in root.
+/*cache*/
+
+# Ignore Sphinx data and configuration.
+/lib/sphinx/sphinx.conf
+/docker/data/sphinx/data/*
+!/docker/data/sphinx/data/.gitkeep

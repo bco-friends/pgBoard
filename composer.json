@@ -1,0 +1,29 @@
+{
+    "name": "pgboard/pgboard",
+    "description": "A pretty good board.",
+    "type": "project",
+    "require-dev": {
+        "fakerphp/faker": "^1.23",
+        "phpstan/phpstan": "^1.10",
+        "phpunit/phpunit": "^10.3",
+        "symfony/console": "^6.3"
+    },
+    "autoload": {
+        "classmap": ["class/"],
+        "psr-4": {
+            "PgBoard\\PgBoard\\": "class/src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PgBoard\\PgBoard\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.5",
+        "symfony/dotenv": "^7.0"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

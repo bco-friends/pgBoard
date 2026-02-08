@@ -137,7 +137,7 @@ class DB
   function load_result()
   {
     $res = false;
-    
+
     // if no sql defined die gracefully
     if(!$this->res)
     {
@@ -146,9 +146,15 @@ class DB
     }
     else
     {
-      if($this->debug) $res = pg_fetch_result($this->res,0);
+      // Check if there are any rows before trying to fetch
+      $num_rows = $this->debug ? pg_num_rows($this->res) : @pg_num_rows($this->res);
+      if($num_rows === 0) {
+        return false;
+      }
+
+      if($this->debug) $res = pg_fetch_result($this->res, 0, 0);
       else
-      $res = @pg_fetch_result($this->res,0);
+      $res = @pg_fetch_result($this->res, 0, 0);
     }
     return $res;
   }

@@ -28,9 +28,9 @@ function create_post()
   $output = "";
   if($DB->check("SELECT true FROM member WHERE LOWER(name)=$1",array(strtolower(post('account'))))) $output .= ERROR_MEMBER_NAME_INUSE."<br/>";
 
-  if(!eregi(MEMBER_REGEXP,post('account'))) $output .= ERROR_MEMBER_NAME."<br/>";
+  if(!preg_match(MEMBER_REGEXP,post('account'))) $output .= ERROR_MEMBER_NAME."<br/>";
 
-  if(eregi("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$",post('email_signup')))
+  if(preg_match("|^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$|",post('email_signup')))
   {
     if(post('email_signup') != post('email_confirm')) $output .= ERROR_MEMBER_EMAIL_NOMATCH."<br/>\n";
   }
@@ -185,13 +185,13 @@ function editcolors_post()
         $val = "#".substr($val,0,6);
         break;
       default:
-        continue;
+        continue 2;
         break;
     }
     $theme[$key] = strip_tags($val);
   }
   $save = serialize($theme);
-  
+
   if($Core->member_pref(session('id'),"theme"))
   {
     $DB->query("UPDATE member_pref SET value=$1 WHERE member_id=$2 AND pref_id=15",array($save,session('id')));

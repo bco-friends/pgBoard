@@ -1,9 +1,4 @@
-FROM php:5.6-fpm
-
-# Update apt sources to use archived Debian repositories
-RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list && \
-    sed -i 's|security.debian.org|archive.debian.org|g' /etc/apt/sources.list && \
-    sed -i '/stretch-updates/d' /etc/apt/sources.list
+FROM php:8.5-fpm
 
 # Install dependencies
 RUN apt-get update && apt-get install -y --allow-unauthenticated \

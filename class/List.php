@@ -1,6 +1,8 @@
 <?php
 class BoardList extends Base
 {
+  public const NO_DATA_ERROR = 'No data to display specified.';
+
   public $data;
   public $favorites;
   function data($data) { $this->data = $data; }
@@ -16,41 +18,41 @@ class BoardList extends Base
   function prep_data($row)
   {
     global $Parse;
-  
+
     $data = array_values($row);
-    
+
     // start shared parsing
-    $data['date'] = date(LIST_DATE_FORMAT,$data[LIST_DATE_LAST_POST]);
-    $data['subject'] = htmlentities($data[LIST_SUBJECT],ENT_QUOTES,"UTF-8");
+    $data['date'] = date(LIST_DATE_FORMAT,(int)$data[BoardQuery::LIST_DATE_LAST_POST]);
+    $data['subject'] = htmlentities($data[BoardQuery::LIST_SUBJECT],ENT_QUOTES,"UTF-8");
 
     $data['dot'] = $data['fav'] = $data['read'] = $data['me'] = "";
-    $data['body'] = $Parse->run($data[LIST_FIRSTPOST_BODY]);
+    $data['body'] = $Parse->run($data[BoardQuery::LIST_FIRSTPOST_BODY]);
 
     if(session('id'))
     {
-      if($data[LIST_CREATOR_ID] == session('id')) $data['me'] = SPACE.CSS_ME;
-      if(in_array($data[LIST_ID],$this->favorites)) $data['fav'] = LIST_FAV.NON_BREAKING_SPACE;
+      if($data[BoardQuery::LIST_CREATOR_ID] == session('id')) $data['me'] = SPACE.CSS_ME;
+      if(in_array($data[BoardQuery::LIST_ID],$this->favorites)) $data['fav'] = LIST_FAV.NON_BREAKING_SPACE;
     }
     // end shared parsing
 
     // start list specific parsing
     switch($this->type)
     {
-      case LIST_THREAD:
-      case LIST_THREAD_HISTORY:
-      case LIST_THREAD_SEARCH:
-        if($data[LIST_STICKY] == "t") $data['subject'] = STICKY_TEXT.NON_BREAKING_SPACE.$data['subject'];
+      case Base::LIST_THREAD:
+      case Base::LIST_THREAD_HISTORY:
+      case Base::LIST_THREAD_SEARCH:
+        if($data[BoardQuery::LIST_STICKY] == "t") $data['subject'] = STICKY_TEXT.NON_BREAKING_SPACE. $data['subject'];
         if(session('id'))
         {
-          if($data[LIST_LAST_POSTER_ID] != session('id') && $data[LIST_DOTFLAG] == "t") $data['dot'] = LIST_DOT;
-          if($data[LIST_POSTS] != $data[LIST_LAST_VIEW_POSTS]) $data['read'] = SPACE.CSS_READ;
+          if($data[BoardQuery::LIST_LAST_POSTER_ID] != session('id') && $data[BoardQuery::LIST_DOTFLAG] == "t") $data['dot'] = LIST_DOT;
+          if($data[BoardQuery::LIST_POSTS] != $data[BoardQuery::LIST_LAST_VIEW_POSTS]) $data['read'] = SPACE.CSS_READ;
         }
         break;
-      case LIST_MESSAGE:
+      case Base::LIST_MESSAGE:
         if(session('id'))
         {
-          if($data[LIST_LAST_POSTER_ID] != session('id') && $data[LIST_DOTFLAG] == "t") $data['dot'] = LIST_DOT;
-          if($data[LIST_POSTS] != $data[LIST_LAST_VIEW_POSTS])
+          if($data[BoardQuery::LIST_LAST_POSTER_ID] != session('id') && $data[BoardQuery::LIST_DOTFLAG] == "t") $data['dot'] = LIST_DOT;
+          if($data[BoardQuery::LIST_POSTS] != $data[BoardQuery::LIST_LAST_VIEW_POSTS])
           {
             $data['read'] = SPACE.CSS_READ;
             $data['subject'] = "<strong>$data[subject]</strong>";
@@ -59,7 +61,7 @@ class BoardList extends Base
         break;
     }
     // end list specific parsing
-    
+
     // Start Parsing Override
     $Plugin = new BoardPlugin;
     $data = $Plugin->list_prep_data($data,$row);
@@ -72,10 +74,10 @@ class BoardList extends Base
   function thread($stickies=false) // this stickies flag is crap, find a better way
   {
     global $Core;
-    
+
     if(!isset($this->data))
     {
-      print "No data to display specified.";
+      print self::NO_DATA_ERROR;
       return;
     }
     if(!$this->data) $this->data = array();
@@ -92,24 +94,24 @@ class BoardList extends Base
       $field = $this->prep_data($row);
       $class = ($class==CSS_ODD?CSS_EVEN:CSS_ODD);
       if($field['fav'] != "") $class .= " favorite";
-      $firstpost = "<a href=\"javascript:;\" onclick=\"firstpost('{$this->table}',{$field[LIST_ID]},this);return false;\">".ARROW_RIGHT."</a>&nbsp;";
+      $firstpost = "<a href=\"javascript:;\" onclick=\"firstpost('{$this->table}',{$field[BoardQuery::LIST_ID]},this);return false;\">".ARROW_RIGHT."</a>&nbsp;";
       if(session('nofirstpost')) $firstpost = "";
-      print "<div class=\"{$class}$field[me]\" id=\"{$this->table}_{$field[LIST_ID]}\">\n";
-      print "<ul class=\"list$field[read]\" ondblclick=\"location.href='/{$this->table}/view/{$field[LIST_ID]}/&r={$field[LIST_POSTS]}'\">\n";
+      print "<div class=\"{$class}$field[me]\" id=\"{$this->table}_{$field[BoardQuery::LIST_ID]}\">\n";
+      print "<ul class=\"list$field[read]\" ondblclick=\"location.href='/{$this->table}/view/{$field[BoardQuery::LIST_ID]}/&r={$field[BoardQuery::LIST_POSTS]}'\">\n";
       print "  <li class=\"readbar\">&nbsp;</li>\n";
-      print "  <li class=\"member\"><span>Thread By: </span>".$Core->member_link($field[LIST_CREATOR_NAME])."</li>\n";
+      print "  <li class=\"member\"><span>Thread By: </span>".$Core->member_link($field[BoardQuery::LIST_CREATOR_NAME])."</li>\n";
       print "  <li class=\"subject\">\n";
       print "    <div class=\"extra\">\n";
       print "      $field[dot]&nbsp;$field[fav]{$firstpost}\n";
       print "    </div>\n";
       print "    <span>Subject: </span>\n";
-      print "    <a href=\"/{$this->table}/view/{$field[LIST_ID]}/&p={$field[LIST_POSTS]}\">$field[subject]</a>\n";
+      print "    <a href=\"/{$this->table}/view/{$field[BoardQuery::LIST_ID]}/&p={$field[BoardQuery::LIST_POSTS]}\">$field[subject]</a>\n";
       print "  </li>\n";
-      print "  <li class=\"posts\"><span>Posts: </span>{$field[LIST_POSTS]}</li>\n";
-      print "  <li class=\"lastpost\"><span>Last Post By:</span>".$Core->member_link($field[LIST_LAST_POSTER_NAME])." on $field[date]</li>\n";
+      print "  <li class=\"posts\"><span>Posts: </span>{$field[BoardQuery::LIST_POSTS]}</li>\n";
+      print "  <li class=\"lastpost\"><span>Last Post By:</span>".$Core->member_link($field[BoardQuery::LIST_LAST_POSTER_NAME])." on $field[date]</li>\n";
       print "  <li class=\"readbar\" style=\"float:right\">&nbsp;</li>\n";
       print "</ul>\n";
-      print "<div id=\"fp_{$field[LIST_ID]}\" class=\"firstpost\"></div>\n";
+      print "<div id=\"fp_{$field[BoardQuery::LIST_ID]}\" class=\"firstpost\"></div>\n";
       print "</div>\n";
     }
     if(!$this->ajax)
@@ -124,7 +126,7 @@ class BoardList extends Base
   function thread_xml($stickies)
   {
     global $Core;
-     
+
     if(!isset($this->data))
     {
       print "No data to display specified.";
@@ -147,13 +149,13 @@ class BoardList extends Base
       #print "  <class=\"{$class}$field[me]\" id=\"{$this->table}_{$field[LIST_ID]}\">\n";
       #print "<ul class=\"list$field[read]\" ondblclick=\"location.href='/{$this->table}/view/{$field[LIST_ID]}/&r={$field[LIST_POSTS]}'\">\n";
       #print "  <li class=\"readbar\">&nbsp;</li>\n";
-      $xmldata .= "    <member>{$field[LIST_CREATOR_NAME]}</member>\n";
+      $xmldata .= "    <member>{$field[BoardQuery::LIST_CREATOR_NAME]}</member>\n";
       #print "  <li class=\"subject\">\n";
       #print "    <div class=\"extra\">\n";
       #print "      $field[dot]&nbsp;$field[fav]{$firstpost}\n";
       #print "    </div>\n";
       #print "    <span>Subject: </span>\n";
-      $xmldata .= "    <thread_id>{$field[LIST_ID]}</thread_id>\n";
+      $xmldata .= "    <thread_id>{$field[BoardQuery::LIST_ID]}</thread_id>\n";
       #print "    <a href=\"/{$this->table}/view/{$field[LIST_ID]}/&p={$field[LIST_POSTS]}\">$field[subject]</a>\n";
       #print "  </li>\n";
       #print "  <li class=\"posts\"><span>Posts: </span>{$field[LIST_POSTS]}</li>\n";
@@ -166,6 +168,6 @@ class BoardList extends Base
     }
     return $xmldata; // return the data
   }
-  
+
   function message() { $this->thread(); }
 }

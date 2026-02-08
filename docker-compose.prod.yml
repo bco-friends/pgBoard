@@ -1,4 +1,14 @@
 services:
+  composer:
+    container_name: boardcrewcial_composer
+    image: composer:latest
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html
+    command: composer install
+    networks:
+      - boardcrewcial_network
+
   sphinx:
     image: macbre/sphinxsearch:3.1.1
     container_name: boardcrewcial_sphinx
@@ -37,6 +47,7 @@ services:
       - "80:80"
       - "443:443"
     depends_on:
+      - composer
       - sphinx
     networks:
       - boardcrewcial_network

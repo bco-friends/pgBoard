@@ -7,10 +7,10 @@ function list_get()
 
   // Container for XML data
   $xmldata = '';
-  
+
   $Query = new BoardQuery;
-  $List = new BoardList;
-  $List->type(LIST_THREAD);
+  $List = BoardList::init();
+  $List->type(Base::LIST_THREAD);
 
   $_title_ = TITLE_BOARD;
 
@@ -29,16 +29,16 @@ function list_get()
 
 
   // stickies
-  $DB->query($Query->list_thread(true,false,false));
+  $DB->query($Query->list_thread(false, false, true));
   $List->data($DB->load_all());
   if (get('xml')) {
     $xmldata .= $List->thread_xml(true);
   } else {
     $List->thread(true);
   }
-  
+
   // the rest
-  $DB->query($Query->list_thread(false,cmd(2,true),cmd(3,true)));
+  $DB->query($Query->list_thread(cmd(2, true), cmd(3, true)));
   $List->data($DB->load_all());
   if (get('xml')) {
     $xmldata .= $List->thread_xml();
@@ -63,12 +63,12 @@ function view_get()
   global $DB,$Core;
 
   $xmldata = '';
- 
+
   if(!id(true)) return to_index();
 
   $Query = new BoardQuery;
-  $View = new BoardView;
-  $View->type(VIEW_THREAD);
+  $View = BoardView::init();
+  $View->type(Base::VIEW_THREAD);
   $View->increment_views();
 
   $subtitle="";
@@ -119,7 +119,7 @@ function view_get()
 
   if(session('admin'))
   {
-    $Admin = new BoardAdmin;
+    $Admin = new BoardAdmin($DB);
     $sticky = $Admin->check_flag("thread","sticky",id());
     $locked = $Admin->check_flag("thread","locked",id());
     $subtitle .= SPACE.ARROW_RIGHT.SPACE."<a href=\"/admin/togglesticky/".id()."/".md5(session_id())."/\">".($sticky ? "unsticky" :"sticky")."</a>";
@@ -130,7 +130,7 @@ function view_get()
 
   $View->header();
 
-  $DB->query($Query->view_thread(id(true),cmd(3,true),cmd(4,true)));
+  $DB->query($Query->view_thread(cmd(3, true), cmd(4, true), id(true)));
   $View->data($DB->load_all());
   if(get('xml'))
   {
@@ -175,12 +175,12 @@ function listbymember_get()
   $id = $Core->idfromname(id());
   $name = $Core->namefromid($id);
   $page = cmd(3,true)+1;
-  
+
   if(!$id || !$name) return to_index();
-  
+
   $Query = new BoardQuery;
-  $List = new BoardList;
-  $List->type(LIST_THREAD_HISTORY);
+  $List = BoardList::init();
+  $List->type(Base::LIST_THREAD_HISTORY);
 
   $List->title("Threads Created: $name");
   $List->subtitle("page: $page");
@@ -223,14 +223,14 @@ function listbymemberposted_get()
   if (!$threads) $threads = array(0);
 
   $Query = new BoardQuery;
-  $List = new BoardList;
-  $List->type(LIST_THREAD_HISTORY);
+  $List = BoardList::init();
+  $List->type(Base::LIST_THREAD_HISTORY);
 
   $List->title("Threads Participated: $name");
   $List->subtitle("page: $page");
   $List->header();
 
-  $DB->query($Query->list_thread(false,cmd(3,true),cmd(4,true),$threads));
+  $DB->query($Query->list_thread(cmd(3, true), cmd(4, true), false, $threads));
   $List->data($DB->load_all());
   $List->thread();
 
@@ -266,14 +266,14 @@ function listfavoritesbymember_get()
   if (!$threads) $threads = array(0);
 
   $Query = new BoardQuery;
-  $List = new BoardList;
-  $List->type(LIST_THREAD_HISTORY);
+  $List = BoardList::init();
+  $List->type(Base::LIST_THREAD_HISTORY);
 
   $List->title("Favorites: $name");
   $List->subtitle("page: $page");
   $List->header();
 
-  $DB->query($Query->list_thread(false,cmd(3,true),cmd(4,true),$threads));
+  $DB->query($Query->list_thread(cmd(3, true), cmd(4, true), false, $threads));
   $List->data($DB->load_all());
   $List->thread();
 
@@ -309,14 +309,14 @@ function listignoredthreadsbymember_get()
   if (!$threads) $threads = array(0);
 
   $Query = new BoardQuery;
-  $List = new BoardList;
-  $List->type(LIST_THREAD_HISTORY);
+  $List = BoardList::init();
+  $List->type(Base::LIST_THREAD_HISTORY);
 
   $List->title("Ignored threads: $name");
   $List->subtitle("page: $page");
   $List->header();
 
-  $DB->query($Query->list_thread(false,cmd(3,true),cmd(4,true),$threads, false, false));
+  $DB->query($Query->list_thread(cmd(3, true), cmd(4, true), false, $threads, false, false));
   $List->data($DB->load_all());
   $List->thread();
 
@@ -335,8 +335,8 @@ function viewbymember_get()
   if(!$id || !$name) return to_index();
 
   $Query = new BoardQuery;
-  $View = new BoardView;
-  $View->type(VIEW_THREAD_HISTORY);
+  $View = BoardView::init();
+  $View->type(Base::VIEW_THREAD_HISTORY);
 
   $View->title("Posts Created: $name");
   $View->subtitle("page $page");

@@ -1,38 +1,12 @@
 <?php
-define("LANG","en");
+$baseDir = dirname(__DIR__);
 
-define("ADMIN_EMAIL","admin@domain.com");
-define("DB","dbname=board user=board password=board");
-define("DIR","/path/to/board/www/");
-define("SPHINX_HOST","localhost");
-define("SPHINX_PORT",3312);
+require_once $baseDir . '/vendor/autoload.php';
 
-define("REGISTRATION_OPEN",true);
-define("REGISTRATION_PASSWORD","membersonly"); // set to false to disable this feature
-define("MEMBER_REGEXP","^[a-z0-9_-]{3,15}$"); // regexp to define valid member name
-define("INACTIVITY_LOCK_INTERVAL", "1 year"); // the amount of time a member can only read the board
-define("INACTIVITY_WARNING_INTERVAL", "9 months"); // the amount of time before a warning is displayed for inactivity 
+$dotenv = new \Symfony\Component\Dotenv\Dotenv();
+$dotenv->load($baseDir . '/.env');
 
-define("IGNORE_ENABLED",true); // if you disable this be sure to DELETE * FROM member_ignore
-define("IGNORE_PUBLIC",true); // set to false to make ignoring private
-define("IGNORE_BUFFER","1 year"); // how long from first post until ignore can be used (set false to disable)
-
-define("IGNORED_THREADS_PUBLIC",true); // set to false to make thread ignoring private
-define("FAVORITES_PUBLIC",true); // set to false to make favorite threads private
-
-define("LIST_DEFAULT_LIMIT",100); // number of threads per page
-define("COLLAPSE_DEFAULT",25); // default value to collapse at
-define("COLLAPSE_OPEN_DEFAULT",5); // default number of posts to leave open after collapse
-define("UNCOLLAPSE_COUNT_DEFAULT",15); // number of additional posts to show when showing "more"
-
-define("FUNDRAISER_ID",-1); // id of fundraiser record in database
-define("FUNDRAISER_ITEM_NAME","Board Hosting"); // item name for paypal ipn to recognize payment
-define("FUNDRAISER_EMAIL","adminpaypal@domain.com"); // email address for paypal payments
-
-define("VIEW_DATE_FORMAT","F jS, Y @ g:i:s a");
-define("LIST_DATE_FORMAT","D\&\\n\b\s\p\;M\&\\n\b\s\p\;d\&\\n\b\s\p;Y&\\n\b\s\p\;h:i\&\\n\b\s\p\;a");
-
-define("FORM_SALT","aksjdsa9*^&*@&(@*22@*1");
+require_once $baseDir . '/constants.php';
 
 // functions allowed no matter what your login state
 $_allowed_ = array("threadmain","threadlist","threadview","threadviewpost",
@@ -116,7 +90,7 @@ $_rep_ = array("","<span style=\"text-decoration:underline;\">","</span>",
 /*
 * Do not edit below this line unless you know what you're doing!
 **/
-define("VERSION","2.9.5");
+define("VERSION","3.0.0");
 
 require_once("core.php"); // framework
 ini_set("magic_gpc_quotes",false);
@@ -142,36 +116,45 @@ if(!isset($commandline))
   session_start();
 }
 
-require_once("error.php");          // error handler
-require_once("lang/".LANG.".php");  // language file
-require_once("class/Security.php"); // security
-require_once("class/Core.php");     // common commands
-require_once("class/DB.php");       // database
-require_once("class/Query.php");    // query creation
-require_once("class/Style.php");    // color themes, dynamic styling
-require_once("class/Base.php");     // base layout
-require_once("class/List.php");     // display for lists
-require_once("class/View.php");     // display for views
-require_once("class/Parse.php");    // bbcode parser
-require_once("class/Form.php");     // forms
-require_once("class/Data.php");     // data management
-require_once("class/Search.php");   // search management
-require_once("class/Admin.php");    // search management
-require_once("class/Plugin.php");    // plugins
+foreach ([
+  'error.php',          // error handler
+  'lang/'.LANG.'.php',  // language file
+  'class/Security.php', // security
+  'class/Core.php',     // common commands
+  'class/DB.php',       // database
+  'class/Query.php',    // query creation
+  'class/Style.php',    // color themes, dynamic styling
+  'class/Base.php',     // query creation
+  'class/List.php',     // display for lists
+  'class/View.php',     // display for views
+  'class/Parse.php',    // bbcode parser
+  'class/Form.php',     // forms
+  'class/Data.php',     // data management
+  'class/Search.php',   // search management
+  'class/Admin.php',    // admin management
+  'class/Plugin.php',   // plugins
+  ] as $includePath
+) {
+  if (is_readable('config/'.$includePath)) {
+    $includePath = 'config/'.$includePath;
+  }
 
-$Security = new BoardSecurity;
-$Core = new BoardCore;
+  require_once($includePath);
+}
+
 $DB = new DB(DB,true);
-$Parse = new BoardParse($_bbc_,$_rep_);
+$Security = new BoardSecurity($DB, $_allowed_);
+$Parse = BoardParse::init($_bbc_,$_rep_);
 if(!session('id') && cookie('board')) $Security->login_cookie();
-$Style = new BoardStyle(session('id'));
+$Core = new BoardCore($DB, $Security, $Parse);
+$Style = new BoardStyle($Core, $DB, session('id'));
 
 if(!isset($commandline))
 {
   ob_start();
   if(!$DB->db)
   {
-    $Base = new Base;
+    $Base = Base::init();
     $Base->title("Dead database!");
     $Base->header();
     $Base->footer();

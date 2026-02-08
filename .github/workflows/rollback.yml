@@ -71,13 +71,9 @@ jobs:
 
             # Restore from backup (excluding production-specific files)
             rsync -av --no-g --no-perms --no-owner --omit-dir-times --delete \
-              --exclude='config.php' \
+              --exclude='config/' \
               --exclude='.env' \
               --exclude='docker/sphinx/sphinx.conf' \
-              --exclude='lang/en.php' \
-              --exclude='lang/en_footer.php' \
-              --exclude='lang/en_header.php' \
-              --exclude='class/Plugin.php' \
               --exclude='lib/gif/partyshark.gif' \
               --exclude='favicon.ico' \
               --exclude='robots.txt' \

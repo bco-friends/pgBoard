@@ -1,6 +1,6 @@
 <?php
 $__start__ = microtime(true);
-require_once("config.php");
+require_once __DIR__ . '/config/config.php';
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -14,13 +14,13 @@ if(session('externalcss')) $Style->external_css(session('externalcss'));
 $Style->display($Style->get_theme());
 ?>
 </style>
-<script type="text/javascript" src="/js/core.js"></script>
+<script type="text/javascript" src="/js/core.js?scroll"></script>
 </head>
 <body lang="en">
 <!-- Start Error Display -->
 <?php error_display(); ?>
 <!-- End Error Display -->
-<?php if(!get('ajax') && file_exists(DIR."/lang/".LANG."_header.php")) require(DIR."/lang/".LANG."_header.php"); ?>
+<?php if(!get('ajax') && file_exists(DIR."/config/lang/".LANG."_header.php")) require(DIR."/config/lang/".LANG."_header.php"); ?>
 <!-- Start Content Display -->
 <div id="content">
 <div class="pad">
@@ -31,6 +31,6 @@ $Style->display($Style->get_theme());
 </div>
 <div id="bottom"></div>
 <!-- End Content Display -->
-<?php if(!get('ajax') && file_exists(DIR."/lang/".LANG."_footer.php")) require(DIR."/lang/".LANG."_footer.php"); ?>
+<?php if(!get('ajax') && file_exists(DIR."/config/lang/".LANG."_footer.php")) require(DIR."/config/lang/".LANG."_footer.php"); ?>
 </body>
 </html>

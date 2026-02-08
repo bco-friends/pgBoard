@@ -1,4 +1,6 @@
 <?php
+global $DB;
+
 if($DB->value("SELECT locked FROM thread WHERE id=$1",array(id())) == 't') return;
 
 $Form = new Form;

@@ -1,19 +1,33 @@
 <?php
 class BoardParse
 {
-  private $bbc;
-  private $rep;
-  private $imgsuffix = array("jpg","gif","png");
-  private $hidemedia = false;
+  private $imgsuffix = ["jpg", "gif", "png"];
 
-  function __construct($bbc,$rep)
-  {
-    $this->bbc = $bbc;
-    $this->rep = $rep;
-    $this->hidemedia = session('hidemedia');
-    if(get('media')=='enabled') $this->hidemedia=false;
-    else if(get('media')=='disabled') $this->hidemedia=true;
-    else if(get('media')) $this->hidemedia = !$this->hidemedia;
+  public function __construct(
+    private $bbc,
+    private $rep,
+    private bool $hidemedia
+  ) {}
+
+  public static function init($bbc, $rep): self {
+      $hidemedia = function()
+      {
+        if (get('media') == 'enabled') {
+          return false;
+        }
+
+        if (get('media') == 'disabled') {
+          return true;
+        }
+
+        if (get('media')) {
+          return !session('hidemedia');
+        }
+
+        return false;
+      };
+
+      return new self($bbc, $rep, $hidemedia());
   }
 
   // prepare urls (so hack)
@@ -109,7 +123,8 @@ class BoardParse
     if(($host == "twitter.com" || $host == "www.twitter.com" || $host == "mobile.twitter.com") && isset($url['path']))
     {
       // The tweet ID is the last part of the path, and it should be numeric.
-      $tweet_id = end(explode('/', $url['path']));
+      $tweet_url_path = explode('/', $url['path']);
+      $tweet_id = end($tweet_url_path);
       if ($tweet_id && is_numeric($tweet_id))
       {
         // Assign this tweet's DOM elements unique IDs to distinguish them from
@@ -189,12 +204,12 @@ class BoardParse
     }
 
     // start line break stuff
-    $s = str_replace('<br />',NULL,$s);
+    $s = str_replace('<br />','',$s);
     $s = nl2br(chop($s));
-  
+
     // remove line breaks inside these tags
     $lbr = array(array("<pre>","</pre>"));
-  
+
     foreach($lbr as $lb)
     {
       $lb1 = $lb[0];
@@ -210,7 +225,7 @@ class BoardParse
       $s = preg_replace("#".$lb2q."(\r\n)\<br \/\>#i",$lb2,$s);
     }
     // end line break stuff
-  
+
     return $s;
   }
 }

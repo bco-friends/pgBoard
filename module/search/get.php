@@ -7,13 +7,13 @@ function thread_get()
 
   $offset = cmd(3,true)?cmd(3,true)*100:0;
   $res = $Search->query(cmd(2),"thread",$offset);
-  $ids = array_keys($res['matches']);
+  $ids = (isset($res['matches']) && is_array($res['matches'])) ? array_keys($res['matches']) : array();
   $page = cmd(3,true)+1;
 
   $Query = new BoardQuery;
-  $List = new BoardList;
-  $List->type(LIST_THREAD_SEARCH);
-  
+  $List = BoardList::init();
+  $List->type(Base::LIST_THREAD_SEARCH);
+
   $List->title("Search Threads: ".htmlentities(cmd(2)));
   $List->subtitle(number_format($res['total'])." results found showing ".($offset?$offset:1)."-".($offset+100).SPACE.ARROW_RIGHT.SPACE."page: $page");
   $List->header(false);
@@ -21,7 +21,7 @@ function thread_get()
   $List->header_menu();
 
   if($res['total'] == 0 || $offset > $res['total']) $ids = array(0);
-  $DB->query($Query->list_thread(false,false,false,$ids));
+  $DB->query($Query->list_thread(false, false, false, $ids));
   $List->data($DB->load_all());
   $List->thread();
 
@@ -36,13 +36,13 @@ function thread_post_get()
 
   $offset = cmd(3,true)?cmd(3,true)*100:0;
   $res = $Search->query(cmd(2),"thread_post",$offset);
-  $ids = array_keys($res['matches']);
+  $ids = (isset($res['matches']) && is_array($res['matches'])) ? array_keys($res['matches']) : array();
   $page = cmd(3,true)+1;
 
   $Query = new BoardQuery;
-  $View = new BoardView;
-  $View->type(VIEW_THREAD_SEARCH);
-  
+  $View = BoardView::init();
+  $View->type(Base::VIEW_THREAD_SEARCH);
+
   $View->title("Search Thread Posts: ".htmlentities(cmd(2)));
   $View->subtitle(number_format($res['total'])." results found showing ".($offset?$offset:1)."-".($offset+100).SPACE.ARROW_RIGHT.SPACE."page: $page");
   $View->header(false);
@@ -50,7 +50,7 @@ function thread_post_get()
   $View->header_menu();
 
   if($res['total'] == 0) $ids = array(0);
-  $DB->query($Query->view_thread(false,cmd(3,true),cmd(4,true),$ids));
+  $DB->query($Query->view_thread(cmd(3, true), cmd(4, true), false, $ids));
   $View->data($DB->load_all());
   $View->thread();
 

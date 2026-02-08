@@ -33,8 +33,9 @@ function error_handler($errno, $errstr, $errfile, $errline)
       case E_USER_ERROR:        $type = "USER ERROR";             break;
       case E_USER_WARNING:      $type = "USER WARNING";           break;
       case E_USER_NOTICE:       $type = "USER NOTICE";            break;
-      case E_STRICT:            $type = "STRICT NOTICE";          break;
       case E_RECOVERABLE_ERROR: $type = "RECOVERABLE ERROR";      break;
+      case E_DEPRECATED:        $type = "DEPRECATED";             break;
+      case E_USER_DEPRECATED:   $type = "USER DEPRECATED";        break;
       default:                  $type = "UNKNOWN ERROR [$errno]"; break;
   }
   $error .= "<strong>$type</strong>:\n$errstr\n";
