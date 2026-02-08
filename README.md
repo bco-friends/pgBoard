@@ -5,7 +5,7 @@ A minimalist forum system that supports threads, posts, private messages, member
 ## Requirements
 
 * nginx
-* PHP 8.2
+* PHP 8.5
 * PostgreSQL 14.4x
 * Sphinx 3.1.1
 
