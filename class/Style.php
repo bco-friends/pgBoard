@@ -37,7 +37,7 @@ class BoardStyle
 
     $m = min($rgb[0], $rgb[1], $rgb[2]);
     $n = max($rgb[0], $rgb[1], $rgb[2]);
-    $lum = (double)(($m+$n)/510.0);
+    $lum = (float)(($m+$n)/510.0);
 
     if($lum < 0.45) return "#ffffff";
     else
