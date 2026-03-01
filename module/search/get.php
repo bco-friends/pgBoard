@@ -1,59 +1,63 @@
 <?php
+
 function thread_get()
 {
-  global $DB;
+    global $DB;
 
-  $Search = new Search;
+    $Search = new Search();
 
-  $offset = cmd(3,true)?cmd(3,true)*100:0;
-  $res = $Search->query(cmd(2),"thread",$offset);
-  $ids = (isset($res['matches']) && is_array($res['matches'])) ? array_keys($res['matches']) : array();
-  $page = cmd(3,true)+1;
+    $offset = cmd(3, true) ? cmd(3, true) * 100 : 0;
+    $res = $Search->query(cmd(2), "thread", $offset);
+    $ids = (isset($res['matches']) && is_array($res['matches'])) ? array_keys($res['matches']) : array();
+    $page = cmd(3, true) + 1;
 
-  $Query = new BoardQuery;
-  $List = BoardList::init();
-  $List->type(Base::LIST_THREAD_SEARCH);
+    $Query = new BoardQuery();
+    $List = BoardList::init();
+    $List->type(Base::LIST_THREAD_SEARCH);
 
-  $List->title("Search Threads: ".htmlentities(cmd(2)));
-  $List->subtitle(number_format($res['total'])." results found showing ".($offset?$offset:1)."-".($offset+100).SPACE.ARROW_RIGHT.SPACE."page: $page");
-  $List->header(false);
-  require_once(DIR."module/search/.content/main.php");
-  $List->header_menu();
+    $List->title("Search Threads: " . htmlentities(cmd(2)));
+    $List->subtitle(number_format($res['total']) . " results found showing " . ($offset ? $offset : 1) . "-" . ($offset + 100) . SPACE . ARROW_RIGHT . SPACE . "page: $page");
+    $List->header(false);
+    require_once(DIR . "module/search/.content/main.php");
+    $List->header_menu();
 
-  if($res['total'] == 0 || $offset > $res['total']) $ids = array(0);
-  $DB->query($Query->list_thread(false, false, false, $ids));
-  $List->data($DB->load_all());
-  $List->thread();
+    if ($res['total'] == 0 || $offset > $res['total']) {
+        $ids = array(0);
+    }
+    $DB->query($Query->list_thread(false, false, false, $ids));
+    $List->data($DB->load_all());
+    $List->thread();
 
-  $List->footer();
+    $List->footer();
 }
 
 function thread_post_get()
 {
-  global $DB;
+    global $DB;
 
-  $Search = new Search;
+    $Search = new Search();
 
-  $offset = cmd(3,true)?cmd(3,true)*100:0;
-  $res = $Search->query(cmd(2),"thread_post",$offset);
-  $ids = (isset($res['matches']) && is_array($res['matches'])) ? array_keys($res['matches']) : array();
-  $page = cmd(3,true)+1;
+    $offset = cmd(3, true) ? cmd(3, true) * 100 : 0;
+    $res = $Search->query(cmd(2), "thread_post", $offset);
+    $ids = (isset($res['matches']) && is_array($res['matches'])) ? array_keys($res['matches']) : array();
+    $page = cmd(3, true) + 1;
 
-  $Query = new BoardQuery;
-  $View = BoardView::init();
-  $View->type(Base::VIEW_THREAD_SEARCH);
+    $Query = new BoardQuery();
+    $View = BoardView::init();
+    $View->type(Base::VIEW_THREAD_SEARCH);
 
-  $View->title("Search Thread Posts: ".htmlentities(cmd(2)));
-  $View->subtitle(number_format($res['total'])." results found showing ".($offset?$offset:1)."-".($offset+100).SPACE.ARROW_RIGHT.SPACE."page: $page");
-  $View->header(false);
-  require_once(DIR."module/search/.content/main.php");
-  $View->header_menu();
+    $View->title("Search Thread Posts: " . htmlentities(cmd(2)));
+    $View->subtitle(number_format($res['total']) . " results found showing " . ($offset ? $offset : 1) . "-" . ($offset + 100) . SPACE . ARROW_RIGHT . SPACE . "page: $page");
+    $View->header(false);
+    require_once(DIR . "module/search/.content/main.php");
+    $View->header_menu();
 
-  if($res['total'] == 0) $ids = array(0);
-  $DB->query($Query->view_thread(cmd(3, true), cmd(4, true), false, $ids));
-  $View->data($DB->load_all());
-  $View->thread();
+    if ($res['total'] == 0) {
+        $ids = array(0);
+    }
+    $DB->query($Query->view_thread(cmd(3, true), cmd(4, true), false, $ids));
+    $View->data($DB->load_all());
+    $View->thread();
 
-  $View->footer();
+    $View->footer();
 }
-?>
