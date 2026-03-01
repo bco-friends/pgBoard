@@ -1,0 +1,31 @@
+name: Static Analysis
+
+on:
+  push:
+    branches-ignore:
+      - master
+  pull_request:
+
+jobs:
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v3
+
+      - name: Create .env
+        run: cp .example.env .env
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse --memory-limit=512M --no-progress
