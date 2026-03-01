@@ -1,10 +1,5 @@
 <?php
 
-function number($str)
-{
-    return str_replace(array("$",","), "", $str);
-}
-
 $Base = Base::init();
 $Base->type(Base::MISC);
 $Base->title("Donate");
