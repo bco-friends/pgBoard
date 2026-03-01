@@ -6,6 +6,7 @@
         "fakerphp/faker": "^1.23",
         "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^10.3",
+        "squizlabs/php_codesniffer": "^4.0",
         "symfony/console": "^6.3"
     },
     "autoload": {
