@@ -1,8 +1,11 @@
 <?php
-if(!session('id')) return to_index();
+
+if (!session('id')) {
+    return to_index();
+}
 
 // prep data for form
-$DB->query("SELECT * FROM member m WHERE id=$1",array(session('id')));
+$DB->query("SELECT * FROM member m WHERE id=$1", array(session('id')));
 $member = $DB->load_array();
 
 $DB->query("SELECT
@@ -15,16 +18,32 @@ $DB->query("SELECT
             ON
               p.id = mp.pref_id
             WHERE
-                mp.member_id=$1",array(session('id')));
+                mp.member_id=$1", array(session('id')));
 $prefs = $DB->load_all_key();
-if(!isset($prefs['mincollapse'])) $prefs['mincollapse'] = COLLAPSE_DEFAULT;
-if(!is_numeric($prefs['mincollapse'])) $prefs['mincollapse'] = COLLAPSE_DEFAULT;
-if(!isset($prefs['collapseopen'])) $prefs['collapseopen'] = COLLAPSE_OPEN_DEFAULT;
-if(!is_numeric($prefs['collapseopen'])) $prefs['collapseopen'] = COLLAPSE_OPEN_DEFAULT;
-if($prefs['collapseopen'] < 1) $prefs['collapseopen'] = 1;
-if(!isset($prefs['uncollapsecount'])) $prefs['uncollapsecount'] = UNCOLLAPSE_COUNT_DEFAULT;
-if(!is_numeric($prefs['uncollapsecount'])) $prefs['uncollapsecount'] = UNCOLLAPSE_COUNT_DEFAULT;
-if($prefs['uncollapsecount'] < 1) $prefs['uncollapsecount'] = 1;
+if (!isset($prefs['mincollapse'])) {
+    $prefs['mincollapse'] = COLLAPSE_DEFAULT;
+}
+if (!is_numeric($prefs['mincollapse'])) {
+    $prefs['mincollapse'] = COLLAPSE_DEFAULT;
+}
+if (!isset($prefs['collapseopen'])) {
+    $prefs['collapseopen'] = COLLAPSE_OPEN_DEFAULT;
+}
+if (!is_numeric($prefs['collapseopen'])) {
+    $prefs['collapseopen'] = COLLAPSE_OPEN_DEFAULT;
+}
+if ($prefs['collapseopen'] < 1) {
+    $prefs['collapseopen'] = 1;
+}
+if (!isset($prefs['uncollapsecount'])) {
+    $prefs['uncollapsecount'] = UNCOLLAPSE_COUNT_DEFAULT;
+}
+if (!is_numeric($prefs['uncollapsecount'])) {
+    $prefs['uncollapsecount'] = UNCOLLAPSE_COUNT_DEFAULT;
+}
+if ($prefs['uncollapsecount'] < 1) {
+    $prefs['uncollapsecount'] = 1;
+}
 
 $Base = Base::init();
 $Base->type(Base::EDIT);
@@ -33,22 +52,22 @@ $Base->header();
 
 print "<div class=\"box clear\">\n";
 
-$Form = new Form;
-$Form->values(array_merge($member,$prefs));
-$Form->header(url(),"post",FORM_SALT);
+$Form = new Form();
+$Form->values(array_merge($member, $prefs));
+$Form->header(url(), "post", FORM_SALT);
 
 $Form->fieldset_open("Account Management");
-$Form->add_text("name","Name:");
-$Form->add_text("postalcode","Postal Code:");
+$Form->add_text("name", "Name:");
+$Form->add_text("postalcode", "Postal Code:");
 $Form->fieldset_close();
 
 $Form->fieldset_open("Password Management");
 print "<div id=\"password\" style=\"display:none\">\n";
-$Form->add_password("_current","Current:");
-$Form->add_password("_pass","New:");
-$Form->add_password("_pass_confirm","Confirm:");
+$Form->add_password("_current", "Current:");
+$Form->add_password("_pass", "New:");
+$Form->add_password("_pass_confirm", "Confirm:");
 print "</div>\n";
-$Form->add_button("_change","Change Password","change_password()","style=\"margin:5px\"");
+$Form->add_button("_change", "Change Password", "change_password()", "style=\"margin:5px\"");
 
 $Form->fieldset_close();
 $Form->fieldset_open("Details");
@@ -69,26 +88,24 @@ $DB->query("SELECT
             ORDER BY
               p.ordering");
 
-while($pref = $DB->load_array())
-{
-  switch($pref['type'])
-  {
-    case "input":
-      $Form->add_text($pref['field'],"$pref[display]:",$pref['width']);
-      break;
-    case "textarea":
-      $Form->add_textarea($pref['field'],"$pref[display]:");
-      break;
-    case "checkbox":
-      $Form->add_checkbox($pref['field'],"$pref[display]:");
-      break;
-  }
+while ($pref = $DB->load_array()) {
+    switch ($pref['type']) {
+        case "input":
+            $Form->add_text($pref['field'], "$pref[display]:", $pref['width']);
+            break;
+        case "textarea":
+            $Form->add_textarea($pref['field'], "$pref[display]:");
+            break;
+        case "checkbox":
+            $Form->add_checkbox($pref['field'], "$pref[display]:");
+            break;
+    }
 }
 $Form->add_submit("Save Changes");
 $Form->fieldset_close();
 $Form->footer();
 $Form->header_validate();
-$Form->add_notnull("postalcode","Please enter a postal code.");
+$Form->add_notnull("postalcode", "Please enter a postal code.");
 $Form->footer_validate();
 
 $Base->footer();
