@@ -1,5 +1,5 @@
 .DEFAULT: help
-.PHONY: start stop build-up rebuild php-shell
+.PHONY: start stop build-up rebuild php-shell phpcs
 
 # Outputs list of available commands.
 help:
@@ -9,6 +9,7 @@ help:
 	"\n" rebuild: "\t" Stop, rebuild, and restart the Docker container \
 	"\n" php-shell: "\t" Open a shell session into the PHP container \
 	"\n" db-seed: "\t" Seed the database with sample data. \
+	"\n" phpcs: "\t\t" Run PHP CodeSniffer. \
 
 # Starts the Docker container.
 start:
@@ -46,6 +47,9 @@ php-shell:
 
 db-shell:
 	docker exec -it pgboard_db psql -U board -d board
+
+phpcs:
+	docker exec -it pgboard_web vendor/bin/phpcs
 
 phpstan:
 	docker exec -it pgboard_web vendor/bin/phpstan analyse index.php config.php error.php core.php class module
