@@ -1,5 +1,7 @@
 FROM php:8.5-fpm
 
+ARG INSTALL_XDEBUG=false
+
 # Install dependencies
 RUN apt-get update && apt-get install -y --allow-unauthenticated \
     libpq-dev \
@@ -11,6 +13,8 @@ RUN apt-get update && apt-get install -y --allow-unauthenticated \
     && docker-php-ext-install pdo pdo_pgsql pgsql \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+RUN if [ "$INSTALL_XDEBUG" = "true" ]; then pecl install xdebug; fi
 
 # Set working directory
 WORKDIR /var/www/html
