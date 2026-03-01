@@ -1,0 +1,16 @@
+parameters:
+    level: 1
+    paths:
+        - constants.php
+        - error.php
+        - core.php
+        - class
+        - module
+    bootstrapFiles:
+        - phpstan-bootstrap.php
+    excludePaths:
+        - vendor
+        - class/Plugin.default.php
+        - index.php
+    stubFiles:
+        - stubs/sphinx.php

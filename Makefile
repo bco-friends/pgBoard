@@ -1,5 +1,5 @@
 .DEFAULT: help
-.PHONY: start stop build-up rebuild php-shell phpcs
+.PHONY: start stop build-up rebuild php-shell phpcs phpstan
 
 # Outputs list of available commands.
 help:
@@ -10,6 +10,7 @@ help:
 	"\n" php-shell: "\t" Open a shell session into the PHP container \
 	"\n" db-seed: "\t" Seed the database with sample data. \
 	"\n" phpcs: "\t\t" Run PHP CodeSniffer. \
+	"\n" phpstan: "\t\t" Run PHPStan static analysis. \
 
 # Starts the Docker container.
 start:
@@ -52,7 +53,7 @@ phpcs:
 	docker exec -it pgboard_web vendor/bin/phpcs
 
 phpstan:
-	docker exec -it pgboard_web vendor/bin/phpstan analyse index.php config.php error.php core.php class module
+	docker exec -it pgboard_web vendor/bin/phpstan analyse --memory-limit=512M
 
 phpunit:
 	docker exec -it pgboard_web vendor/bin/phpunit
