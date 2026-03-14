@@ -240,26 +240,6 @@ function listbymemberposted_get()
         return to_index();
     }
 
-  // get threads participiated in
-    $DB->query("SELECT
-                tm.thread_id
-              FROM
-                thread_member tm
-              LEFT JOIN
-                thread t
-              ON
-                t.id = tm.thread_id
-              WHERE
-                tm.member_id=$1
-              AND
-                tm.date_posted IS NOT null
-              ORDER BY
-                t.date_last_posted DESC", array($id));
-    $threads = $DB->load_all('thread_id');
-    if (!$threads) {
-        $threads = array(0);
-    }
-
     $Query = new BoardQuery();
     $List = BoardList::init();
     $List->type(Base::LIST_THREAD_HISTORY);
@@ -268,7 +248,13 @@ function listbymemberposted_get()
     $List->subtitle("page: $page");
     $List->header();
 
-    $DB->query($Query->list_thread(cmd(3, true), cmd(4, true), false, $threads));
+    $cond = "WHERE EXISTS (
+               SELECT 1 FROM thread_member tm_p
+               WHERE tm_p.thread_id = t.id
+               AND tm_p.member_id = $id
+               AND tm_p.date_posted IS NOT NULL
+             )";
+    $DB->query($Query->list_thread(cmd(3, true), cmd(4, true), false, false, $cond, false));
     $List->data($DB->load_all());
     $List->thread();
 
