@@ -48,6 +48,8 @@ class BoardView extends Base
 
         if (session('admin')) {
             $data['admin'] = NON_BREAKING_SPACE . ARROW_RIGHT . " <a href=\"/admin/editpost/{$data[BoardQuery::VIEW_ID]}/\">edit</a>";
+        } elseif (session('id') && $data[BoardQuery::VIEW_CREATOR_ID] == session('id') && (time() - $data[BoardQuery::VIEW_DATE_POSTED]) < 300) {
+            $data['admin'] = NON_BREAKING_SPACE . ARROW_RIGHT . " <a href=\"/thread/editpost/{$data[BoardQuery::VIEW_ID]}/\">edit</a>";
         }
 
       // Start Parsing Override
