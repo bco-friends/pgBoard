@@ -61,6 +61,41 @@ function reply_post()
     }
     exit_clean();
 }
+function editpost_post()
+{
+    global $DB, $Security;
+
+    if (!session('id')) {
+        print "You must be logged in to edit a post.";
+        exit_clean();
+    }
+
+    $DB->query("SELECT member_id, extract(epoch from date_posted) as date_posted FROM thread_post WHERE id=$1", array(id()));
+    $post = $DB->load_array();
+
+    if (!$post) {
+        print "Post not found.";
+        exit_clean();
+    }
+
+    $post_age = time() - $post['date_posted'];
+    $can_edit = session('admin') || ($post['member_id'] == session('id') && $post_age < 300);
+
+    if (!$can_edit) {
+        print "You are not allowed to edit this post.";
+        exit_clean();
+    }
+
+    $Data = new Data($DB, $Security);
+    if (trim(post('body')) == "") {
+        print "You must enter a post body.";
+    } elseif (!$Data->thread_post_update($_POST, id())) {
+        print "Your post was not updated.";
+    }
+
+    exit_clean();
+}
+
 function view_post()
 {
     global $DB;

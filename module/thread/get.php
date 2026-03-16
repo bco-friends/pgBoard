@@ -199,6 +199,58 @@ function viewpost_get()
     print htmlentities($body);
 }
 
+function editpost_get()
+{
+    global $DB;
+
+    if (!session('id') || !id(true)) {
+        return to_index('/');
+    }
+
+    $DB->query("SELECT thread_id, body, member_id, extract(epoch from date_posted) as date_posted FROM thread_post WHERE id=$1", array(id()));
+    $post = $DB->load_array();
+
+    if (!$post) {
+        return to_index('/');
+    }
+
+    $post_age = time() - $post['date_posted'];
+    $can_edit = session('admin') || ($post['member_id'] == session('id') && $post_age < 300);
+
+    if (!$can_edit) {
+        return to_index('/');
+    }
+
+    $Base = Base::init();
+    $Base->type(Base::EDIT);
+    $Base->title("Edit Post");
+    $Base->header();
+
+    $Form = new Form();
+    $Form->values($post);
+    $Form->header(url(), "post", FORM_SALT);
+    $Form->fieldset_open("Edit");
+    $Form->add_textarea("body", "Body:");
+    $Form->fieldset_close();
+    $Form->add_submit(SAY_BUTTON, "id=\"submit\"/>");
+    $Form->footer();
+
+    $Form->header_validate();
+    $Form->add_notnull("body", "Please enter a post body.");
+    $Form->footer_validate();
+
+    $Base->footer();
+    ?>
+<script type="text/javascript">
+function completed(data)
+{
+  if(jQuery.trim(data) == "") location.href='/thread/view/<?php print $post['thread_id'];?>/';
+  $('.submit').attr('disabled',false);
+}
+</script>
+    <?php
+}
+
 function listbymember_get()
 {
     global $DB,$Core;
