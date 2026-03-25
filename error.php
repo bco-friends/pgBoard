@@ -65,6 +65,10 @@ function error_display()
 {
     global $error;
 
+    if (!empty($error)) {
+        error_log(strip_tags($error));
+    }
+
     if (!(defined('DEBUG_MODE') && DEBUG_MODE && !empty($error))) {
         return;
     }
