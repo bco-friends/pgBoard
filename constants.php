@@ -16,7 +16,8 @@ if (!defined('ADMIN_EMAIL')) {
 }
 
 if (!defined('DB')) {
-  define("DB", $_ENV['DB'] ?? "host={$_ENV['DB_HOST']} dbname={$_ENV['DB_NAME']} user={$_ENV['DB_USER']} password={$_ENV['DB_PASS']} sslmode={$_ENV['DB_SSL_MODE']}");
+  $sslMode = !empty($_ENV['DB_SSL_MODE']) ? " sslmode={$_ENV['DB_SSL_MODE']}" : "";
+  define("DB", $_ENV['DB'] ?? "host={$_ENV['DB_HOST']} dbname={$_ENV['DB_NAME']} user={$_ENV['DB_USER']} password={$_ENV['DB_PASS']}{$sslMode}");
 }
 
 if (!defined('DIR')) {
