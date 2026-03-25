@@ -111,3 +111,7 @@ if (!defined('FORM_SALT')) {
   define("FORM_SALT", $_ENV['FORM_SALT'] ?? "aksjdsa9*^&*@&(@*22@*1");
 }
 
+if (!defined('DEBUG_MODE')) {
+  define("DEBUG_MODE", filter_var($_ENV['DEBUG_MODE'] ?? false, FILTER_VALIDATE_BOOLEAN));
+}
+
