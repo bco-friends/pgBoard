@@ -96,14 +96,13 @@
         float: none;
     }
 
-    body ul.list.read {
-        border-left: 0;
+    .read {
         border-right: 0;
         margin-left: 0;
     }
 
-    body ul.list {
-        border-left: 5px solid red;
+    body ul.list:not(.read) {
+        border-left: 5px solid inherit;
         border-right: none;
         margin-left: 0px
     }
