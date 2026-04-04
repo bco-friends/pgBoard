@@ -9,30 +9,79 @@
 @import "/css/mobile.css";
 
 /* Start Reset */
-* { margin: 0px; padding: 0px; }
-fieldset,img { border: none; outline: none; }
+* {
+    margin: 0px;
+    padding: 0px;
+}
 
-img { border: none; }
+fieldset, img {
+    border: none;
+    outline: none;
+}
+
+img {
+    border: none;
+}
+
 /* End Reset */
 
 /* Start Base Styles */
-body
-{
-  font-size: 62.5%;
-  height: 100%;
+body {
+    font-size: 62.5%;
+    height: 100%;
 }
 
-a:link, a:visited, a:active { text-decoration: none; }
-a:hover { text-decoration: underline; }
-.hide { display: none; }
-.clear { clear: both; }
-.blink { text-decoration: blink; }
-.link,.lurker a { text-decoration: underline !important; }
-img { cursor: pointer; max-width: 100%; }
-h1,h2,h3,h4,h5 { font-weight: bold; }
-h1 { font-size: 2.0em; }
-h2 { font-size: 1.8em; }
-h3 { font-size: 1.6em; }
-h4 { font-size: 1.4em; }
-h5 { font-size: 1.2em; }
+a:link, a:visited, a:active {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.hide {
+    display: none;
+}
+
+.clear {
+    clear: both;
+}
+
+.blink {
+    text-decoration: blink;
+}
+
+.link, .lurker a {
+    text-decoration: underline !important;
+}
+
+img {
+    cursor: pointer;
+    max-width: 100%;
+}
+
+h1, h2, h3, h4, h5 {
+    font-weight: bold;
+}
+
+h1 {
+    font-size: 2.0em;
+}
+
+h2 {
+    font-size: 1.8em;
+}
+
+h3 {
+    font-size: 1.6em;
+}
+
+h4 {
+    font-size: 1.4em;
+}
+
+h5 {
+    font-size: 1.2em;
+}
+
 /* End Base Styles */
