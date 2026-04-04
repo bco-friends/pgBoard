@@ -2,6 +2,13 @@
     margin-top: 10px;
 }
 
+.coreform input,
+.coreform textarea,
+.coreform select {
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
 .coreform legend {
     font-weight: bold;
     padding: 0 2px;

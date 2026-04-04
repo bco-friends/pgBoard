@@ -143,6 +143,22 @@
     }
 
     input[type=text], #m {
+        width: 100%;
+    }
+
+    /* Note: field widths are set in the pref table of the database. !important tags used liberally here for responsive design. */
+    .coreform label {
+        width: 100%;
+    }
+
+    .coreform input#name,
+    .coreform input#postalcode,
+    .coreform input#photo,
+    .coreform input#location,
+    .coreform input#email,
+    .coreform input#website,
+    .coreform input#pronouns,
+    .coreform input#externalcss {
         width: 100% !important;
     }
 
