@@ -32,7 +32,11 @@
     }
 
     .subject {
-        width: 47%;
+        flex: 1 1 47%;
+    }
+
+    .posts {
+        flex: 0 0 40px;
     }
 
     .box {
@@ -51,7 +55,7 @@
 @media only screen and (max-width: 930px) {
     html body {
         margin: 0;
-        padding: 0px 0px;
+        padding: 0;
     }
 
     #content {
@@ -76,20 +80,15 @@
     }
 
     .subject {
+        flex: 1 1 65%;
         font-weight: normal;
-        width: 65%;
     }
 
     .member {
+        flex: 0 0 20%;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        width: 20%;
-    }
-
-    .posts {
-        float: right !important;
-        width: 40px;
     }
 
     .pref {
@@ -104,7 +103,7 @@
     .list {
         border-left: 3px solid transparent;
         border-right: none;
-        margin-left: 0px
+        margin-left: 0
     }
 
     .even, .odd {
@@ -115,8 +114,12 @@
         padding: .4em 0;
     }
 
+    .list li.posts {
+        margin-right: 0.4em;
+    }
+
     .extra {
-        margin-left: 0px;
+        margin-left: 0;
         width: initial;
     }
 
@@ -166,7 +169,7 @@
 
 @media only screen and (max-width: 850px) {
     .view li {
-        margin: 0px;
+        margin: 0;
     }
 }
 
@@ -198,7 +201,7 @@
     }
 
     .subject {
-        width: 61%;
+        flex: 1 1 61%;
     }
 
     .nav.top {
@@ -208,14 +211,16 @@
 
 @media only screen and (max-width: 380px) {
     #auth {
-        margin-bottom: 0px;
+        margin-bottom: 0;
     }
 
     .posts {
-        width: 47px;
+        margin-left: auto;
+        text-align: right;
+        width: auto;
     }
 
     .subject {
-        width: 58%;
+        flex: 1 1 58%;
     }
 }

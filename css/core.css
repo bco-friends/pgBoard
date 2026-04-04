@@ -8,10 +8,11 @@
 @import "/lib/jQuery/datePicker.css";
 @import "/css/mobile.css";
 
+
 /* Start Reset */
 * {
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 }
 
 fieldset, img {

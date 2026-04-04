@@ -3,7 +3,7 @@
 #header,
 #footer {
     clear: both;
-    margin: 0px auto;
+    margin: 0 auto;
     max-width: 1400px;
     min-width: 650px;
     width: 99%;
@@ -75,7 +75,7 @@
 
 .searchwrap {
     padding: .2em .5em;
-    right: 0px;
+    right: 0;
 }
 
 .searchtext {
@@ -105,7 +105,7 @@
 }
 
 .setdown {
-    bottom: 0px;
+    bottom: 0;
     position: absolute;
     z-index: 1;
 }

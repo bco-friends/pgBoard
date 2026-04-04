@@ -1,6 +1,7 @@
 .list {
     clear: both;
     cursor: pointer;
+    display: flex;
     list-style: none;
     overflow: hidden;
     width: 100%;
@@ -11,7 +12,6 @@
 }
 
 .list li {
-    float: left;
     padding: .23em 0em;
 }
 
@@ -24,24 +24,26 @@
 }
 
 .member {
+    flex: 0 0 17%;
     margin-left: .3em;
-    width: 17%;
 }
 
 .subject {
+    flex: 1;
     padding-left: 40px;
-    width: 48.5%;
 }
 
 .posts {
-    margin-left: .5em;
-    width: 4%;
+    flex: 0 0 4%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: right;
 }
 
 .lastpost {
+    flex: 0 0 28%;
     margin-right: .15em;
     text-align: right;
-    width: 28%;
 }
 
 .extra {
