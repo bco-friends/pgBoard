@@ -1,48 +1,69 @@
-.list
-{
-  list-style: none;
-  overflow: hidden;
-  clear: both;
-  width: 100%;
-  cursor: pointer;
+.list {
+    clear: both;
+    cursor: pointer;
+    list-style: none;
+    overflow: hidden;
+    width: 100%;
 }
-.read { margin-left: -3px; }
-.list li
-{
-  float: left;
-  padding: .23em 0em;
-}
-.list li span { display: none; }
-.list li span.dropmenu { display: inline; }
 
-.member { margin-left: .3em; width: 17%; }
-.subject
-{
-  padding-left: 40px;
-  width: 48.5%;
-  _width: 48%;
+.read {
+    margin-left: -3px;
 }
-.posts { width: 4%; margin-left: .5em; }
-.lastpost
-{
-  width: 28%;
-  text-align: right;
-  margin-right: .15em;
+
+.list li {
+    float: left;
+    padding: .23em 0em;
 }
-.extra
-{
-  float: left;
-  margin-left: -40px;
-  width: 40px;
-  _margin-left: 0px;
-  _height: 1.25em;
-  text-align: right;
+
+.list li span {
+    display: none;
 }
-.extra a { font-weight: bold; }
-.firstpost
-{
-  display: none;
-  padding: 2em;
+
+.list li span.dropmenu {
+    display: inline;
 }
-.even, .odd { clear: both; }
-#noresults { padding: 2em; }
+
+.member {
+    margin-left: .3em;
+    width: 17%;
+}
+
+.subject {
+    padding-left: 40px;
+    width: 48.5%;
+}
+
+.posts {
+    margin-left: .5em;
+    width: 4%;
+}
+
+.lastpost {
+    margin-right: .15em;
+    text-align: right;
+    width: 28%;
+}
+
+.extra {
+    float: left;
+    margin-left: -40px;
+    text-align: right;
+    width: 40px;
+}
+
+.extra a {
+    font-weight: bold;
+}
+
+.firstpost {
+    display: none;
+    padding: 2em;
+}
+
+.even, .odd {
+    clear: both;
+}
+
+#noresults {
+    padding: 2em;
+}

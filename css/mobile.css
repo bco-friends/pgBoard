@@ -1,155 +1,221 @@
-@media only screen and (max-width: 1150px){
-	#quicksearch { display:none; }
+@media only screen and (max-width: 1150px) {
+    #quicksearch {
+        display: none;
+    }
 
-	.nav { 
-		width: 100%; 
-		overflow: auto; 
-		-webkit-overflow-scrolling: touch; 
-	}
-	.setdown { 
-		display: inline-flex;
-	}
-	.nav.bottom { 
-		display: inline-flex; 
-		overflow: auto; 
-		-webkit-overflow-scrolling: touch; 
-	}
-	.nav li { white-space: nowrap; }
-	.nav li a {
-	    padding: 1em 1em;
-	}
-	input[type="button"], input[type="submit"], input[type="reset"], input {
-	    padding: 0.5em 0.5em;
-	}
-	.subject { width: 47%; }
-	.box {
-		overflow:auto;
-	}
-	.view { overflow: auto; }
-	.nav.top { min-height: 80px; }
+    .nav {
+        -webkit-overflow-scrolling: touch;
+        overflow: auto;
+        width: 100%;
+    }
 
+    .setdown {
+        display: inline-flex;
+    }
+
+    .nav.bottom {
+        -webkit-overflow-scrolling: touch;
+        display: inline-flex;
+        overflow: auto;
+    }
+
+    .nav li {
+        white-space: nowrap;
+    }
+
+    .nav li a {
+        padding: 1em 1em;
+    }
+
+    input[type="button"], input[type="submit"], input[type="reset"], input {
+        padding: 0.5em 0.5em;
+    }
+
+    .subject {
+        width: 47%;
+    }
+
+    .box {
+        overflow: auto;
+    }
+
+    .view {
+        overflow: auto;
+    }
+
+    .nav.top {
+        min-height: 80px;
+    }
 }
 
-@media only screen and (max-width: 930px){
+@media only screen and (max-width: 930px) {
+    html body {
+        margin: 0;
+        padding: 0px 0px;
+    }
 
-	html body {
-		margin: 0;
-		padding: 0px 0px;
-	}
+    #content {
+        display: block;
+        min-width: 320px !important;
+        width: 100% !important;
+    }
 
-	#content {
-		display: block;
-		width: 100% !important;
-		min-width: 320px !important;
-	}
+    #content .pad {
+        margin: 0;
+        padding: 0;
+    }
 
-	#content .pad {
-		margin: 0;
-		padding: 0;
-	}
-	.subtitle {
-		width: 85%;
-	}
-	#auth {
-		height: auto;
-		padding-top: 10px;
-		margin-bottom: 0;
-	}
-	.subject {
-		width: 65%;
-		font-weight:normal;
-	}
+    .subtitle {
+        width: 85%;
+    }
 
-	.member {
-		width: 20%;
-		text-overflow: ellipsis;
-		overflow: hidden;
-		white-space: nowrap;
-	}
-	.posts {
-		float: right!important;
-		width: 40px;
-	}
-		
-	.pref { float:none; }	
-	body ul.list.read { border-left: 0; border-right: 0; margin-left: 0; }
-	body ul.list { border-left: 5px solid red; border-right:none; margin-left:0px }
-	.even, .odd {
-		overflow: hidden;
-	}
-	
-	.list li {
-		padding: .4em 0;
-	}
+    #auth {
+        height: auto;
+        margin-bottom: 0;
+        padding-top: 10px;
+    }
 
+    .subject {
+        font-weight: normal;
+        width: 65%;
+    }
 
-	.extra { 
-		margin-left: 0px;
-		width: initial;
-	}
-	.extra a { font-weight: 400; }
-	.list .lastpost { color: #000; display:none; }
+    .member {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 20%;
+    }
 
-	.bottom li {  border: 0; font-weight:normal; }
+    .posts {
+        float: right !important;
+        width: 40px;
+    }
 
-	textarea { width: 100% !important; font-size:140%;}
-	input[type=text], #m { width: 100% !important; }
-	.coreform .submit { margin-left: 10px; }
-	.firstpost { padding: .4em .4em 1em .4em; }
-	.postbody a { text-decoration:underline; !important; }
-	.view .odd { padding-top: 1.0em; }
-	
-	.title, .subtitle, .subtitle a {
-		opacity: 0.8;
-	}	
+    .pref {
+        float: none;
+    }
+
+    .read {
+        border-right: 0;
+        margin-left: 0;
+    }
+
+    body ul.list {
+        border-left: 5px solid inherit;
+        border-right: none;
+        margin-left: 0px
+    }
+
+    .even, .odd {
+        overflow: hidden;
+    }
+
+    .list li {
+        padding: .4em 0;
+    }
+
+    .extra {
+        margin-left: 0px;
+        width: initial;
+    }
+
+    .extra a {
+        font-weight: 400;
+    }
+
+    .list .lastpost {
+        color: #000;
+        display: none;
+    }
+
+    .bottom li {
+        border: 0;
+        font-weight: normal;
+    }
+
+    textarea {
+        font-size: 140%;
+        width: 100% !important;
+    }
+
+    input[type=text], #m {
+        width: 100% !important;
+    }
+
+    .coreform .submit {
+        margin-left: 10px;
+    }
+
+    .firstpost {
+        padding: .4em .4em 1em .4em;
+    }
+
+    .postbody a {
+        text-decoration: underline !important;
+    }
+
+    .view .odd {
+        padding-top: 1.0em;
+    }
+
+    .title, .subtitle, .subtitle a {
+        opacity: 0.8;
+    }
 }
 
-@media only screen and (max-width: 850px){
-	.view li { margin:0px; }
+@media only screen and (max-width: 850px) {
+    .view li {
+        margin: 0px;
+    }
 }
 
 @media only screen and (max-width: 586px) {
+    .nav.top li {
+        margin-left: 0;
+        margin-right: 4px;
+    }
 
-	.nav.top li {
-		margin-left: 0;
-		margin-right: 4px;
-		}
-		
-	.nav.top li a {
-		padding: 1em .39em!important;
-	}
-		
-	.top .setdown li {
-		border: 0;
-		font-weight: bold;
-		}
-		
-	.nav .setdown li:hover, .nav .setdown a:hover {
-		text-decoration: none;
-		}
-		
-	.top .setdown li a {
-			text-decoration: none;
-		}
+    .nav.top li a {
+        padding: 1em .39em !important;
+    }
 
-	#content > div > div.small.clear {
-		margin-top: 20px;
-	}
+    .top .setdown li {
+        border: 0;
+        font-weight: bold;
+    }
 
-	.subject {
-		width: 61%;
-	}
-	.nav.top { min-height: 69px; }
+    .nav .setdown li:hover, .nav .setdown a:hover {
+        text-decoration: none;
+    }
+
+    .top .setdown li a {
+        text-decoration: none;
+    }
+
+    #content > div > div.small.clear {
+        margin-top: 20px;
+    }
+
+    .subject {
+        width: 61%;
+    }
+
+    .nav.top {
+        min-height: 69px;
+    }
 }
 
 @media only screen and (max-width: 380px) {
-	#auth {
-		margin-bottom: 0px;
-	}
-	.posts {
-		width: 47px;
-	}
-	.subject {
-		width: 58%;
-	}
+    #auth {
+        margin-bottom: 0px;
+    }
+
+    .posts {
+        width: 47px;
+    }
+
+    .subject {
+        width: 58%;
+    }
 }

@@ -1,33 +1,39 @@
-ul.drop
-{
-  list-style: none;
-  height: 1%;
-}
-.drop li
-{
-  float: left;
-  margin-right: 0.25em;
-  list-style: none;
-}
-a.domenu:hover { text-decoration: none; }
-
-.dropmenu .control { display: none; }
-.dropmenu:hover a, .dropmenu.active a, .hovermenu a
-{
-  padding: 0.2em;
-}
-.dropmenu:hover .control, .dropmenu.active .control, .hovermenu .control
-{
-  display: inline;
-  padding: 0.2em;
-  cursor: pointer;
+ul.drop {
+    height: 1%;
+    list-style: none;
 }
 
-.submenu
-{
-  list-style: none;
-	position: absolute;
-	width: 150px;
-  display: none;
+.drop li {
+    float: left;
+    list-style: none;
+    margin-right: 0.25em;
 }
-.submenu li { list-style: none; }
+
+a.domenu:hover {
+    text-decoration: none;
+}
+
+.dropmenu .control {
+    display: none;
+}
+
+.dropmenu:hover a, .dropmenu.active a, .hovermenu a {
+    padding: 0.2em;
+}
+
+.dropmenu:hover .control, .dropmenu.active .control, .hovermenu .control {
+    cursor: pointer;
+    display: inline;
+    padding: 0.2em;
+}
+
+.submenu {
+    display: none;
+    list-style: none;
+    position: absolute;
+    width: 150px;
+}
+
+.submenu li {
+    list-style: none;
+}
