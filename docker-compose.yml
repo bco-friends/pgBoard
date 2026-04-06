@@ -50,7 +50,10 @@ services:
       - pgboard_network
 
   web:
-    build: .
+    build:
+      context: .
+      args:
+        INSTALL_XDEBUG: "true"
     container_name: pgboard_web
     volumes:
       - .:/var/www/html

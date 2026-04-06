@@ -8,315 +8,349 @@ class Base
   /**
   * List Functions
   */
-  public const LIST_THREAD = 100;
-  public const LIST_THREAD_HISTORY = 200;
-  public const LIST_THREAD_SEARCH = 300;
-  public const LIST_MESSAGE = 400;
-  public const LIST_MESSAGE_HISTORY = 500;
-  public const LIST_MESSAGE_SEARCH = 600;
-  public const LIST_MEMBER = 700;
+    public const LIST_THREAD = 100;
+    public const LIST_THREAD_HISTORY = 200;
+    public const LIST_THREAD_SEARCH = 300;
+    public const LIST_MESSAGE = 400;
+    public const LIST_MESSAGE_HISTORY = 500;
+    public const LIST_MESSAGE_SEARCH = 600;
+    public const LIST_MEMBER = 700;
 
   /**
   * View Functions
   */
-  public const VIEW_THREAD = 800;
-  public const VIEW_THREAD_HISTORY = 900;
-  public const VIEW_THREAD_SEARCH = 1000;
-  public const VIEW_THREAD_PREVIEW = 1100;
-  public const VIEW_MESSAGE = 1200;
-  public const VIEW_MESSAGE_HISTORY = 1300;
-  public const VIEW_MESSAGE_SEARCH = 1400;
-  public const VIEW_MESSAGE_PREVIEW = 1100;
-  public const VIEW_MEMBER = 1500;
+    public const VIEW_THREAD = 800;
+    public const VIEW_THREAD_HISTORY = 900;
+    public const VIEW_THREAD_SEARCH = 1000;
+    public const VIEW_THREAD_PREVIEW = 1100;
+    public const VIEW_MESSAGE = 1200;
+    public const VIEW_MESSAGE_HISTORY = 1300;
+    public const VIEW_MESSAGE_SEARCH = 1400;
+    public const VIEW_MESSAGE_PREVIEW = 1100;
+    public const VIEW_MEMBER = 1500;
 
   /**
    * Various Functions
    */
-  public const CREATE = 1600;
-  public const EDIT = 1700;
-  public const SEARCH = 1800;
-  public const ERROR = 1900;
-  public const MISC = 2000;
+    public const CREATE = 1600;
+    public const EDIT = 1700;
+    public const SEARCH = 1800;
+    public const ERROR = 1900;
+    public const MISC = 2000;
 
 
-  public $ajax = false;     // data only flag
-  public $xml = false;
-  public $name;             // unique name
-  public $title;            // title to display
-  public $type;             // type of call
-  public $table;            // table split for thread/message
-  public $blocked = false;  // blocked members
-  public $subtitle = "";
+    public $ajax = false;     // data only flag
+    public $xml = false;
+    public $name;             // unique name
+    public $title;            // title to display
+    public $type;             // type of call
+    public $table;            // table split for thread/message
+    public $blocked = false;  // blocked members
+    public $subtitle = "";
 
 
-  public function __construct(
-    public DB $DB
-  ) {}
-
-  public static function init()
-  {
-    global $DB;
-
-    $called_classname = get_called_class();
-
-    $base = new $called_classname($DB);
-
-    $base->name = "l" . substr(md5(time()), 0, 5);
-    if (session('id'))
-    {
-      $DB->query("UPDATE member SET last_view=now() WHERE id=$1", [session('id')]);
-    }
-    if (session('blocked'))
-    {
-      $base->blocked(session('blocked'));
-    }
-    if (get('ajax'))
-    {
-      $base->ajax = true;
-    }
-    if (get('xml'))
-    {
-      $base->xml = true;
+    public function __construct(
+        public DB $DB
+    ) {
     }
 
-    return $base;
-  }
-
-  function title($title)
-  {
-    global $_title_;
-    $_title_ = strip_tags($title);
-    $Plugin = new BoardPlugin;
-    $title = $Plugin->base_title($title);
-    $this->title = $title;
-  }
-  function subtitle($subtitle) { $this->subtitle = $subtitle; }
-  function blocked($blocked) { $this->blocked = $blocked; }
-
-  function type($type)
-  {
-    $this->type = $type;
-    switch($this->type)
+    public static function init()
     {
-      case self::LIST_THREAD:
-      case self::VIEW_THREAD:
-      case self::LIST_THREAD_HISTORY:
-      case self::LIST_THREAD_SEARCH:
-      case self::VIEW_THREAD_HISTORY:
-      case self::VIEW_THREAD_SEARCH:
-        $this->table = "thread";
-        break;
-      case self::LIST_MESSAGE:
-      case self::VIEW_MESSAGE:
-      case self::LIST_MESSAGE_HISTORY:
-      case self::LIST_MESSAGE_SEARCH:
-      case self::VIEW_MESSAGE_HISTORY:
-      case self::VIEW_MESSAGE_SEARCH:
-        $this->table = "message";
-        break;
-    }
-  }
+        global $DB;
 
-  function header($loadmenu=true)
-  {
-    global $Core,$Security;
-    if($this->ajax) return;
-    if($this->xml) return;
+        $called_classname = get_called_class();
 
-    print "<div id=\"wrap_{$this->name}\" class=\"clear\">\n";
-    print "  <h3 class=\"title\">$this->title</h3>\n";
-    $Security->auth_control();
-    if(!$this->subtitle && $this->type != self::ERROR)
-    {
-      $subtitle = "<a href=\"/\">".number_format($Core->thread_count())." threads</a> ".ARROW_RIGHT.SPACE;
-      $subtitle .= "<a href=\"/main/status/\">".number_format($Core->active_member_count())." active members, ";
-      $subtitle .= number_format($Core->posting_member_count())." of which are posting, ";
-      $subtitle .= number_format($Core->lurking_member_count())." of which are lurking, ";
-      $subtitle .= number_format($Core->chatting_member_count())." of which are chatting</a>";
-      $this->subtitle($subtitle);
-    }
-    print "  <div class=\"subtitle\">\n";
-    print $this->subtitle;
-    print "  </div>\n";
-    print "  <div class=\"clear\"></div>\n";
-    if($loadmenu) $this->header_menu();
-  }
+        $base = new $called_classname($DB);
 
-  function header_menu()
-  {
-    global $Core,$_menu_;
-
-    if(!isset($this->type) || $this->ajax) return;
-    if(!isset($this->type) || $this->xml) return;
-
-    // quicksearch
-    switch($this->type)
-    {
-      case self::LIST_THREAD:
-      case self::LIST_THREAD_HISTORY:
-      case self::LIST_THREAD_SEARCH:
-      case self::LIST_MESSAGE:
-      case self::LIST_MESSAGE_HISTORY:
-      case self::LIST_MESSAGE_SEARCH:
-        print "<div id=\"quicksearch\"><div class=\"setdown searchwrap\">\n";
-        print "<input type=\"text\" class=\"searchtext\" id=\"filter_{$this->name}\"/>\n";
-        print "<input type=\"button\" class=\"clearbutton\" value=\"clear\" onclick=\"clear_search('{$this->name}')\"/>\n";
-        print "</div></div>\n";
-        break;
-    }
-
-    $messages = $chatters = "";
-    if(session('id'))
-    {
-      $m = $Core->message_unread_count(session('id'));
-      $p = $Core->message_unread_post_count(session('id'));
-      if($m != 0 || $p != 0) $messages = " <strong class=\"blink\">({$m}/{$p})</strong>";
-    }
-
-    $c = $Core->chatting_member_count();
-    if($c != 0) $chatters = " ({$c})";
-
-    print "  <ul class=\"nav top\"><div class=\"setdown\">\n";
-    foreach($_menu_ as $menu => $data)
-    {
-      if(!$data['show']) continue;
-      if(!session('id') && $data['auth']) continue;
-      if($data['link'] == "/member/create/" && session('id')) continue;
-      $menu = str_replace(array("%MESSAGES%","%CHATTERS%"),array($messages,$chatters),$menu);
-      $code = $data['code'] != "" ? " $data[code]" : "";
-      print "<li><a href=\"$data[link]\" title=\"$data[title]\"$code>$menu</a></li>\n";
-    }
-    print "  </div></ul>\n";
-
-    // line under nav (not showing standard board display)
-    switch($this->type)
-    {
-      case self::CREATE:
-      case self::EDIT:
-      case self::SEARCH:
-      case self::ERROR:
-        print "<div class=\"hr\"><hr/></div>\n";
-        break;
-
-    }
-  }
-
-  function footer_menu()
-  {
-    global $DB,$Security,$Core;
-
-    // setup message/thread split and next/prev offsets from url
-    switch($this->type)
-    {
-      case self::LIST_THREAD:
-      case self::VIEW_THREAD:
-      case self::LIST_MESSAGE:
-      case self::VIEW_MESSAGE:
-        $end = 2;
-        break;
-
-      case self::LIST_THREAD_HISTORY:
-      case self::LIST_THREAD_SEARCH:
-      case self::VIEW_THREAD_HISTORY:
-      case self::VIEW_THREAD_SEARCH:
-      case self::LIST_MESSAGE_HISTORY:
-      case self::LIST_MESSAGE_SEARCH:
-      case self::VIEW_MESSAGE_HISTORY:
-      case self::VIEW_MESSAGE_SEARCH:
-        $end = 3;
-        break;
-    }
-
-    switch($this->type)
-    {
-      case self::LIST_THREAD:
-      case self::LIST_THREAD_HISTORY:
-      case self::LIST_THREAD_SEARCH:
-      case self::LIST_MESSAGE:
-      case self::LIST_MESSAGE_HISTORY:
-      case self::LIST_MESSAGE_SEARCH:
-      case self::VIEW_THREAD_SEARCH:
-      case self::VIEW_THREAD_HISTORY:
-      case self::VIEW_MESSAGE_SEARCH:
-      case self::VIEW_MESSAGE_HISTORY:
-        $next = (cmd($end,true) ? cmd($end,true)+1 : 1);
-        $prev = ($next-2 > 0 ? ($next-2)."/" : "");
-        print "<ul class=\"nav bottom clear\">\n";
-        print "  <li><a href=\"/{$this->table}/list/\">".HOME_BUTTON."</a></li>\n";
-        if(cmd($end,true) > 0) print "  <li><a href=\"".url(0,$end)."$prev\">&laquo; prev</a></li>\n";
-        print "  <li><a href=\"".url(0,$end)."$next/\">next ".ARROW_RIGHT."</a></li>\n";
-        print "</ul>\n";
-        print "<div class=\"clear\"></div>\n";
-        break;
-
-      case self::VIEW_THREAD:
-      case self::VIEW_MESSAGE:
-        print "<ul class=\"nav bottom clear shiftup\">\n";
-        print "  <li><a href=\"/{$this->table}/list/\">".HOME_BUTTON."</a></li>\n";
-        print "  <li><a href=\"javascript:;\" onclick=\"loadposts('{$this->table}',this)\">load new posts</a></li>\n";
-        print "</ul>\n";
-        print "<div class=\"clear\"></div>\n";
-        break;
-
-
-    case self::VIEW_MEMBER:
-        if(!is_numeric(id())) $idnum = $Core->idfromname(id());
-        else
-        $idnum = $DB->value("SELECT id FROM member WHERE name=$1",array(id()));
-
-        $ignorelisten = $Core->is_ignoring(session('id'),$idnum) ? "listen" : "ignore";
-        print "<ul class=\"nav bottom clear\">\n";
-        if(session('id') != $idnum) print "  <li><a href=\"/message/create/".id()."/\">send message</a></li>\n";
-        if(!$Security->is_admin($idnum) && session('id') != $idnum && IGNORE_ENABLED && $Core->can_ignore(session('id')))
-        {
-          print "  <li><a href=\"/member/$ignorelisten/".id()."/".MD5(session_id())."/\">$ignorelisten</a></li>\n";
+        $base->name = "l" . substr(md5(time()), 0, 5);
+        if (session('id')) {
+            $DB->query("UPDATE member SET last_view=now() WHERE id=$1", [session('id')]);
         }
-        print "  <li><a href=\"/thread/listbymemberposted/".id()."/\">threads participated</a></li>\n";
-        print "  <li><a href=\"/thread/listbymember/".id()."/\">threads created</a></li>\n";
-        print "  <li><a href=\"/thread/viewbymember/".id()."/\">posts created</a></li>\n";
-        if(FAVORITES_PUBLIC || $idnum == session('id'))
-        {
-          print "  <li><a href=\"/thread/listfavoritesbymember/".id()."/\">favorites</a></li>\n";
+        if (session('blocked')) {
+            $base->blocked(session('blocked'));
         }
-        if(IGNORED_THREADS_PUBLIC || $idnum == session('id'))
-        {
-          print "  <li><a href=\"/thread/listignoredthreadsbymember/".id()."/\">ignored threads</a></li>\n";
+        if (get('ajax')) {
+            $base->ajax = true;
         }
-        print "  <li><a href=\"/member/editcolors/".id()."/\">color scheme</a></li>\n";
-        if(session('id') == $idnum) print "  <li><a href=\"/member/edit/\">edit account</a></li>\n";
-        if(session('admin'))
-        {
-          $banunban = $Core->is_banned($idnum) ? "unban" : "ban";
-          if(!$Security->is_admin($idnum))
-          {
-            print "  <li><a href=\"/admin/resetlink/$idnum/".md5(session_id())."/\" onclick=\"return confirm('Are you sure?')\">reset password link</a></li>\n";
-            print "  <li><a href=\"/admin/togglebanned/$idnum/".md5(session_id())."/\">$banunban</a></li>\n";
-          }
+        if (get('xml')) {
+            $base->xml = true;
         }
-        print "</ul>\n";
-        print "<div class=\"clear\"></div>\n";
-        break;
+
+        return $base;
     }
 
-  }
-
-  function footer($loadmenu=true)
-  {
-    if($this->ajax) return;
-    if($this->xml) return;
-    print "</div>\n";
-    if($loadmenu) $this->footer_menu();
-    switch($this->type)
+    function title($title)
     {
-      case self::LIST_THREAD:
-      case self::LIST_THREAD_HISTORY:
-      case self::LIST_THREAD_SEARCH:
-      case self::LIST_MESSAGE:
-      case self::LIST_MESSAGE_HISTORY:
-      case self::LIST_MESSAGE_SEARCH:
-        print "<script type=\"text/javascript\">\n";
-        print "setTimeout(function(){init_search('{$this->name}','list');},50);\n";
-        print "</script>\n";
+        global $_title_;
+        $_title_ = strip_tags($title);
+        $Plugin = new BoardPlugin();
+        $title = $Plugin->base_title($title);
+        $this->title = $title;
     }
-  }
+    function subtitle($subtitle)
+    {
+        $this->subtitle = $subtitle;
+    }
+    function blocked($blocked)
+    {
+        $this->blocked = $blocked;
+    }
+
+    function type($type)
+    {
+        $this->type = $type;
+        switch ($this->type) {
+            case self::LIST_THREAD:
+            case self::VIEW_THREAD:
+            case self::LIST_THREAD_HISTORY:
+            case self::LIST_THREAD_SEARCH:
+            case self::VIEW_THREAD_HISTORY:
+            case self::VIEW_THREAD_SEARCH:
+                $this->table = "thread";
+                break;
+            case self::LIST_MESSAGE:
+            case self::VIEW_MESSAGE:
+            case self::LIST_MESSAGE_HISTORY:
+            case self::LIST_MESSAGE_SEARCH:
+            case self::VIEW_MESSAGE_HISTORY:
+            case self::VIEW_MESSAGE_SEARCH:
+                $this->table = "message";
+                break;
+        }
+    }
+
+    function header($loadmenu = true)
+    {
+        global $Core,$Security;
+        if ($this->ajax) {
+            return;
+        }
+        if ($this->xml) {
+            return;
+        }
+
+        print "<div id=\"wrap_{$this->name}\" class=\"clear\">\n";
+        print "  <h3 class=\"title\">$this->title</h3>\n";
+        $Security->auth_control();
+        if (!$this->subtitle && $this->type != self::ERROR) {
+            $postingCount = $Core->posting_member_count();
+            $lurkingCount = $Core->lurking_member_count();
+            $chattingCount = $Core->chatting_member_count();
+
+            $subtitle = "<a href=\"/\">" . number_format($Core->thread_count()) . " threads</a> " . ARROW_RIGHT . SPACE;
+            $subtitle .= "<a href=\"/main/status/\">" . number_format($Core->active_member_count()) . " active members, ";
+            $subtitle .= number_format($postingCount) . " of which are posting";
+
+            if ($lurkingCount) {
+                $subtitle .= ', '.number_format($Core->lurking_member_count()) . " of which are lurking";
+            }
+
+            if ($chattingCount) {
+                $subtitle .= ', '.number_format($Core->chatting_member_count()) . " of which are chatting";
+            }
+
+            $subtitle .= '</a>';
+
+            $this->subtitle($subtitle);
+        }
+        print "  <div class=\"subtitle\">\n";
+        print $this->subtitle;
+        print "  </div>\n";
+        print "  <div class=\"clear\"></div>\n";
+        if ($loadmenu) {
+            $this->header_menu();
+        }
+    }
+
+    function header_menu()
+    {
+        global $Core,$_menu_;
+
+        if (!isset($this->type) || $this->ajax) {
+            return;
+        }
+        if (!isset($this->type) || $this->xml) {
+            return;
+        }
+
+      // quicksearch
+        switch ($this->type) {
+            case self::LIST_THREAD:
+            case self::LIST_THREAD_HISTORY:
+            case self::LIST_THREAD_SEARCH:
+            case self::LIST_MESSAGE:
+            case self::LIST_MESSAGE_HISTORY:
+            case self::LIST_MESSAGE_SEARCH:
+                print "<div id=\"quicksearch\"><div class=\"setdown searchwrap\">\n";
+                print "<input type=\"text\" class=\"searchtext\" id=\"filter_{$this->name}\"/>\n";
+                print "<input type=\"button\" class=\"clearbutton\" value=\"clear\" onclick=\"clear_search('{$this->name}')\"/>\n";
+                print "</div></div>\n";
+                break;
+        }
+
+        $messages = $chatters = "";
+        if (session('id')) {
+            $m = $Core->message_unread_count(session('id'));
+            $p = $Core->message_unread_post_count(session('id'));
+            if ($m != 0 || $p != 0) {
+                $messages = " <strong class=\"blink\">({$m}/{$p})</strong>";
+            }
+        }
+
+        $c = $Core->chatting_member_count();
+        if ($c != 0) {
+            $chatters = " ({$c})";
+        }
+
+        print "  <ul class=\"nav top\"><div class=\"setdown\">\n";
+        foreach ($_menu_ as $menu => $data) {
+            if (!$data['show']) {
+                continue;
+            }
+            if (!session('id') && $data['auth']) {
+                continue;
+            }
+            if ($data['link'] == "/member/create/" && session('id')) {
+                continue;
+            }
+            $menu = str_replace(array("%MESSAGES%","%CHATTERS%"), array($messages,$chatters), $menu);
+            $code = $data['code'] != "" ? " $data[code]" : "";
+            print "<li><a href=\"$data[link]\" title=\"$data[title]\"$code>$menu</a></li>\n";
+        }
+        print "  </div></ul>\n";
+
+      // line under nav (not showing standard board display)
+        switch ($this->type) {
+            case self::CREATE:
+            case self::EDIT:
+            case self::SEARCH:
+            case self::ERROR:
+                print "<div class=\"hr\"><hr/></div>\n";
+                break;
+        }
+    }
+
+    function footer_menu()
+    {
+        global $DB,$Security,$Core;
+
+      // setup message/thread split and next/prev offsets from url
+        switch ($this->type) {
+            case self::LIST_THREAD:
+            case self::VIEW_THREAD:
+            case self::LIST_MESSAGE:
+            case self::VIEW_MESSAGE:
+                $end = 2;
+                break;
+
+            case self::LIST_THREAD_HISTORY:
+            case self::LIST_THREAD_SEARCH:
+            case self::VIEW_THREAD_HISTORY:
+            case self::VIEW_THREAD_SEARCH:
+            case self::LIST_MESSAGE_HISTORY:
+            case self::LIST_MESSAGE_SEARCH:
+            case self::VIEW_MESSAGE_HISTORY:
+            case self::VIEW_MESSAGE_SEARCH:
+                $end = 3;
+                break;
+        }
+
+        switch ($this->type) {
+            case self::LIST_THREAD:
+            case self::LIST_THREAD_HISTORY:
+            case self::LIST_THREAD_SEARCH:
+            case self::LIST_MESSAGE:
+            case self::LIST_MESSAGE_HISTORY:
+            case self::LIST_MESSAGE_SEARCH:
+            case self::VIEW_THREAD_SEARCH:
+            case self::VIEW_THREAD_HISTORY:
+            case self::VIEW_MESSAGE_SEARCH:
+            case self::VIEW_MESSAGE_HISTORY:
+                $next = (cmd($end, true) ? cmd($end, true) + 1 : 1);
+                $prev = ($next - 2 > 0 ? ($next - 2) . "/" : "");
+                print "<ul class=\"nav bottom clear\">\n";
+                print "  <li><a href=\"/{$this->table}/list/\">" . HOME_BUTTON . "</a></li>\n";
+                if (cmd($end, true) > 0) {
+                    print "  <li><a href=\"" . url(0, $end) . "$prev\">&laquo; prev</a></li>\n";
+                }
+                print "  <li><a href=\"" . url(0, $end) . "$next/\">next " . ARROW_RIGHT . "</a></li>\n";
+                print "</ul>\n";
+                print "<div class=\"clear\"></div>\n";
+                break;
+
+            case self::VIEW_THREAD:
+            case self::VIEW_MESSAGE:
+                print "<ul class=\"nav bottom clear shiftup\">\n";
+                print "  <li><a href=\"/{$this->table}/list/\">" . HOME_BUTTON . "</a></li>\n";
+                print "  <li><a href=\"javascript:;\" onclick=\"loadposts('{$this->table}',this)\">load new posts</a></li>\n";
+                print "</ul>\n";
+                print "<div class=\"clear\"></div>\n";
+                break;
+
+
+            case self::VIEW_MEMBER:
+                if (!is_numeric(id())) {
+                    $idnum = $Core->idfromname(id());
+                } else {
+                    $idnum = $DB->value("SELECT id FROM member WHERE name=$1", array(id()));
+                }
+
+                $ignorelisten = $Core->is_ignoring(session('id'), $idnum) ? "listen" : "ignore";
+                print "<ul class=\"nav bottom clear\">\n";
+                if (session('id') != $idnum) {
+                    print "  <li><a href=\"/message/create/" . id() . "/\">send message</a></li>\n";
+                }
+                if (!$Security->is_admin($idnum) && session('id') != $idnum && IGNORE_ENABLED && $Core->can_ignore(session('id'))) {
+                    print "  <li><a href=\"/member/$ignorelisten/" . id() . "/" . MD5(session_id()) . "/\">$ignorelisten</a></li>\n";
+                }
+                print "  <li><a href=\"/thread/listbymemberposted/" . id() . "/\">threads participated</a></li>\n";
+                print "  <li><a href=\"/thread/listbymember/" . id() . "/\">threads created</a></li>\n";
+                print "  <li><a href=\"/thread/viewbymember/" . id() . "/\">posts created</a></li>\n";
+                if (FAVORITES_PUBLIC || $idnum == session('id')) {
+                    print "  <li><a href=\"/thread/listfavoritesbymember/" . id() . "/\">favorites</a></li>\n";
+                }
+                if (IGNORED_THREADS_PUBLIC || $idnum == session('id')) {
+                    print "  <li><a href=\"/thread/listignoredthreadsbymember/" . id() . "/\">ignored threads</a></li>\n";
+                }
+                print "  <li><a href=\"/member/editcolors/" . id() . "/\">color scheme</a></li>\n";
+                if (session('id') == $idnum) {
+                    print "  <li><a href=\"/member/edit/\">edit account</a></li>\n";
+                }
+                if (session('admin')) {
+                    $banunban = $Core->is_banned($idnum) ? "unban" : "ban";
+                    if (!$Security->is_admin($idnum)) {
+                        print "  <li><a href=\"/admin/resetlink/$idnum/" . md5(session_id()) . "/\" onclick=\"return confirm('Are you sure?')\">reset password link</a></li>\n";
+                        print "  <li><a href=\"/admin/togglebanned/$idnum/" . md5(session_id()) . "/\">$banunban</a></li>\n";
+                    }
+                }
+                print "</ul>\n";
+                print "<div class=\"clear\"></div>\n";
+                break;
+        }
+    }
+
+    function footer($loadmenu = true)
+    {
+        if ($this->ajax) {
+            return;
+        }
+        if ($this->xml) {
+            return;
+        }
+        print "</div>\n";
+        if ($loadmenu) {
+            $this->footer_menu();
+        }
+        switch ($this->type) {
+            case self::LIST_THREAD:
+            case self::LIST_THREAD_HISTORY:
+            case self::LIST_THREAD_SEARCH:
+            case self::LIST_MESSAGE:
+            case self::LIST_MESSAGE_HISTORY:
+            case self::LIST_MESSAGE_SEARCH:
+                print "<script type=\"text/javascript\">\n";
+                print "setTimeout(function(){init_search('{$this->name}','list');},50);\n";
+                print "</script>\n";
+        }
+    }
 }

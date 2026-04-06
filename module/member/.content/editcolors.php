@@ -3,35 +3,37 @@ global $Style;
 global $Core;
 global $DB;
 
-if (cmd(2))
-{
-  $theme_member_id = $Core->idfromname(cmd(2));
-  if ($theme_member_id)
-  {
-    $theme = $Core->member_pref($theme_member_id, "theme");
-    if ($theme)
-      $Style->set_theme($theme);
-    else
-      $Style->load_default();
-  }
-}
-else if(get('theme'))
-{
-  if ($theme = $DB->value("SELECT value FROM theme WHERE name=$1",array(get('theme'))))
-    $Style->set_theme($theme);
+if (cmd(2)) {
+    $theme_member_id = $Core->idfromname(cmd(2));
+    if ($theme_member_id) {
+        $theme = $Core->member_pref($theme_member_id, "theme");
+        if ($theme) {
+            $Style->set_theme($theme);
+        } else {
+            $Style->load_default();
+        }
+    }
+} elseif (get('theme')) {
+    if ($theme = $DB->value("SELECT value FROM theme WHERE name=$1", array(get('theme')))) {
+        $Style->set_theme($theme);
+    }
 }
 
 $theme = unserialize($Style->theme);
-foreach($theme as $type => $val) if(substr($val,0,1) == "#") $theme[$type] = substr($val,1);
+foreach ($theme as $type => $val) {
+    if (substr($val, 0, 1) == "#") {
+        $theme[$type] = substr($val, 1);
+    }
+}
 
-$fontsizes = array("1"=>"10pt",
-                   "1.1"=>"11pt",
-                   "1.2"=>"12pt",
-                   "1.3"=>"13pt",
-                   "1.4"=>"14pt",
-                   "1.5"=>"15pt",
-                   "1.6"=>"16pt",
-                   "1.7"=>"17pt");
+$fontsizes = array("1" => "10pt",
+                   "1.1" => "11pt",
+                   "1.2" => "12pt",
+                   "1.3" => "13pt",
+                   "1.4" => "14pt",
+                   "1.5" => "15pt",
+                   "1.6" => "16pt",
+                   "1.7" => "17pt");
 ?>
 <!--
 Copyright (c) 2007 John Dyer (http://johndyer.name)
@@ -189,30 +191,32 @@ function preview_theme()
 </script>
 <div style="float:left;width:50%">
 <?php
-$Form = new Form;
-if($theme['hover'] == "transparent") $theme['hover'] = "none";
-$Form->values(array_merge($theme,get('theme')?array("theme"=>get('theme')):array()));
-$Form->header(url(),"post",FORM_SALT);
+$Form = new Form();
+if ($theme['hover'] == "transparent") {
+    $theme['hover'] = "none";
+}
+$Form->values(array_merge($theme, get('theme') ? array("theme" => get('theme')) : array()));
+$Form->header(url(), "post", FORM_SALT);
 
 $Form->fieldset_open("Theme Options");
-$Form->add_text("font","Font Family:",250);
-$Form->add_select("fontsize","Font Size:","Select Size",$fontsizes);
-$Form->add_text("body","Background #:",50,6,"/> <input type=\"radio\" id=\"type\" name=\"type\" value=\"body\" checked=\"true\"/>");
-$Form->add_text("even","Even #:",50,6,"/> <input type=\"radio\" id=\"type\" name=\"type\" value=\"even\"/>");
-$Form->add_text("odd","Odd #:",50,6,"/> <input type=\"radio\" id=\"type\" name=\"type\" value=\"odd\"/>");
-$Form->add_text("me","My Posts #:",50,6,"/> <input type=\"radio\" id=\"type\" name=\"type\" value=\"me\"/>");
-$Form->add_text("hover","Hover Bar #:<br/><span class=\"small\">(or 'none')</span>",50,6,"/> <input type=\"radio\" id=\"type\" name=\"type\" value=\"hover\"/>");
-$Form->add_text("readbar","Read Bars #:",50,6,"/> <input type=\"radio\" id=\"type\" name=\"type\" value=\"readbar\"/>");
+$Form->add_text("font", "Font Family:", 250);
+$Form->add_select("fontsize", "Font Size:", "Select Size", $fontsizes);
+$Form->add_text("body", "Background #:", 50, 6, "/> <input type=\"radio\" id=\"type\" name=\"type\" value=\"body\" checked=\"true\"/>");
+$Form->add_text("even", "Even #:", 50, 6, "/> <input type=\"radio\" id=\"type\" name=\"type\" value=\"even\"/>");
+$Form->add_text("odd", "Odd #:", 50, 6, "/> <input type=\"radio\" id=\"type\" name=\"type\" value=\"odd\"/>");
+$Form->add_text("me", "My Posts #:", 50, 6, "/> <input type=\"radio\" id=\"type\" name=\"type\" value=\"me\"/>");
+$Form->add_text("hover", "Hover Bar #:<br/><span class=\"small\">(or 'none')</span>", 50, 6, "/> <input type=\"radio\" id=\"type\" name=\"type\" value=\"hover\"/>");
+$Form->add_text("readbar", "Read Bars #:", 50, 6, "/> <input type=\"radio\" id=\"type\" name=\"type\" value=\"readbar\"/>");
 $Form->fieldset_close();
 
 $Form->add_submit("Save");
-$Form->add_button("preview","Preview","preview_theme()");
+$Form->add_button("preview", "Preview", "preview_theme()");
 
 $Form->labels(false);
 $Form->fieldset_open("Preset Themes");
 $DB->query("SELECT name as id,name FROM theme");
-$Form->add_select("theme","Themes:","Select Theme",$DB->load_all_key());
-$Form->add_button("preview","Preview","if(jQuery('#theme')[0].selectedIndex) location.href='/member/editcolors/&theme='+jQuery('#theme')[0][jQuery('#theme')[0].selectedIndex].value;");
+$Form->add_select("theme", "Themes:", "Select Theme", $DB->load_all_key());
+$Form->add_button("preview", "Preview", "if(jQuery('#theme')[0].selectedIndex) location.href='/member/editcolors/&theme='+jQuery('#theme')[0][jQuery('#theme')[0].selectedIndex].value;");
 $Form->fieldset_close();
 
 $Form->footer();

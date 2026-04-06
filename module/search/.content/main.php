@@ -1,19 +1,21 @@
 <?php
-if(!isset($res)) // if calling from within search itself don't include structure
-{
-  $Base = Base::init();
-  $Base->type(Base::SEARCH);
-  $Base->title("Search");
-  $Base->header();
+
+if (!isset($res)) { // if calling from within search itself don't include structure
+    $Base = Base::init();
+    $Base->type(Base::SEARCH);
+    $Base->title("Search");
+    $Base->header();
 }
-$Form = new Form;
+$Form = new Form();
 $Form->ajax(false);
-if(isset($_SESSION['search'])) $Form->values($_SESSION['search']);
-$Form->header("/search/","post",FORM_SALT);
+if (isset($_SESSION['search'])) {
+    $Form->values($_SESSION['search']);
+}
+$Form->header("/search/", "post", FORM_SALT);
 $Form->fieldset_open("Search Information");
-$Form->add_text("search","Search For:",300);
-$Form->values(array("_type"=>"thread"));
-$Form->add_select("_type","Within:",NULL,array("thread"=>"Threads","thread_post"=>"Thread Posts","message"=>"Messages","message_post"=>"Message Posts"));
+$Form->add_text("search", "Search For:", 300);
+$Form->values(array("_type" => "thread"));
+$Form->add_select("_type", "Within:", null, array("thread" => "Threads","thread_post" => "Thread Posts","message" => "Messages","message_post" => "Message Posts"));
 $Form->fieldset_close();
 $Form->fieldset_open("Optional Fields");
 print "<li>will return in a bit</li>\n";
@@ -35,12 +37,14 @@ $Form->add_submit("Search");
 $Form->footer();
 
 $Form->header_validate();
-$Form->add_notnull("search","Please enter a search term.");
-$Form->add_notnull("_type","Please choose what to search.");
+$Form->add_notnull("search", "Please enter a search term.");
+$Form->add_notnull("_type", "Please choose what to search.");
 $Form->set_focus("search");
 $Form->footer_validate();
 
-if(!isset($res)) $Base->footer();
+if (!isset($res)) {
+    $Base->footer();
+}
 ?>
 <script type="text/javascript">
 function quickrange(what)

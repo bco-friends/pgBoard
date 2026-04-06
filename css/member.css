@@ -1,24 +1,23 @@
-.nophoto
-{
-  width: 320px;
-  height: 240px;
+.nophoto {
+    height: 240px;
+    width: 320px;
 }
 
-.pref
-{
-  float: left;
-  width: 100px;
-  font-weight: bold;
-}
-.prefdata
-{
-  float: left;
+.pref {
+    float: left;
+    font-weight: bold;
+    width: 100px;
 }
 
-.memberinfo { list-style: none; }
+.prefdata {
+    float: left;
+}
 
-.memberinfo li
-{
-  clear: left;
-  padding-top: .5em;
+.memberinfo {
+    list-style: none;
+}
+
+.memberinfo li {
+    clear: left;
+    padding-top: .5em;
 }

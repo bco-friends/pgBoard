@@ -1,289 +1,305 @@
 <?php
+
 class BoardView extends Base
 {
-  public $data;
-  public $collapse = false;
-  function data($data) { $this->data = $data; }
-  function collapse($collapse) { $this->collapse = $collapse; }
-
-  function increment_views()
-  {
-    if(!$this->ajax && $this->type == Base::VIEW_THREAD || $this->type == Base::VIEW_MESSAGE)
+    public $data;
+    public $collapse = false;
+    function data($data)
     {
-      $this->DB->query("UPDATE {$this->table} SET views=views+1 WHERE id=$1",array(id(true)));
+        $this->data = $data;
     }
-  }
-
-  function prep_data($row)
-  {
-    global $Parse;
-
-    $data = array_values($row);
-    $data['date'] = date(VIEW_DATE_FORMAT,(int)$data[BoardQuery::VIEW_DATE_POSTED]);
-
-    $data['me'] = $data['quote'] = $data['admin'] = "";
-    if(session('id'))
+    function collapse($collapse)
     {
-      if($data[BoardQuery::VIEW_CREATOR_ID] == session('id')) $data['me'] = SPACE.CSS_ME;
+        $this->collapse = $collapse;
     }
 
-    $data['body'] = $Parse->run($data[BoardQuery::VIEW_BODY]);
-    switch($this->type)
+    function increment_views()
     {
-      case Base::VIEW_THREAD_SEARCH:
-      case Base::VIEW_THREAD_HISTORY:
-        $data['body'] = "<strong>thread:</strong> <a href=\"/thread/view/{$data[BoardQuery::VIEW_THREAD_ID]}/\">".htmlentities($data[BoardQuery::VIEW_SUBJECT],ENT_QUOTES,'UTF-8')."</a><br/><br/>\n". $data['body'];
-        break;
-
-      case Base::VIEW_THREAD:
-      case Base::VIEW_MESSAGE:
-        $data['quote'] = NON_BREAKING_SPACE.ARROW_RIGHT." <a href=\"javascript:;\" onclick=\"quote_post({$data[BoardQuery::VIEW_ID]})\"\">quote</a>";
+        if (!$this->ajax && $this->type == Base::VIEW_THREAD || $this->type == Base::VIEW_MESSAGE) {
+            $this->DB->query("UPDATE {$this->table} SET views=views+1 WHERE id=$1", array(id(true)));
+        }
     }
 
-    if(session('admin')) $data['admin'] = NON_BREAKING_SPACE.ARROW_RIGHT." <a href=\"/admin/editpost/{$data[BoardQuery::VIEW_ID]}/\">edit</a>";
+    function prep_data($row)
+    {
+        global $Parse;
 
-    // Start Parsing Override
-    $Plugin = new BoardPlugin;
-    $data = $Plugin->view_prep_data($data,$row);
-    // End Parsing Override
+        $data = array_values($row);
+        $data['date'] = date(VIEW_DATE_FORMAT, (int)$data[BoardQuery::VIEW_DATE_POSTED]);
 
-    return $data;
-  }
+        $data['me'] = $data['quote'] = $data['admin'] = "";
+        if (session('id')) {
+            if ($data[BoardQuery::VIEW_CREATOR_ID] == session('id')) {
+                $data['me'] = SPACE . CSS_ME;
+            }
+        }
 
-  function subject($id)
-  {
-    $this->DB->query("SELECT
+        $data['body'] = $Parse->run($data[BoardQuery::VIEW_BODY]);
+        switch ($this->type) {
+            case Base::VIEW_THREAD_SEARCH:
+            case Base::VIEW_THREAD_HISTORY:
+                $data['body'] = "<strong>thread:</strong> <a href=\"/thread/view/{$data[BoardQuery::VIEW_THREAD_ID]}/\">" . htmlentities($data[BoardQuery::VIEW_SUBJECT], ENT_QUOTES, 'UTF-8') . "</a><br/><br/>\n" . $data['body'];
+                break;
+
+            case Base::VIEW_THREAD:
+            case Base::VIEW_MESSAGE:
+                $data['quote'] = NON_BREAKING_SPACE . ARROW_RIGHT . " <a href=\"javascript:;\" onclick=\"quote_post({$data[BoardQuery::VIEW_ID]})\"\">quote</a>";
+        }
+
+        if (session('admin')) {
+            $data['admin'] = NON_BREAKING_SPACE . ARROW_RIGHT . " <a href=\"/admin/editpost/{$data[BoardQuery::VIEW_ID]}/\">edit</a>";
+        } elseif (session('id') && $data[BoardQuery::VIEW_CREATOR_ID] == session('id') && (time() - $data[BoardQuery::VIEW_DATE_POSTED]) < 300) {
+            $data['admin'] = NON_BREAKING_SPACE . ARROW_RIGHT . " <a href=\"/thread/editpost/{$data[BoardQuery::VIEW_ID]}/\">edit</a>";
+        }
+
+      // Start Parsing Override
+        $Plugin = new BoardPlugin();
+        $data = $Plugin->view_prep_data($data, $row);
+      // End Parsing Override
+
+        return $data;
+    }
+
+    function subject($id)
+    {
+        $this->DB->query("SELECT
                   subject,
                   views
                 FROM
                   {$this->table}
                 WHERE
-                  id=$1",array($id));
-    $data = $this->DB->load_array();
-    return htmlentities($data['subject'])." <span class=\"smaller\">($data[views] views)</span>";
-  }
-
-  function thread()
-  {
-    global $Core;
-
-    if(!isset($this->data))
-    {
-      print "No data to display specified.";
-      return;
-    }
-    if(!$this->data) $this->data = array();
-
-    $uncollapsecount = UNCOLLAPSE_COUNT_DEFAULT;
-    if(session('id') && ($this->type == Base::VIEW_THREAD || $this->type == Base::VIEW_MESSAGE) && !$this->ajax)
-    {
-      if (intval(session('uncollapsecount')) >= 1)
-        $uncollapsecount = intval(session('uncollapsecount'));
-
-      if($list = array_keys($Core->list_ignored(session('id')))) $list = implode(",",$list);
-      else
-      $list = "0";
-
-      // minimum number of posts before collapse
-      $mincollapse = is_numeric(session('mincollapse')) ? session('mincollapse') : COLLAPSE_DEFAULT;
-
-      // number of posts to leave open after collapse
-      $collapseopen = is_numeric(session('collapseopen')) ? session('collapseopen') : COLLAPSE_OPEN_DEFAULT;
-      if($collapseopen < 1) $collapseopen = 1;
-
-      // offset collapsing by the number of people ignored
-      $offsetignores = $this->DB->value("SELECT count(*) FROM {$this->table}_post WHERE {$this->table}_id=$1 AND member_id IN ($list)",array(id()));
-
-      $this->collapse($this->DB->value("SELECT COALESCE(last_view_posts,0)-$offsetignores-$collapseopen FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2",array(id(),session('id'))));
-
-      // don't collapse if there aren't new posts or if we are offsetting/limiting
-      if(cmd(3,true) ||
-         cmd(4,true) ||
-         session('nocollapse') ||
-         count($this->data) < $mincollapse ||
-         $this->collapse <= 0) $this->collapse(false);
-
+                  id=$1", array($id));
+        $data = $this->DB->load_array();
+        return htmlentities($data['subject']) . " <span class=\"smaller\">($data[views] views)</span>";
     }
 
-    $i=1;
-    if(cmd(3,true)) $i = abs(cmd(3,true))+1;
-    if(!$this->ajax)
+    function thread()
     {
-      $hidemedia = get('media') ? "true" : "false";
+        global $Core;
 
-      print "<div id=\"view_".id()."\">\n";
-      if($this->collapse && $this->type != Base::VIEW_THREAD_PREVIEW && $this->type != Base::VIEW_MESSAGE_PREVIEW)
-      {
-        $uncollapsecount = min($this->collapse, $uncollapsecount);
-        print "<div class=\"post clear\" id=\"uncollapse\">\n";
-        print "  <ul class=\"postbody odd collapse\">\n";
-        print "    <span id=\"uncollapse_links\">\n";
-        print "     <a id=\"uncollapse_some\" href=\"javascript:;\" onclick=\"uncollapser('{$this->table}',$hidemedia,$uncollapsecount);\">show <span id=\"uncollapse_more_counter\">$uncollapsecount</span> previous posts</a>\n";
-        print "     <span id=\"uncollapse_all\">&raquo; <a href=\"javascript:;\" onclick=\"uncollapser('{$this->table}',$hidemedia,null);\">show all <span id=\"uncollapse_counter\">".($this->collapse)."</span> previous posts</a></span>\n";
-        print "    </span>\n";
-        print "    <span id=\"uncollapse_loading\" style=\"display:none\">loading...</span>\n";
-        print "  </ul>\n";
-        print "</div>\n";
-        $this->data(array_slice($this->data,$this->collapse));
-        $i = $this->collapse+1;
-      }
+        if (!isset($this->data)) {
+            print "No data to display specified.";
+            return;
+        }
+        if (!$this->data) {
+            $this->data = array();
+        }
+
+        $uncollapsecount = UNCOLLAPSE_COUNT_DEFAULT;
+        if (session('id') && ($this->type == Base::VIEW_THREAD || $this->type == Base::VIEW_MESSAGE) && !$this->ajax) {
+            if (intval(session('uncollapsecount')) >= 1) {
+                $uncollapsecount = intval(session('uncollapsecount'));
+            }
+
+            if ($list = array_keys($Core->list_ignored(session('id')))) {
+                $list = implode(",", $list);
+            } else {
+                $list = "0";
+            }
+
+          // minimum number of posts before collapse
+            $mincollapse = is_numeric(session('mincollapse')) ? session('mincollapse') : COLLAPSE_DEFAULT;
+
+          // number of posts to leave open after collapse
+            $collapseopen = is_numeric(session('collapseopen')) ? session('collapseopen') : COLLAPSE_OPEN_DEFAULT;
+            if ($collapseopen < 1) {
+                $collapseopen = 1;
+            }
+
+          // offset collapsing by the number of people ignored
+            $offsetignores = $this->DB->value("SELECT count(*) FROM {$this->table}_post WHERE {$this->table}_id=$1 AND member_id IN ($list)", array(id()));
+
+            $this->collapse($this->DB->value("SELECT COALESCE(last_view_posts,0)-$offsetignores-$collapseopen FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2", array(id(),session('id'))));
+
+          // don't collapse if there aren't new posts or if we are offsetting/limiting
+            if (
+                cmd(3, true) ||
+                cmd(4, true) ||
+                session('nocollapse') ||
+                count($this->data) < $mincollapse ||
+                $this->collapse <= 0
+            ) {
+                $this->collapse(false);
+            }
+        }
+
+        $i = 1;
+        if (cmd(3, true)) {
+            $i = abs(cmd(3, true)) + 1;
+        }
+        if (!$this->ajax) {
+            $hidemedia = get('media') ? "true" : "false";
+
+            print "<div id=\"view_" . id() . "\">\n";
+            if ($this->collapse && $this->type != Base::VIEW_THREAD_PREVIEW && $this->type != Base::VIEW_MESSAGE_PREVIEW) {
+                $uncollapsecount = min($this->collapse, $uncollapsecount);
+                print "<div class=\"post clear\" id=\"uncollapse\">\n";
+                print "  <ul class=\"postbody odd collapse\">\n";
+                print "    <span id=\"uncollapse_links\">\n";
+                print "     <a id=\"uncollapse_some\" href=\"javascript:;\" onclick=\"uncollapser('{$this->table}',$hidemedia,$uncollapsecount);\">show <span id=\"uncollapse_more_counter\">$uncollapsecount</span> previous posts</a>\n";
+                print "     <span id=\"uncollapse_all\">&raquo; <a href=\"javascript:;\" onclick=\"uncollapser('{$this->table}',$hidemedia,null);\">show all <span id=\"uncollapse_counter\">" . ($this->collapse) . "</span> previous posts</a></span>\n";
+                print "    </span>\n";
+                print "    <span id=\"uncollapse_loading\" style=\"display:none\">loading...</span>\n";
+                print "  </ul>\n";
+                print "</div>\n";
+                $this->data(array_slice($this->data, $this->collapse));
+                $i = $this->collapse + 1;
+            }
+        }
+
+        foreach ($this->data as $row) {
+            $field = $this->prep_data($row);
+            $count = "#{$i}";
+            if (session('nopostnumber')) {
+                $count = "";
+            }
+            print "<div id=\"view_" . id() . "_{$field[BoardQuery::VIEW_ID]}_{$i}\" class=\"post\">\n";
+            print "<ul class=\"view\" id=\"post_{$field[BoardQuery::VIEW_ID]}\">\n";
+            print "  <li class=\"info even$field[me]\">\n";
+            print "    <div class=\"postinfo\">" . $Core->member_link($field[BoardQuery::VIEW_CREATOR_NAME]) . " posted this on $field[date]</div>\n";
+            print "    <div class=\"controls\">$field[quote]$field[admin]</div>\n";
+            print "    <div class=\"count\"><a href=\"#{$i}\" name=\"$i\">{$count}</a></div>\n";
+            print "    <div class=\"clear\"></div>\n";
+            print "  </li>\n";
+            print "  <li class=\"postbody odd\">\n";
+            print $field['body'];
+            print "  </li>\n";
+            print "</ul>\n";
+            print "</div>\n";
+            $i++;
+        }
+        if (!$this->ajax) {
+            if (!count($this->data)) {
+                print "<div class=\"post\"><ul class=\"view\"><li class=\"odd\" id=\"noresults\">" . NO_RESULTS . "</li></ul></div>\n";
+            }
+            print "</div>\n";
+        }
     }
 
-    foreach($this->data as $row)
+    function thread_xml()
     {
-      $field = $this->prep_data($row);
-      $count = "#{$i}";
-      if(session('nopostnumber')) $count = "";
-      print "<div id=\"view_".id()."_{$field[BoardQuery::VIEW_ID]}_{$i}\" class=\"post\">\n";
-      print "<ul class=\"view\" id=\"post_{$field[BoardQuery::VIEW_ID]}\">\n";
-      print "  <li class=\"info even$field[me]\">\n";
-      print "    <div class=\"postinfo\">".$Core->member_link($field[BoardQuery::VIEW_CREATOR_NAME])." posted this on $field[date]</div>\n";
-      print "    <div class=\"controls\">$field[quote]$field[admin]</div>\n";
-      print "    <div class=\"count\"><a href=\"#{$i}\" name=\"$i\">{$count}</a></div>\n";
-      print "    <div class=\"clear\"></div>\n";
-      print "  </li>\n";
-      print "  <li class=\"postbody odd\">\n";
-      print $field['body'];
-      print "  </li>\n";
-      print "</ul>\n";
-      print "</div>\n";
-      $i++;
+        global $Core;
+
+        if (!isset($this->data)) {
+            print "No data to display specified.";
+            return;
+        }
+        if (!$this->data) {
+            $this->data = array();
+        }
+
+        if (session('id') && ($this->type == Base::VIEW_THREAD || $this->type == Base::VIEW_MESSAGE) && !$this->ajax) {
+            if ($list = array_keys($Core->list_ignored(session('id')))) {
+                $list = implode(",", $list);
+            } else {
+                $list = "0";
+            }
+
+          // minimum number of posts before collapse
+          #$mincollapse = is_numeric(session('mincollapse')) ? session('mincollapse') : COLLAPSE_DEFAULT;
+
+          // number of posts to leave open after collapse
+          #$collapseopen = is_numeric(session('collapseopen')) ? session('collapseopen') : COLLAPSE_OPEN_DEFAULT;
+          #if($collapseopen < 1) $collapseopen = 1;
+
+          // offset collapsing by the number of people ignored
+          #$offsetignores = $this->DB->value("SELECT count(*) FROM {$this->table}_post WHERE {$this->table}_id=$1 AND member_id IN ($list)",array(id()));
+
+          #$this->collapse($this->DB->value("SELECT COALESCE(last_view_posts,0)-$offsetignores-$collapseopen FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2",array(id(),session('id'))));
+
+          // don't collapse if there aren't new posts or if we are offsetting/limiting
+          #if(cmd(3,true) ||
+          #   cmd(4,true) ||
+          #   session('nocollapse') ||
+          #   count($this->data) < $mincollapse ||
+          #   $this->collapse <= 0) $this->collapse(false);
+        }
+
+        $i = 1;
+        if (cmd(3, true)) {
+            $i = cmd(3, true) + 1;
+        }
+
+        if (!$this->ajax) {
+            $hidemedia = get('media') ? "true" : "false";
+
+          #print "<div id=\"view_".id()."\">\n";
+            if ($this->collapse && $this->type != Base::VIEW_THREAD_PREVIEW && $this->type != Base::VIEW_MESSAGE_PREVIEW) {
+                print "<div class=\"post clear\" id=\"uncollapse\">\n";
+                print "  <ul class=\"postbody odd collapse\">\n";
+                print "    <a href=\"javascript:;\" onclick=\"uncollapse('{$this->table}',$this->collapse,$hidemedia,this);\">show read (" . ($this->collapse) . " posts)</a>\n";
+                print "  </ul>\n";
+                print "</div>\n";
+                $this->data(array_slice($this->data, $this->collapse));
+                $i = $this->collapse + 1;
+            }
+        } // End thread_xml
+
+        foreach ($this->data as $row) {
+            $field = $this->prep_data($row);
+            $count = "#{$i}";
+          #if(session('nopostnumber')) $count = "";
+            print "<post number=\"$i\">";
+            print "<id>{$field[BoardQuery::VIEW_ID]}</id>\n";
+            print "<member>{$field[BoardQuery::VIEW_CREATOR_NAME]}</member>\n";
+            print "<date>{$field['date']}</date>\n";
+            print "<body>{$field['body']}</body>\n";
+            print "</post>\n";
+          #print "<ul class=\"view\" id=\"post_{$field[VIEW_ID]}\">\n";
+          #print "  <li class=\"info even$field[me]\">\n";
+          #print "    <div class=\"postinfo\">".$Core->member_link($field[VIEW_CREATOR_NAME])." posted this on $field[date]</div>\n";
+          #print "    <div class=\"controls\">$field[quote]$field[admin]</div>\n";
+          #print "    <div class=\"count\"><a href=\"#{$i}\" name=\"$i\">{$count}</a></div>\n";
+          #print "    <div class=\"clear\"></div>\n";
+          #print "  </li>\n";
+          #print "  <li class=\"postbody odd\">\n";
+          #print $field['body'];
+          #print "  </li>\n";
+          #print "</ul>\n";
+          #print "</div>\n";
+            $i++;
+        }
+        if (!$this->ajax) {
+            if (!count($this->data)) {
+                print "<div class=\"post\"><ul class=\"view\"><li class=\"odd\" id=\"noresults\">" . NO_RESULTS . "</li></ul></div>\n";
+            }
+          #print "</div>\n";
+        }
     }
-    if(!$this->ajax)
+
+    function message()
     {
-      if(!count($this->data))
-      {
-        print "<div class=\"post\"><ul class=\"view\"><li class=\"odd\" id=\"noresults\">".NO_RESULTS."</li></ul></div>\n";
-      }
-      print "</div>\n";
-    }
-  }
-
-  function thread_xml()
-  {
-    global $Core;
-
-    if(!isset($this->data))
-    {
-      print "No data to display specified.";
-      return;
-    }
-    if(!$this->data) $this->data = array();
-
-    if(session('id') && ($this->type == Base::VIEW_THREAD || $this->type == Base::VIEW_MESSAGE) && !$this->ajax)
-    {
-      if($list = array_keys($Core->list_ignored(session('id')))) $list = implode(",",$list);
-      else
-      $list = "0";
-
-      // minimum number of posts before collapse
-      #$mincollapse = is_numeric(session('mincollapse')) ? session('mincollapse') : COLLAPSE_DEFAULT;
-
-      // number of posts to leave open after collapse
-      #$collapseopen = is_numeric(session('collapseopen')) ? session('collapseopen') : COLLAPSE_OPEN_DEFAULT;
-      #if($collapseopen < 1) $collapseopen = 1;
-
-      // offset collapsing by the number of people ignored
-      #$offsetignores = $this->DB->value("SELECT count(*) FROM {$this->table}_post WHERE {$this->table}_id=$1 AND member_id IN ($list)",array(id()));
-
-      #$this->collapse($this->DB->value("SELECT COALESCE(last_view_posts,0)-$offsetignores-$collapseopen FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2",array(id(),session('id'))));
-
-      // don't collapse if there aren't new posts or if we are offsetting/limiting
-      #if(cmd(3,true) ||
-      #   cmd(4,true) ||
-      #   session('nocollapse') ||
-      #   count($this->data) < $mincollapse ||
-      #   $this->collapse <= 0) $this->collapse(false);
+        $this->thread();
     }
 
-    $i=1;
-    if(cmd(3,true)) $i = cmd(3,true)+1;
-
-    if(!$this->ajax)
+    function member_update()
     {
-      $hidemedia = get('media') ? "true" : "false";
+        if (!session('id')) {
+            return;
+        }
 
-      #print "<div id=\"view_".id()."\">\n";
-      if($this->collapse && $this->type != Base::VIEW_THREAD_PREVIEW && $this->type != Base::VIEW_MESSAGE_PREVIEW)
-      {
-        print "<div class=\"post clear\" id=\"uncollapse\">\n";
-        print "  <ul class=\"postbody odd collapse\">\n";
-        print "    <a href=\"javascript:;\" onclick=\"uncollapse('{$this->table}',$this->collapse,$hidemedia,this);\">show read (".($this->collapse)." posts)</a>\n";
-        print "  </ul>\n";
-        print "</div>\n";
-        $this->data(array_slice($this->data,$this->collapse));
-        $i = $this->collapse+1;
-      }
-    } // End thread_xml
-
-    foreach($this->data as $row)
-    {
-      $field = $this->prep_data($row);
-      $count = "#{$i}";
-      #if(session('nopostnumber')) $count = "";
-      print "<post number=\"$i\">";
-      print "<id>{$field[BoardQuery::VIEW_ID]}</id>\n";
-      print "<member>{$field[BoardQuery::VIEW_CREATOR_NAME]}</member>\n";
-      print "<date>{$field['date']}</date>\n";
-      print "<body>{$field['body']}</body>\n";
-      print "</post>\n";
-      #print "<ul class=\"view\" id=\"post_{$field[VIEW_ID]}\">\n";
-      #print "  <li class=\"info even$field[me]\">\n";
-      #print "    <div class=\"postinfo\">".$Core->member_link($field[VIEW_CREATOR_NAME])." posted this on $field[date]</div>\n";
-      #print "    <div class=\"controls\">$field[quote]$field[admin]</div>\n";
-      #print "    <div class=\"count\"><a href=\"#{$i}\" name=\"$i\">{$count}</a></div>\n";
-      #print "    <div class=\"clear\"></div>\n";
-      #print "  </li>\n";
-      #print "  <li class=\"postbody odd\">\n";
-      #print $field['body'];
-      #print "  </li>\n";
-      #print "</ul>\n";
-      #print "</div>\n";
-      $i++;
-    }
-    if(!$this->ajax)
-    {
-      if(!count($this->data))
-      {
-        print "<div class=\"post\"><ul class=\"view\"><li class=\"odd\" id=\"noresults\">".NO_RESULTS."</li></ul></div>\n";
-      }
-      #print "</div>\n";
-    }
-  }
-
-  function message() { $this->thread(); }
-
-  function member_update()
-  {
-    if(!session('id')) return;
-
-    if($this->DB->check("SELECT member_id FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2",array(id(),session('id'))))
-    {
-/*
-      if($this->type == VIEW_MESSAGE)
-      {
-        print "number of posts on last view (cached): ".$this->DB->value("SELECT last_view_posts FROM {$this->table}_member WHERE message_id=$1",array(id()))."<br/>\n";
-        print "total number of posts total (cached): ".$this->DB->value("SELECT posts FROM {$this->table} WHERE id=$1",array(id()))."<br/>\n";
-        print "total number of posts with actual count: ".$this->DB->value("SELECT count(*) FROM {$this->table}_post WHERE message_id=$1",array(id()));
-      }
-*/
-      $this->DB->query("UPDATE
+        if ($this->DB->check("SELECT member_id FROM {$this->table}_member WHERE {$this->table}_id=$1 AND member_id=$2", array(id(),session('id')))) {
+    /*
+          if($this->type == VIEW_MESSAGE)
+          {
+            print "number of posts on last view (cached): ".$this->DB->value("SELECT last_view_posts FROM {$this->table}_member WHERE message_id=$1",array(id()))."<br/>\n";
+            print "total number of posts total (cached): ".$this->DB->value("SELECT posts FROM {$this->table} WHERE id=$1",array(id()))."<br/>\n";
+            print "total number of posts with actual count: ".$this->DB->value("SELECT count(*) FROM {$this->table}_post WHERE message_id=$1",array(id()));
+          }
+    */
+            $this->DB->query("UPDATE
                     {$this->table}_member
                   SET
-                    last_view_posts=(SELECT posts FROM {$this->table} WHERE id=".id().")
+                    last_view_posts=(SELECT posts FROM {$this->table} WHERE id=" . id() . ")
                   WHERE
                     {$this->table}_id=$1
                   AND
-                    member_id=$2",array(id(),session('id')));
-
-    }
-    else
-    if($this->type != Base::VIEW_MESSAGE)
-    {
-      $this->DB->query("INSERT INTO
+                    member_id=$2", array(id(),session('id')));
+        } elseif ($this->type != Base::VIEW_MESSAGE) {
+            $this->DB->query("INSERT INTO
                     {$this->table}_member ({$this->table}_id,member_id,last_view_posts)
                   VALUES
-                    ($1,$2,(SELECT posts FROM {$this->table} WHERE id=$1))",array(id(),session('id')));
+                    ($1,$2,(SELECT posts FROM {$this->table} WHERE id=$1))", array(id(),session('id')));
+        }
     }
-  }
 }

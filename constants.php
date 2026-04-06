@@ -16,7 +16,8 @@ if (!defined('ADMIN_EMAIL')) {
 }
 
 if (!defined('DB')) {
-  define("DB", $_ENV['DB'] ?? "host={$_ENV['DB_HOST']} dbname={$_ENV['DB_NAME']} user={$_ENV['DB_USER']} password={$_ENV['DB_PASS']} sslmode={$_ENV['DB_SSL_MODE']}");
+  $sslMode = !empty($_ENV['DB_SSL_MODE']) ? " sslmode={$_ENV['DB_SSL_MODE']}" : "";
+  define("DB", $_ENV['DB'] ?? "host={$_ENV['DB_HOST']} dbname={$_ENV['DB_NAME']} user={$_ENV['DB_USER']} password={$_ENV['DB_PASS']}{$sslMode}");
 }
 
 if (!defined('DIR')) {
@@ -109,5 +110,9 @@ if (!defined('LIST_DATE_FORMAT')) {
 
 if (!defined('FORM_SALT')) {
   define("FORM_SALT", $_ENV['FORM_SALT'] ?? "aksjdsa9*^&*@&(@*22@*1");
+}
+
+if (!defined('DEBUG_MODE')) {
+  define("DEBUG_MODE", filter_var($_ENV['DEBUG_MODE'] ?? false, FILTER_VALIDATE_BOOLEAN));
 }
 
