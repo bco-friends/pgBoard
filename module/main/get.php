@@ -110,12 +110,17 @@ function status_get()
 
     $DB->query("SELECT
                 count(*) as num,
-                (SELECT subject FROM thread WHERE id=f.thread_id) as subject,
+                t.subject,
                 f.thread_id as id
               FROM
                 favorite f
+                JOIN thread t ON t.id = f.thread_id
+                JOIN member m ON m.id = f.member_id
+              WHERE
+                t.date_last_posted >= now() - INTERVAL '1 year'
+                AND m.banned IS NOT TRUE
               GROUP BY
-                f.thread_id
+                f.thread_id, t.subject
               ORDER BY num DESC
               LIMIT 25");
 
