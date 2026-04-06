@@ -273,7 +273,7 @@ class BoardCore
 
     function lurking_member_count()
     {
-        return $this->DB->value("SELECT count(id) FROM member WHERE last_post < now()-INTERVAL '3 day' AND last_view BETWEEN now() - INTERVAL '5 minutes' AND now()");
+        return $this->DB->value("SELECT count(id) FROM member WHERE last_post < now()-INTERVAL '1 year' AND last_view BETWEEN now() - INTERVAL '5 minutes' AND now()");
     }
 
     function active_members()
