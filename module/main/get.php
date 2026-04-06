@@ -156,9 +156,11 @@ function status_get()
                 member m
               WHERE
                 banned IS true
+              AND
+                  last_view >= now() - INTERVAL '1 year'
               ORDER BY
-                m.name");
-    print "<br/><br/><strong>banished members:</strong><br/><br/>";
+                m.last_post DESC");
+    print "<br/><br/><strong>recently banished members:</strong><br/><br/>";
     print "<ol style=\"padding-left:30px\">\n";
     while ($row = $DB->load_array()) {
         print "  <li>" . $Core->member_link($row['name']) . "</li>\n";
