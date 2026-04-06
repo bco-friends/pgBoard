@@ -296,7 +296,7 @@ class BoardCore
 
     function lurking_members()
     {
-        $this->DB->query("SELECT id,name FROM member WHERE last_post < now()-INTERVAL '3 day' AND last_view BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
+        $this->DB->query("SELECT id,name FROM member WHERE last_post < now()-INTERVAL '1 year' AND last_view BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
         return $this->DB->load_all_key();
     }
 
