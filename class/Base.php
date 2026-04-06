@@ -133,11 +133,24 @@ class Base
         print "  <h3 class=\"title\">$this->title</h3>\n";
         $Security->auth_control();
         if (!$this->subtitle && $this->type != self::ERROR) {
+            $postingCount = $Core->posting_member_count();
+            $lurkingCount = $Core->lurking_member_count();
+            $chattingCount = $Core->chatting_member_count();
+
             $subtitle = "<a href=\"/\">" . number_format($Core->thread_count()) . " threads</a> " . ARROW_RIGHT . SPACE;
             $subtitle .= "<a href=\"/main/status/\">" . number_format($Core->active_member_count()) . " active members, ";
-            $subtitle .= number_format($Core->posting_member_count()) . " of which are posting, ";
-            $subtitle .= number_format($Core->lurking_member_count()) . " of which are lurking, ";
-            $subtitle .= number_format($Core->chatting_member_count()) . " of which are chatting</a>";
+            $subtitle .= number_format($postingCount) . " of which are posting";
+
+            if ($lurkingCount) {
+                $subtitle .= ', '.number_format($Core->lurking_member_count()) . " of which are lurking";
+            }
+
+            if ($chattingCount) {
+                $subtitle .= ', '.number_format($Core->chatting_member_count()) . " of which are chatting";
+            }
+
+            $subtitle .= '</a>';
+
             $this->subtitle($subtitle);
         }
         print "  <div class=\"subtitle\">\n";
