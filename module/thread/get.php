@@ -153,10 +153,28 @@ function view_get()
 
 function firstpost_get()
 {
-  global $DB,$Parse;
+  global $DB,$Parse,$Core;
   if(!id()) return;
-  $body = $DB->value("SELECT body FROM thread_post WHERE thread_id=$1 ORDER BY date_posted LIMIT 1",array(id()));
-  print $Parse->run($body);
+  $DB->query("SELECT tp.id, tp.body, tp.date_posted, m.name FROM thread_post tp LEFT JOIN member m ON m.id=tp.member_id WHERE tp.thread_id=$1 ORDER BY tp.date_posted LIMIT 1",array(id()));
+  $first = $DB->load_array();
+  $DB->query("SELECT tp.id, tp.body, tp.date_posted, m.name FROM thread_post tp LEFT JOIN member m ON m.id=tp.member_id WHERE tp.thread_id=$1 ORDER BY tp.date_posted DESC LIMIT 1",array(id()));
+  $latest = $DB->load_array();
+  _firstpost_render($first, FIRST_POST, $Parse, $Core);
+  if($first['id'] !== $latest['id'])
+  {
+    print "<br />\n";
+    _firstpost_render($latest, LATEST_POST, $Parse, $Core);
+  }
+}
+
+function _firstpost_render($post, $label, $Parse, $Core)
+{
+  $date = date(VIEW_DATE_FORMAT, strtotime($post['date_posted']));
+  $name = $Core->member_link($post['name']);
+  print "<ul class=\"view\">\n";
+  print "  <li class=\"info even\"><div class=\"postinfo\"><strong>$label</strong> $name posted this on $date</div><div class=\"clear\"></div></li>\n";
+  print "  <li class=\"postbody odd\">".$Parse->run($post['body'])."</li>\n";
+  print "</ul>\n";
 }
 
 function viewpost_get()

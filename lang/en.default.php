@@ -7,6 +7,8 @@ define("SPACE"," ");
 define("NON_BREAKING_SPACE","&nbsp;");
 define("STICKY_TEXT","<strong>Sticky:</strong>");
 define("ARROW_RIGHT","&raquo;"); // if changed must fix core.js to match
+define("FIRST_POST","First post:");
+define("LATEST_POST","Latest post:");
 define("ARROW_LEFT","&laquo;");  // if changed must fix core.js to match
 define("ERROR_MEMBER_NAME","Your name must be between 3 and 15 characters.  Letters, numbers, underscores and hypens are allowed.");
 define("ERROR_MEMBER_NAME_INUSE","That name is already in use.");
