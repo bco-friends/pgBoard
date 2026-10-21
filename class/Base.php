@@ -142,11 +142,11 @@ class Base
             $subtitle .= number_format($postingCount) . " of which are posting";
 
             if ($lurkingCount) {
-                $subtitle .= ', '.number_format($Core->lurking_member_count()) . " of which are lurking";
+                $subtitle .= ', ' . number_format($Core->lurking_member_count()) . " of which are lurking";
             }
 
             if ($chattingCount) {
-                $subtitle .= ', '.number_format($Core->chatting_member_count()) . " of which are chatting";
+                $subtitle .= ', ' . number_format($Core->chatting_member_count()) . " of which are chatting";
             }
 
             $subtitle .= '</a>';
