@@ -1,5 +1,5 @@
 .DEFAULT: help
-.PHONY: start stop build-up rebuild php-shell phpcs
+.PHONY: start stop build-up rebuild php-shell php-version phpcs
 
 # Outputs list of available commands.
 help:
@@ -8,6 +8,7 @@ help:
 	"\n" stop: "\t\t" Stop the Docker container \
 	"\n" rebuild: "\t" Stop, rebuild, and restart the Docker container \
 	"\n" php-shell: "\t" Open a shell session into the PHP container \
+	"\n" php-version: "\t" Show PHP and Composer versions in the container \
 	"\n" db-seed: "\t" Seed the database with sample data. \
 	"\n" phpcs: "\t\t" Run PHP CodeSniffer. \
 
@@ -19,9 +20,9 @@ start:
 stop:
 	docker compose down
 
-# Builds the Docker container and starts it.
+# Builds the Docker container, refreshing base images, and starts it.
 build-up:
-	docker compose up --build -d
+	docker compose up --build --pull always -d
 
 composer-init:
 	docker exec -it pgboard_web /usr/bin/composer install
@@ -40,6 +41,11 @@ init-files:
 
 # Stops the Docker container if it's running, the rebuilds and restarts it.
 rebuild: stop build-up
+
+# Prints the PHP and Composer versions installed in the PHP container.
+php-version:
+	docker exec pgboard_web php -v
+	docker exec pgboard_web composer --version
 
 # Opens a Bash session within the PHP container.
 php-shell:
