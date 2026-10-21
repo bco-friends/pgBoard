@@ -25,6 +25,9 @@
         "symfony/dotenv": "^7.0"
     },
     "config": {
+        "platform": {
+            "php": "8.5"
+        },
         "sort-packages": true
     }
 }

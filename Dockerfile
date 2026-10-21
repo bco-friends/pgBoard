@@ -2,7 +2,7 @@ FROM php:8.5-fpm
 
 ARG INSTALL_XDEBUG=false
 
-COPY --from=composer /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Install dependencies
 RUN apt-get update && apt-get install -y --allow-unauthenticated \

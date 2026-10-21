@@ -1,7 +1,7 @@
 services:
   composer:
     container_name: boardcrewcial_composer
-    image: composer:latest
+    image: composer:2
     volumes:
       - ./:/var/www/html
     working_dir: /var/www/html
