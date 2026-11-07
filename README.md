@@ -6,7 +6,7 @@ A minimalist forum system that supports threads, posts, private messages, member
 
 * nginx
 * PHP 8.5
-* PostgreSQL 14.4x
+* PostgreSQL 17
 * Sphinx 3.1.1
 
 ## Caveats
