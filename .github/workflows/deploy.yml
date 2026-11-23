@@ -77,6 +77,7 @@ jobs:
             --exclude='.example.env' \
             --exclude='*.default.php' \
             --exclude='docker-compose.yml' \
+            --exclude='vendor/' \
             `# Production-specific assets (don't overwrite)` \
             --exclude='lib/gif/partyshark.gif' \
             --exclude='favicon.ico' \
@@ -97,11 +98,16 @@ jobs:
           ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} << 'EOF'
             cd /var/www/boardcrewcial
 
-            echo "Building Docker images (pulls latest base images)..."
-            docker compose -f docker-compose.prod.yml build --pull
+            echo "Pulling latest composer image (build --pull does not cover it)..."
+            docker compose -f docker-compose.prod.yml pull composer
+
+            echo "Building Docker images (pulls latest base images, skips layer cache so apt packages refresh)..."
+            docker compose -f docker-compose.prod.yml build --pull --no-cache
 
             echo "Starting containers with new images..."
-            docker compose -f docker-compose.prod.yml up -d
+            docker compose -f docker-compose.prod.yml up -d composer sphinx
+            # Bind-mounted nginx config is replaced by rsync (new inode); recreate web once to pick it up
+            docker compose -f docker-compose.prod.yml up -d --force-recreate web
 
             echo "Checking container status after restart..."
             docker ps -a | grep boardcrewcial || echo "No boardcrewcial containers found"

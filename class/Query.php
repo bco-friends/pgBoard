@@ -1,8 +1,9 @@
 <?php
+
 /**
 * Builds SQL queries for board usage
 *
-* @classDescription	This class builds SQL queries.
+* @classDescription This class builds SQL queries.
 * @return {SQL}
 * @type {Object}
 * @constructor
@@ -12,78 +13,77 @@ class BoardQuery
   /**
   * list_query constants
   **/
-  public const LIST_ID = 0;
-  public const LIST_DATE_LAST_POST = 1;
-  public const LIST_CREATOR_ID = 2;
-  public const LIST_CREATOR_NAME = 3;
-  public const LIST_LAST_POSTER_ID = 4;
-  public const LIST_LAST_POSTER_NAME = 5;
-  public const LIST_SUBJECT = 6;
-  public const LIST_POSTS = 7;
-  public const LIST_VIEWS = 8;
-  public const LIST_FIRSTPOST_BODY = 9;
-  public const LIST_LAST_VIEW_POSTS = 10;
-  public const LIST_DOTFLAG = 11;
-  public const LIST_STICKY = 12;
-  public const LIST_LOCKED = 13;
-  public const LIST_LEGENDARY = 14;
+    public const LIST_ID = 0;
+    public const LIST_DATE_LAST_POST = 1;
+    public const LIST_CREATOR_ID = 2;
+    public const LIST_CREATOR_NAME = 3;
+    public const LIST_LAST_POSTER_ID = 4;
+    public const LIST_LAST_POSTER_NAME = 5;
+    public const LIST_SUBJECT = 6;
+    public const LIST_POSTS = 7;
+    public const LIST_VIEWS = 8;
+    public const LIST_FIRSTPOST_BODY = 9;
+    public const LIST_LAST_VIEW_POSTS = 10;
+    public const LIST_DOTFLAG = 11;
+    public const LIST_STICKY = 12;
+    public const LIST_LOCKED = 13;
+    public const LIST_LEGENDARY = 14;
 
   /**
   * view_query constants
   **/
-  public const VIEW_ID = 0;
-  public const VIEW_DATE_POSTED = 1;
-  public const VIEW_CREATOR_ID = 2;
-  public const VIEW_CREATOR_NAME = 3;
-  public const VIEW_BODY = 4;
-  public const VIEW_CREATOR_IP = 5;
-  public const VIEW_SUBJECT = 6;
-  public const VIEW_THREAD_ID = 7;
-  public const VIEW_CREATOR_IS_ADMIN = 8;
+    public const VIEW_ID = 0;
+    public const VIEW_DATE_POSTED = 1;
+    public const VIEW_CREATOR_ID = 2;
+    public const VIEW_CREATOR_NAME = 3;
+    public const VIEW_BODY = 4;
+    public const VIEW_CREATOR_IP = 5;
+    public const VIEW_SUBJECT = 6;
+    public const VIEW_THREAD_ID = 7;
+    public const VIEW_CREATOR_IS_ADMIN = 8;
 
   /**
   * build thread listing query
   */
-  function list_thread($offset, $limit, $sticky = false, $threads = false, $cond = false, $ignore_threads = true)
-  {
-    global $Core;
-
-    // set query conditionals
-    $where = "WHERE t.sticky IS false";
-    $order = "ORDER BY t.date_last_posted DESC";
-    $offset = $this->list_offset($offset);
-    $limit = $this->list_limit($limit);
-    $ignore = "";
-
-    if(session('id'))
-    if($list = array_keys($Core->list_ignored(session('id'))))
+    function list_thread($offset, $limit, $sticky = false, $threads = false, $cond = false, $ignore_threads = true)
     {
-      $list = implode(",",$list);
-      $ignore = "AND m.id NOT IN ($list)";
-    }
-    if ($ignore_threads)
-    {
-      $ignore .= " AND tm.ignore IS NOT TRUE";
-    }
+        global $Core;
 
-    // set query conditionals for stickies only
-    if($sticky)
-    {
-      $where = "WHERE t.sticky IS true";
-      $offset = $limit = "";
-    }
+      // set query conditionals
+        $where = "WHERE t.sticky IS false";
+        $order = "ORDER BY t.date_last_posted DESC";
+        $offset = $this->list_offset($offset);
+        $limit = $this->list_limit($limit);
+        $ignore = "";
 
-    // set query conditionals if an array of threads are defined
-    if($threads)
-    {
-      $threads = implode(",",$threads);
-      $where = "WHERE t.id in ($threads)";
-      $order = "ORDER BY indexOf(t.id,ARRAY[$threads])";
-    }
+        if (session('id')) {
+            if ($list = array_keys($Core->list_ignored(session('id')))) {
+                $list = implode(",", $list);
+                $ignore = "AND m.id NOT IN ($list)";
+            }
+        }
+        if ($ignore_threads) {
+            $ignore .= " AND tm.ignore IS NOT TRUE";
+        }
 
-    if($cond) $where = $cond;
+      // set query conditionals for stickies only
+        if ($sticky) {
+            $where = "WHERE t.sticky IS true";
+            $offset = $limit = "";
+        }
 
-    return "SELECT
+      // set query conditionals if an array of threads are defined
+        if ($threads) {
+            $threads = implode(",", $threads);
+            $where = "WHERE t.id in ($threads)";
+            $order = "ORDER BY indexOf(t.id,ARRAY[$threads])";
+        }
+
+        if ($cond) {
+            $where = $cond;
+        }
+
+        return "SELECT
               t.id as thread,
               extract(epoch from t.date_last_posted) as date_last_posted,
               m.id,
@@ -116,69 +116,65 @@ class BoardQuery
             LEFT OUTER JOIN
               thread_member tm
             ON
-              (tm.member_id=".(session('id')?session('id'):0)." AND tm.thread_id=t.id)
+              (tm.member_id=" . (session('id') ? session('id') : 0) . " AND tm.thread_id=t.id)
             $where
             $ignore
             $order
             $limit
             $offset";
-  }
-  function list_thread_bymember($member_id,$offset,$limit)
-  {
-    $cond = "WHERE t.member_id=$member_id";
-    return $this->list_thread($offset, $limit, false, [], $cond);
-  }
+    }
+    function list_thread_bymember($member_id, $offset, $limit)
+    {
+        $cond = "WHERE t.member_id=$member_id";
+        return $this->list_thread($offset, $limit, false, [], $cond);
+    }
 
   /**
   * build thread view query
   */
-  function view_thread($offset, $limit, $thread = false, $posts = false, $cond = false)
-  {
-    global $Core;
-
-    // set query conditionals
-    $where = "WHERE tp.thread_id=$thread";
-    $order = "ORDER BY tp.date_posted ASC";
-    $ignore = "";
-
-    if(session('id'))
-    if($list = array_keys($Core->list_ignored(session('id'))))
+    function view_thread($offset, $limit, $thread = false, $posts = false, $cond = false)
     {
-      $list = implode(",",$list);
-      $ignore = "AND m.id NOT IN ($list)";
-    }
+        global $Core;
 
-    // sort of hack clean this up (support posting histories)
-    if($cond)
-    {
-      $offset = "OFFSET ".($offset?$offset:0)*LIST_DEFAULT_LIMIT;
-      $limit = "LIMIT ".LIST_DEFAULT_LIMIT;
-    }
-    else
-    {
-      // This is sort of a hack, but I'm not sure the normal case is actually
-      // useful or expected here (multiplying by some scale).
-      if (substr($offset,0,1) === '-')
-        $offset = 'OFFSET ' . strval(-intval($offset));
-      else
-        $offset = $this->view_offset($offset);
-      $limit = $this->view_limit($limit);
-    }
+      // set query conditionals
+        $where = "WHERE tp.thread_id=$thread";
+        $order = "ORDER BY tp.date_posted ASC";
+        $ignore = "";
 
-    // set query conditionals if an array of posts are defined
-    if($posts)
-    {
-      $posts = implode(",",$posts);
-      $where = "WHERE tp.id in ($posts)";
-      $order = "ORDER BY indexOf(tp.id,ARRAY[$posts])";
-    }
-    if($cond)
-    {
-      $where = $cond;
-      $order = "ORDER BY tp.date_posted DESC";
-    }
+        if (session('id')) {
+            if ($list = array_keys($Core->list_ignored(session('id')))) {
+                $list = implode(",", $list);
+                $ignore = "AND m.id NOT IN ($list)";
+            }
+        }
 
-    return "SELECT
+      // sort of hack clean this up (support posting histories)
+        if ($cond) {
+            $offset = "OFFSET " . ($offset ? $offset : 0) * LIST_DEFAULT_LIMIT;
+            $limit = "LIMIT " . LIST_DEFAULT_LIMIT;
+        } else {
+          // This is sort of a hack, but I'm not sure the normal case is actually
+          // useful or expected here (multiplying by some scale).
+            if (substr($offset, 0, 1) === '-') {
+                $offset = 'OFFSET ' . strval(-intval($offset));
+            } else {
+                $offset = $this->view_offset($offset);
+            }
+            $limit = $this->view_limit($limit);
+        }
+
+      // set query conditionals if an array of posts are defined
+        if ($posts) {
+            $posts = implode(",", $posts);
+            $where = "WHERE tp.id in ($posts)";
+            $order = "ORDER BY indexOf(tp.id,ARRAY[$posts])";
+        }
+        if ($cond) {
+            $where = $cond;
+            $order = "ORDER BY tp.date_posted DESC";
+        }
+
+        return "SELECT
               tp.id,
               extract(epoch from tp.date_posted) as date_posted,
               m.id as member_id,
@@ -203,45 +199,44 @@ class BoardQuery
             $order
             $limit
             $offset";
-  }
-  function view_thread_bymember($member_id,$offset,$limit)
-  {
-    $cond = "WHERE tp.member_id=$member_id";
-    return $this->view_thread($offset, $limit, false, false, $cond);
-  }
+    }
+    function view_thread_bymember($member_id, $offset, $limit)
+    {
+        $cond = "WHERE tp.member_id=$member_id";
+        return $this->view_thread($offset, $limit, false, false, $cond);
+    }
 
   /**
   * build message list query
   */
-  function list_message($offset,$limit,$messages=false)
-  {
-    global $Core;
-
-    // set query conditionals
-    $where = "WHERE";
-    $order = "ORDER BY m.date_last_posted DESC";
-    $offset = $this->list_offset($offset);
-    $limit = $this->list_limit($limit);
-    $ignore = "";
-
-/*
-    if(session('id'))
-    if($list = array_keys($Core->list_ignored(session('id'))))
+    function list_message($offset, $limit, $messages = false)
     {
-      $list = implode(",",$list);
-      $ignore = "AND mem.id NOT IN ($list)";
-    }
-*/
+        global $Core;
 
-    // set query conditionals if an array of messages are defined
-    if($messages)
-    {
-      $threads = implode(",",$threads);
-      $where = "WHERE m.id in ($threads) AND";
-      $order = "ORDER BY indexOf(t.id,ARRAY[$threads])";
-    }
+      // set query conditionals
+        $where = "WHERE";
+        $order = "ORDER BY m.date_last_posted DESC";
+        $offset = $this->list_offset($offset);
+        $limit = $this->list_limit($limit);
+        $ignore = "";
 
-    return "SELECT
+  /*
+      if(session('id'))
+      if($list = array_keys($Core->list_ignored(session('id'))))
+      {
+        $list = implode(",",$list);
+        $ignore = "AND mem.id NOT IN ($list)";
+      }
+  */
+
+      // set query conditionals if an array of messages are defined
+        if ($messages) {
+            $threads = implode(",", $threads);
+            $where = "WHERE m.id in ($threads) AND";
+            $order = "ORDER BY indexOf(t.id,ARRAY[$threads])";
+        }
+
+        return "SELECT
               m.id as message,
               extract(epoch from m.date_last_posted) as date_last_posted,
               mem.id,
@@ -273,54 +268,54 @@ class BoardQuery
             ON
               mp.id=m.first_post_id
             $where
-              mm.member_id = ".session('id')."
+              mm.member_id = " . session('id') . "
             AND
               mm.deleted IS false
             $ignore
             $order
             $limit
             $offset";
-  }
+    }
 
   /**
   * build thread view query
   */
-  function view_message($message=false,$offset=false,$limit=false,$posts=false)
-  {
-    global $Core;
-
-    // set query conditionals
-    $where = "WHERE mp.message_id=$message";
-    $order = "ORDER BY mp.date_posted ASC";
-
-    // This is sort of a hack, but I'm not sure the normal case is actually
-    // useful or expected here (multiplying by some scale).
-    if (substr($offset,0,1) === '-')
-      $offset = 'OFFSET ' . strval(-intval($offset));
-    else
-      $offset = $this->view_offset($offset);
-
-    $limit = $this->view_limit($limit);
-    $ignore = "";
-
-/*
-    if(session('id'))
-    if($list = array_keys($Core->list_ignored(session('id'))))
+    function view_message($message = false, $offset = false, $limit = false, $posts = false)
     {
-      $list = implode(",",$list);
-      $ignore = "AND mem.id NOT IN ($list)";
-    }
-*/
+        global $Core;
 
-    // set query conditionals if an array of posts are defined
-    if($posts)
-    {
-      $posts = implode(",",$posts);
-      $where = "WHERE mp.id in ($posts)";
-      $order = "ORDER BY indexOf(mp.id,ARRAY[$posts])";
-    }
+      // set query conditionals
+        $where = "WHERE mp.message_id=$message";
+        $order = "ORDER BY mp.date_posted ASC";
 
-    return "SELECT
+      // This is sort of a hack, but I'm not sure the normal case is actually
+      // useful or expected here (multiplying by some scale).
+        if (substr($offset, 0, 1) === '-') {
+            $offset = 'OFFSET ' . strval(-intval($offset));
+        } else {
+            $offset = $this->view_offset($offset);
+        }
+
+        $limit = $this->view_limit($limit);
+        $ignore = "";
+
+  /*
+      if(session('id'))
+      if($list = array_keys($Core->list_ignored(session('id'))))
+      {
+        $list = implode(",",$list);
+        $ignore = "AND mem.id NOT IN ($list)";
+      }
+  */
+
+      // set query conditionals if an array of posts are defined
+        if ($posts) {
+            $posts = implode(",", $posts);
+            $where = "WHERE mp.id in ($posts)";
+            $order = "ORDER BY indexOf(mp.id,ARRAY[$posts])";
+        }
+
+        return "SELECT
               mp.id,
               extract(epoch from mp.date_posted) as date_posted,
               mem.id as member_id,
@@ -344,42 +339,50 @@ class BoardQuery
             AND EXISTS (
               SELECT mm.member_id
               FROM message_member mm
-              WHERE mm.message_id = mp.message_id AND mm.member_id = ".session('id')."
+              WHERE mm.message_id = mp.message_id AND mm.member_id = " . session('id') . "
             )
             $ignore
             $order
             $limit
             $offset";
-  }
+    }
 
   /**
   * helper functions for offsetting / limiting
   **/
-  function list_limit($limit)
-  {
-    if($limit) return "LIMIT $limit";
-    else
-    return "LIMIT ".LIST_DEFAULT_LIMIT;
-  }
+    function list_limit($limit)
+    {
+        if ($limit) {
+            return "LIMIT $limit";
+        } else {
+            return "LIMIT " . LIST_DEFAULT_LIMIT;
+        }
+    }
 
-  function list_offset($offset)
-  {
-    if($offset) return "OFFSET ".($offset*LIST_DEFAULT_LIMIT);
-    else
-    return "";
-  }
+    function list_offset($offset)
+    {
+        if ($offset) {
+            return "OFFSET " . ($offset * LIST_DEFAULT_LIMIT);
+        } else {
+            return "";
+        }
+    }
 
-  function view_limit($limit)
-  {
-    if($limit) return "LIMIT $limit";
-    else
-    return "";
-  }
+    function view_limit($limit)
+    {
+        if ($limit) {
+            return "LIMIT $limit";
+        } else {
+            return "";
+        }
+    }
 
-  function view_offset($offset)
-  {
-    if($offset) return "OFFSET $offset";
-    else
-    return "";
-  }
+    function view_offset($offset)
+    {
+        if ($offset) {
+            return "OFFSET $offset";
+        } else {
+            return "";
+        }
+    }
 }

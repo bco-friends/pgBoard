@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<ruleset name="pgBoard">
+    <description>pgBoard PHP coding standards (PSR-12)</description>
+
+    <!-- Files/directories to check -->
+    <file>class/</file>
+    <file>module/</file>
+
+    <!-- Exclude generated/vendor code -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+
+    <!-- PSR-12: Extended Coding Style -->
+    <rule ref="PSR12">
+        <!-- Legacy codebase: namespaces, camelCase methods, and visibility will be added incrementally -->
+        <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace"/>
+        <exclude name="PSR1.Methods.CamelCapsMethodName.NotCamelCaps"/>
+        <exclude name="Squiz.Scope.MethodScope.Missing"/>
+        <!-- Long lines will be addressed incrementally -->
+        <exclude name="Generic.Files.LineLength"/>
+    </rule>
+
+    <!-- Report settings -->
+    <arg name="colors"/>
+    <arg value="sp"/>
+</ruleset>

@@ -1,16 +1,13 @@
 services:
   db:
-    image: postgres:14
+    image: postgres:17
     container_name: pgboard_db
     environment:
       POSTGRES_DB: board
       POSTGRES_USER: board
       POSTGRES_PASSWORD: board
-      POSTGRES_HOST_AUTH_METHOD: md5
-      POSTGRES_INITDB_ARGS: "--auth-host=md5"
-    command: postgres -c password_encryption=md5
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres17_data:/var/lib/postgresql/data
       - ./doc:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
@@ -41,7 +38,7 @@ services:
 
   composer:
     container_name: pgboard_composer
-    image: composer:latest
+    image: composer:2
     volumes:
       - ./:/var/www/html
     working_dir: /var/www/html
@@ -50,7 +47,10 @@ services:
       - pgboard_network
 
   web:
-    build: .
+    build:
+      context: .
+      args:
+        INSTALL_XDEBUG: "true"
     container_name: pgboard_web
     volumes:
       - .:/var/www/html
@@ -71,7 +71,7 @@ services:
       - DB_SSL_MODE=
 
 volumes:
-  postgres_data:
+  postgres17_data:
   sphinx_data:
 
 networks:

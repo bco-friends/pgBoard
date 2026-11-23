@@ -8,16 +8,16 @@ $Base->header();
 Loading chat history...
 </div>
 <?php
-$Form = new Form;
+$Form = new Form();
 $Form->labels(false);
-$Form->header("/chat/speak/","post",FORM_SALT);
+$Form->header("/chat/speak/", "post", FORM_SALT);
 $Form->fieldset_open("Chat Panel");
-$Form->add_text("chat",false,400,false,"autocomplete=\"off\" onkeydown=\"return catch_enter(event)\"/>");
-$Form->add_button("add","say that shit","speak();");
+$Form->add_text("chat", false, 400, false, "autocomplete=\"off\" onkeydown=\"return catch_enter(event)\"/>");
+$Form->add_button("add", "say that shit", "speak();");
 print "<br/>\n";
-$Form->add_checkbox("stop","pause scroll","onclick=\"pause=pause?false:true\"/> pause scrolling");
+$Form->add_checkbox("stop", "pause scroll", "onclick=\"pause=pause?false:true\"/> pause scrolling");
 //$Form->add_checkbox("disablemedia","disable media",(session('hidemedia')?' checked="yes" ':'') . "onclick=\"media=!media;lasthash='';update(false);\"/> disable media");
-$Form->add_checkbox("enablemedia","enable media","onclick=\"media=!media;lasthash='';update(false);\"/> enable media");
+$Form->add_checkbox("enablemedia", "enable media", "onclick=\"media=!media;lasthash='';update(false);\"/> enable media");
 $Form->fieldset_close();
 $Form->footer();
 $Form->header_validate();

@@ -1,25 +1,32 @@
 <?php
+
 function view_get()
 {
-  global $DB,$Core,$Parse;
-  if(!id() && !session('id')) return to_index();
-  if(!id()) set_cmd(2,session('name'));
+    global $DB,$Core,$Parse;
+    if (!id() && !session('id')) {
+        return to_index();
+    }
+    if (!id()) {
+        set_cmd(2, session('name'));
+    }
 
   // if member name is a number, overrride lookups
-  if(is_numeric(id()))
-  if($search = $Core->idfromname(id())) $field = "m.id";
-
-  if(!isset($field))
-  {
-    if($search = id(true)) $field = "m.id";
-    else
-    {
-      $field = "LOWER(m.name)";
-      $search = strtolower(id());
+    if (is_numeric(id())) {
+        if ($search = $Core->idfromname(id())) {
+            $field = "m.id";
+        }
     }
-  }
 
-  $DB->query("SELECT
+    if (!isset($field)) {
+        if ($search = id(true)) {
+            $field = "m.id";
+        } else {
+            $field = "LOWER(m.name)";
+            $search = strtolower(id());
+        }
+    }
+
+    $DB->query("SELECT
                 *,
                 extract(epoch from date_joined) as date_joined,
                 extract(epoch from last_view) as last_view,
@@ -27,10 +34,10 @@ function view_get()
               FROM
                 member m
               WHERE
-                $field=$1",array($search));
-  $member = $DB->load_array();
+                $field=$1", array($search));
+    $member = $DB->load_array();
 
-  $DB->query("SELECT
+    $DB->query("SELECT
                 p.display as id,
                 mp.value as name
               FROM
@@ -44,182 +51,199 @@ function view_get()
               AND
                 p.profile IS true
               ORDER BY
-                ordering",array($member['id']));
+                ordering", array($member['id']));
 
-  $pref = $DB->load_all_key();
+    $pref = $DB->load_all_key();
 
-  $Base = Base::init();
-  $Base->title($member['name']);
-  $Base->type(Base::VIEW_MEMBER);
+    $Base = Base::init();
+    $Base->title($member['name']);
+    $Base->type(Base::VIEW_MEMBER);
 
-  $Base->header();
+    $Base->header();
 
   // show profile photo (if any)
-  print "<div class=\"box clear\">\n";
-  if($photo = $DB->value("SELECT value FROM member_pref WHERE pref_id=1 AND member_id=$1",array($member['id'])))
-  {
-    print $Parse->run("[img]{$photo}[/img]");
-  }
-  else
-  print "<div class=\"nophoto\"></div>";
+    print "<div class=\"box clear\">\n";
+    if ($photo = $DB->value("SELECT value FROM member_pref WHERE pref_id=1 AND member_id=$1", array($member['id']))) {
+        print $Parse->run("[img]{$photo}[/img]");
+    } else {
+        print "<div class=\"nophoto\"></div>";
+    }
 
   // admin controllable member data
-  print "<ul class=\"memberinfo\">\n";
-  foreach($pref as $key => $value)
-  {
-    if($key == "email" && $Core->member_pref($member['id'],"show_email") != 'true') continue;
-    $value = $Parse->run($value);
-    print "  <li><div class=\"pref\">$key:</div> <div class=\"prefdata\">$value</div></li>\n";
-  }
+    print "<ul class=\"memberinfo\">\n";
+    foreach ($pref as $key => $value) {
+        if ($key == "email" && $Core->member_pref($member['id'], "show_email") != 'true') {
+            continue;
+        }
+        $value = $Parse->run($value);
+        print "  <li><div class=\"pref\">$key:</div> <div class=\"prefdata\">$value</div></li>\n";
+    }
 
-  print "<li style=\"padding-top:15px\">\n";
-  print "  <div class=\"pref\">date joined:</div>\n";
-  print "  <div class=\"prefdata\">".date(VIEW_DATE_FORMAT,(int)$member['date_joined'])."</div>\n";
-  print "</li>\n";
+    print "<li style=\"padding-top:15px\">\n";
+    print "  <div class=\"pref\">date joined:</div>\n";
+    print "  <div class=\"prefdata\">" . date(VIEW_DATE_FORMAT, (int)$member['date_joined']) . "</div>\n";
+    print "</li>\n";
 
-  print "<li>\n";
-  print "  <div class=\"pref\">last posted:</div>\n";
-  print "  <div class=\"prefdata\">".date(VIEW_DATE_FORMAT,(int)$member['last_post'])."</div>\n";
-  print "</li>\n";
+    print "<li>\n";
+    print "  <div class=\"pref\">last posted:</div>\n";
+    print "  <div class=\"prefdata\">" . date(VIEW_DATE_FORMAT, (int)$member['last_post']) . "</div>\n";
+    print "</li>\n";
 
-  print "<li>\n";
-  print "  <div class=\"pref\">last seen:</div>\n";
-  print "  <div class=\"prefdata\">".date(VIEW_DATE_FORMAT,(int)$member['last_view'])."</div>\n";
-  print "</li>\n";
+    print "<li>\n";
+    print "  <div class=\"pref\">last seen:</div>\n";
+    print "  <div class=\"prefdata\">" . date(VIEW_DATE_FORMAT, (int)$member['last_view']) . "</div>\n";
+    print "</li>\n";
 
-  print "<li>\n";
-  print "  <div class=\"pref\">member:</div>\n";
-  print "  <div class=\"prefdata\">$member[id]</div>\n";
-  print "</li>\n";
+    print "<li>\n";
+    print "  <div class=\"pref\">member:</div>\n";
+    print "  <div class=\"prefdata\">$member[id]</div>\n";
+    print "</li>\n";
 
   // total threads
-  $threads_percent = 0;
-  $total_threads = $Core->thread_count();
-  if($member['total_threads']) $threads_percent = round(($member['total_threads']/$total_threads*100),3);
-  print "<li style=\"padding-top:15px\">\n";
-  print "  <div class=\"pref\">total threads:</div>\n";
-  print "  <div class=\"prefdata\"><strong>".number_format($member['total_threads'])."</strong>, $threads_percent% of ".number_format($total_threads)."</div>\n";
-  print "</li>\n";
+    $threads_percent = 0;
+    $total_threads = $Core->thread_count();
+    if ($member['total_threads']) {
+        $threads_percent = round(($member['total_threads'] / $total_threads * 100), 3);
+    }
+    print "<li style=\"padding-top:15px\">\n";
+    print "  <div class=\"pref\">total threads:</div>\n";
+    print "  <div class=\"prefdata\"><strong>" . number_format($member['total_threads']) . "</strong>, $threads_percent% of " . number_format($total_threads) . "</div>\n";
+    print "</li>\n";
 
   // total thread posts
-  $thread_posts_percent= 0;
-  $total_thread_posts = $Core->thread_post_count();
-  if($member['total_thread_posts']) $thread_posts_percent = round(($member['total_thread_posts']/$total_thread_posts*100),3);
-  print "<li>\n";
-  print "  <div class=\"pref\">total posts:</div>\n";
-  print "  <div class=\"prefdata\"><strong>".number_format($member['total_thread_posts'])."</strong>, $thread_posts_percent% of ".number_format($total_thread_posts)."</div>\n";
-  print "</li>\n";
+    $thread_posts_percent = 0;
+    $total_thread_posts = $Core->thread_post_count();
+    if ($member['total_thread_posts']) {
+        $thread_posts_percent = round(($member['total_thread_posts'] / $total_thread_posts * 100), 3);
+    }
+    print "<li>\n";
+    print "  <div class=\"pref\">total posts:</div>\n";
+    print "  <div class=\"prefdata\"><strong>" . number_format($member['total_thread_posts']) . "</strong>, $thread_posts_percent% of " . number_format($total_thread_posts) . "</div>\n";
+    print "</li>\n";
 
-  if(IGNORE_ENABLED)
-  {
-    if(IGNORE_PUBLIC || $member['id'] == session('id'))
-    {
-      // ignoring
-      if($member['id'] == session('id')) $listen = " <sup><a href=\"/member/listen/%name%/".MD5(session_id())."/\">x</a></sup>";
-      else
-      $listen = "";
+    if (IGNORE_ENABLED) {
+        if (IGNORE_PUBLIC || $member['id'] == session('id')) {
+          // ignoring
+            if ($member['id'] == session('id')) {
+                $listen = " <sup><a href=\"/member/listen/%name%/" . MD5(session_id()) . "/\">x</a></sup>";
+            } else {
+                $listen = "";
+            }
 
-      $ignoring = "";
-      foreach($Core->list_ignored($member['id']) as $id => $name)
-      {
-        $l = str_replace("%name%",$name,$listen);
-        $ignoring .= $l.$Core->member_link($name).", ";
-      }
-      if($ignoring == "") $ignoring = "-";
-      else
-      $ignoring = substr($ignoring,0,-2);
-      print "<li style=\"padding-top:15px\">\n";
-      print "  <div class=\"pref\">ignoring:</div>\n";
-      print "  <div class=\"prefdata\">$ignoring</div>\n";
-      print "</li>\n";
+            $ignoring = "";
+            foreach ($Core->list_ignored($member['id']) as $id => $name) {
+                $l = str_replace("%name%", $name, $listen);
+                $ignoring .= $l . $Core->member_link($name) . ", ";
+            }
+            if ($ignoring == "") {
+                $ignoring = "-";
+            } else {
+                $ignoring = substr($ignoring, 0, -2);
+            }
+            print "<li style=\"padding-top:15px\">\n";
+            print "  <div class=\"pref\">ignoring:</div>\n";
+            print "  <div class=\"prefdata\">$ignoring</div>\n";
+            print "</li>\n";
+        }
+
+        if (IGNORE_PUBLIC) {
+          // ignored by
+            $ignoredby = "";
+            foreach ($Core->list_ignoredby($member['id']) as $id => $name) {
+                $ignoredby .= $Core->member_link($name) . ", ";
+            }
+            if ($ignoredby == "") {
+                $ignoredby = "-";
+            } else {
+                $ignoredby = substr($ignoredby, 0, -2);
+            }
+            print "<li>\n";
+            print "  <div class=\"pref\">ignored by:</div>\n";
+            print "  <div class=\"prefdata\">$ignoredby</div>\n";
+            print "</li>\n";
+        }
     }
 
-    if(IGNORE_PUBLIC)
-    {
-      // ignored by
-      $ignoredby = "";
-      foreach($Core->list_ignoredby($member['id']) as $id => $name) $ignoredby .= $Core->member_link($name).", ";
-      if($ignoredby == "") $ignoredby = "-";
-      else
-      $ignoredby = substr($ignoredby,0,-2);
-      print "<li>\n";
-      print "  <div class=\"pref\">ignored by:</div>\n";
-      print "  <div class=\"prefdata\">$ignoredby</div>\n";
-      print "</li>\n";
-    }
-  }
-
-  print "</ul>\n";
-  print "<div class=\"clear\"></div>\n";
-  print "</div>\n";
-  $Base->footer();
+    print "</ul>\n";
+    print "<div class=\"clear\"></div>\n";
+    print "</div>\n";
+    $Base->footer();
 }
 
 function ignore_get()
 {
-  global $Security,$Core,$DB;
+    global $Security,$Core,$DB;
 
-  if(cmd(3) != MD5(session_id()) || !IGNORE_ENABLED) return to_index();
-  if($Core->idfromname(id()) == session('id')) return to_index();
-  if(!$Core->can_ignore(session('id'))) return to_index();
+    if (cmd(3) != MD5(session_id()) || !IGNORE_ENABLED) {
+        return to_index();
+    }
+    if ($Core->idfromname(id()) == session('id')) {
+        return to_index();
+    }
+    if (!$Core->can_ignore(session('id'))) {
+        return to_index();
+    }
 
-  if(!$listen = $Core->idfromname(id()))
-  {
-    $Base = Base::init();
-    $Base->type(Base::ERROR);
-    $Base->title(ERROR_MEMBER_NOTFOUND);
-    $Base->header();
-    $Base->footer();
-    return;
-  }
+    if (!$listen = $Core->idfromname(id())) {
+        $Base = Base::init();
+        $Base->type(Base::ERROR);
+        $Base->title(ERROR_MEMBER_NOTFOUND);
+        $Base->header();
+        $Base->footer();
+        return;
+    }
 
-  if($Security->is_admin($listen) || !session('id')) return to_index();
+    if ($Security->is_admin($listen) || !session('id')) {
+        return to_index();
+    }
 
-  $insert = array();
-  $insert['member_id'] = session('id');
-  $insert['ignore_member_id'] = $listen;
-  if($DB->insert("member_ignore",$insert)) return to_index();
-  else
-  print "<h3>Something got fucked.</h3>\n";
+    $insert = array();
+    $insert['member_id'] = session('id');
+    $insert['ignore_member_id'] = $listen;
+    if ($DB->insert("member_ignore", $insert)) {
+        return to_index();
+    } else {
+        print "<h3>Something got fucked.</h3>\n";
+    }
 }
 
 function listen_get()
 {
-  global $Security,$Core,$DB;
+    global $Security,$Core,$DB;
 
-  if(cmd(3) != MD5(session_id())) return to_index();
+    if (cmd(3) != MD5(session_id())) {
+        return to_index();
+    }
 
-  if(!$listen = $Core->idfromname(id()))
-  {
-    $Base = Base::init();
-    $Base->type(Base::ERROR);
-    $Base->title(ERROR_MEMBER_NOTFOUND);
-    $Base->header();
-    $Base->footer();
-    return;
-  }
+    if (!$listen = $Core->idfromname(id())) {
+        $Base = Base::init();
+        $Base->type(Base::ERROR);
+        $Base->title(ERROR_MEMBER_NOTFOUND);
+        $Base->header();
+        $Base->footer();
+        return;
+    }
 
-  if($Security->is_admin($listen)  || !session('id')) return to_index();
+    if ($Security->is_admin($listen)  || !session('id')) {
+        return to_index();
+    }
 
-  if($DB->query("DELETE FROM member_ignore WHERE member_id=$1 AND ignore_member_id=$2",array(session('id'),$listen)))
-  {
-    return to_index();
-  }
-  else
-  print "<h3>Something got fucked.</h3>\n";
+    if ($DB->query("DELETE FROM member_ignore WHERE member_id=$1 AND ignore_member_id=$2", array(session('id'),$listen))) {
+        return to_index();
+    } else {
+        print "<h3>Something got fucked.</h3>\n";
+    }
 }
 
 function reset_get()
 {
-  global $DB;
-  $DB->query("SELECT id,reset FROM member WHERE reset=$1",array(id()));
-  if($data = $DB->load_array())
-  {
-    $pass = md5($data['reset']);
-    $update = array("reset"=>null,"pass"=>md5($pass));
-    $DB->update("member","id",$data['id'],$update);
-    print "Your new password: $pass";
-  }
-  exit_clean();
+    global $DB;
+    $DB->query("SELECT id,reset FROM member WHERE reset=$1", array(id()));
+    if ($data = $DB->load_array()) {
+        $pass = md5($data['reset']);
+        $update = array("reset" => null,"pass" => md5($pass));
+        $DB->update("member", "id", $data['id'], $update);
+        print "Your new password: $pass";
+    }
+    exit_clean();
 }
-?>

@@ -50,7 +50,7 @@ function error_handler($errno, $errstr, $errfile, $errline)
       if(isset($l['class'])) $c = $l['class'];
       if(isset($l['type'])) $t = $l['type'];
       if(isset($l['function'])) $f = $l['function'];
-      
+
       $error .= "Function <strong>{$c}{$t}{$f}</strong>";
       if(isset($l['file'])) $error .= " in <strong>{$l['file']}</strong>";
       if(isset($l['line'])) $error .= " on line <strong>{$l['line']}</strong>";
@@ -63,9 +63,16 @@ function error_handler($errno, $errstr, $errfile, $errline)
 
 function error_display()
 {
-  global $error;
-  if($error != "")
-  {
+    global $error;
+
+    if (!empty($error)) {
+        error_log(strip_tags($error));
+    }
+
+    if (!(defined('DEBUG_MODE') && DEBUG_MODE && !empty($error))) {
+        return;
+    }
+
     print "<div id=\"error\">\n";
     print "<pre>Errors:</pre><hr/>\n";
     print $error;
@@ -78,7 +85,6 @@ function error_display()
     print_r($_SERVER);
     print "</pre>\n</div>\n";
     print "<div id=\"errorbar\"><a href=\"javascript:;\" onclick=\"$('#error').slideToggle('slow');\">toggle errors</a> &raquo; <a href=\"javascript:;\" onclick=\"$('input[type=submit]').attr('disabled',false);$('#error').remove();$('#errorbar').remove();\">clear</a>&nbsp;</div>\n";
-  }
 }
 $handler = set_error_handler("error_handler");
 

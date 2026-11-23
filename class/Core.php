@@ -1,76 +1,84 @@
 <?php
+
 class BoardCore
 {
-  public $data;
+    public $data;
 
-  public function __construct(
-    public DB $DB,
-    public BoardSecurity $Security,
-    public BoardParse $Parse
-  ) {}
-
-  function command_parse()
-  {
-    global $DB, $Base;
-    if(!$this->Security->allowed()) return;
-
-    $include = implode("/",module());
-    if(file_exists("module/{$include}/main.php"))
-    {
-      $dir = "";
-      foreach(module() as $module)
-      {
-        $dir .= "$module/";
-        $shared = "module/{$dir}shared.php";
-        if(file_exists($shared)) include($shared);
-      }
-      require_once("module/{$include}/main.php");
-      if(function_exists(command())) eval(command()."();");
-      if(file_exists("module/{$include}/.content/".func().".php"))
-      {
-        if(!get('ajax') && !get('xml')) require_once("module/{$include}/.content/".func().".php");
-      }
+    public function __construct(
+        public DB $DB,
+        public BoardSecurity $Security,
+        public BoardParse $Parse
+    ) {
     }
-    else
+
+    function command_parse()
     {
-      $Base = Base::init();
-      $Base->title("Invalid Module");
-      $Base->Header();
-      $Base->Footer();
+        global $DB, $Base;
+        if (!$this->Security->allowed()) {
+            return;
+        }
+
+        $include = implode("/", module());
+        if (file_exists("module/{$include}/main.php")) {
+            $dir = "";
+            foreach (module() as $module) {
+                $dir .= "$module/";
+                $shared = "module/{$dir}shared.php";
+                if (file_exists($shared)) {
+                    include($shared);
+                }
+            }
+            require_once("module/{$include}/main.php");
+            if (function_exists(command())) {
+                eval(command() . "();");
+            }
+            if (file_exists("module/{$include}/.content/" . func() . ".php")) {
+                if (!get('ajax') && !get('xml')) {
+                    require_once("module/{$include}/.content/" . func() . ".php");
+                }
+            }
+        } else {
+            $Base = Base::init();
+            $Base->title("Invalid Module");
+            $Base->Header();
+            $Base->Footer();
+        }
     }
-  }
 
-  function namefromid($id)
-  {
-    if(!is_numeric($id)) return false;
-    return $this->DB->value("SELECT name FROM member WHERE id=$1",array($id));
-  }
-
-  function idfromname($name)
-  {
-    $name = str_replace(SPACE,"",strtolower($name));
-    return $this->DB->value("SELECT id FROM member WHERE LOWER(REPLACE(name,' ',''))=$1",array($name));
-  }
-
-  function member_link($id)
-  {
-    if(is_int($id))
+    function namefromid($id)
     {
-      if(!$id = $this->namefromid($id)) return "";
+        if (!is_numeric($id)) {
+            return false;
+        }
+        return $this->DB->value("SELECT name FROM member WHERE id=$1", array($id));
     }
-    /*
-    $output = "<span class=\"dropmenu\">";
-    $output .= "<a href=\"/member/view/$id/\" class=\"domenu memberlink\">".str_replace(SPACE,"&nbsp;",$id)."</a>";
-    $output .= "<span class=\"control\" onclick=\"menuhandle(this)\">".ARROW_RIGHT."</span>";
-    $output .= "</span>";
-    */
-    $output = "<a href=\"/member/view/$id/\" class=\"memberlink\">".str_replace(SPACE,"&nbsp;",$id)."</a>";
-    return $output;
-  }
 
-  function member_pref($member_id,$name)
-  {
-    return $this->DB->value("SELECT
+    function idfromname($name)
+    {
+        $name = str_replace(SPACE, "", strtolower($name));
+        return $this->DB->value("SELECT id FROM member WHERE LOWER(REPLACE(name,' ',''))=$1", array($name));
+    }
+
+    function member_link($id)
+    {
+        if (is_int($id)) {
+            if (!$id = $this->namefromid($id)) {
+                return "";
+            }
+        }
+      /*
+      $output = "<span class=\"dropmenu\">";
+      $output .= "<a href=\"/member/view/$id/\" class=\"domenu memberlink\">".str_replace(SPACE,"&nbsp;",$id)."</a>";
+      $output .= "<span class=\"control\" onclick=\"menuhandle(this)\">".ARROW_RIGHT."</span>";
+      $output .= "</span>";
+      */
+        $output = "<a href=\"/member/view/$id/\" class=\"memberlink\">" . str_replace(SPACE, "&nbsp;", $id) . "</a>";
+        return $output;
+    }
+
+    function member_pref($member_id, $name)
+    {
+        return $this->DB->value("SELECT
                          mp.value
                        FROM
                          member_pref mp
@@ -81,46 +89,57 @@ class BoardCore
                        WHERE
                          mp.member_id=$1
                        AND
-                         LOWER(p.name)=LOWER($2)",array($member_id,$name));
-  }
-
-  function is_ignoring($member_id,$ignored)
-  {
-    if(!is_numeric($ignored)) $ignored = $this->idfromname($ignored);
-    if(!$ignored) return false;
-
-    return $this->DB->check("SELECT true FROM member_ignore WHERE member_id=$1 AND ignore_member_id=$2",array($member_id,$ignored));
-  }
-
-  function is_banned($member_id)
-  {
-    return $this->DB->check("SELECT true FROM member WHERE id=$1 AND banned=true",array($member_id));
-  }
-
-  function can_ignore($member_id)
-  {
-    if($this->Security->is_admin($member_id)) return true;
-    if(!IGNORE_BUFFER) return true;
-    if ($this->DB->value("SELECT date_first_post FROM member WHERE id=$1",array($member_id)) === NULL)
-    {
-      $dfp = $this->DB->value("SELECT date_posted::date FROM thread_post WHERE member_id=$1 ORDER BY date_posted ASC LIMIT 1", array($member_id));
-      if (!$dfp) return false; // No posts
-      $this->DB->update("member","id",$member_id,array("date_first_post"=>$dfp));
+                         LOWER(p.name)=LOWER($2)", array($member_id,$name));
     }
-    $this->DB->query("SELECT
-                  extract(epoch FROM (date_first_post+interval '".IGNORE_BUFFER."'))
+
+    function is_ignoring($member_id, $ignored)
+    {
+        if (!is_numeric($ignored)) {
+            $ignored = $this->idfromname($ignored);
+        }
+        if (!$ignored) {
+            return false;
+        }
+
+        return $this->DB->check("SELECT true FROM member_ignore WHERE member_id=$1 AND ignore_member_id=$2", array($member_id,$ignored));
+    }
+
+    function is_banned($member_id)
+    {
+        return $this->DB->check("SELECT true FROM member WHERE id=$1 AND banned=true", array($member_id));
+    }
+
+    function can_ignore($member_id)
+    {
+        if ($this->Security->is_admin($member_id)) {
+            return true;
+        }
+        if (!IGNORE_BUFFER) {
+            return true;
+        }
+        if ($this->DB->value("SELECT date_first_post FROM member WHERE id=$1", array($member_id)) === null) {
+            $dfp = $this->DB->value("SELECT date_posted::date FROM thread_post WHERE member_id=$1 ORDER BY date_posted ASC LIMIT 1", array($member_id));
+            if (!$dfp) {
+                return false; // No posts
+            }
+            $this->DB->update("member", "id", $member_id, array("date_first_post" => $dfp));
+        }
+        $this->DB->query("SELECT
+                  extract(epoch FROM (date_first_post+interval '" . IGNORE_BUFFER . "'))
                 FROM
                   member
                 WHERE
-                  id=$1",array($member_id));
-    if(!$time = $this->DB->load_result()) return false;
-    else
-    return $time<time();
-  }
+                  id=$1", array($member_id));
+        if (!$time = $this->DB->load_result()) {
+            return false;
+        } else {
+            return $time < time();
+        }
+    }
 
-  function list_ignored($member_id)
-  {
-    $this->DB->query("SELECT
+    function list_ignored($member_id)
+    {
+        $this->DB->query("SELECT
                   m.id,
                   m.name
                 FROM
@@ -132,13 +151,13 @@ class BoardCore
                 WHERE
                   mi.member_id=$1
                 ORDER BY
-                  m.name",array($member_id));
-    return $this->DB->load_all_key();
-  }
+                  m.name", array($member_id));
+        return $this->DB->load_all_key();
+    }
 
-  function list_ignoredby($member_id)
-  {
-    $this->DB->query("SELECT
+    function list_ignoredby($member_id)
+    {
+        $this->DB->query("SELECT
                   m.id,
                   m.name
                 FROM
@@ -150,13 +169,13 @@ class BoardCore
                 WHERE
                   mi.ignore_member_id=$1
                 ORDER BY
-                  m.name",array($member_id));
-    return $this->DB->load_all_key();
-  }
+                  m.name", array($member_id));
+        return $this->DB->load_all_key();
+    }
 
-  function message_unread_count($member_id)
-  {
-    return $this->DB->value("SELECT
+    function message_unread_count($member_id)
+    {
+        return $this->DB->value("SELECT
                          count(*)
                        FROM
                          message_member mm
@@ -165,13 +184,13 @@ class BoardCore
                        AND
                          mm.deleted IS false
                        AND
-                         mm.last_view_posts=0",array($member_id));
-  }
+                         mm.last_view_posts=0", array($member_id));
+    }
 
   /* there is a bug here, figure out how posts and last_view_posts get out of sync */
-  function message_unread_post_count($member_id)
-  {
-    return $this->DB->value("SELECT
+    function message_unread_post_count($member_id)
+    {
+        return $this->DB->value("SELECT
                          sum(m.posts-mm.last_view_posts)
                        FROM
                          message_member mm
@@ -182,116 +201,124 @@ class BoardCore
                        WHERE
                          mm.member_id=$1
                        AND
-                         mm.deleted IS false",array($member_id));
-  }
+                         mm.deleted IS false", array($member_id));
+    }
 
-  function check_favorite($thread_id)
-  {
-    if(!session('id')) return false;
-    else
-    return $this->DB->check("SELECT true FROM favorite WHERE thread_id=$1 AND member_id=$2",array($thread_id,session('id')));
-  }
+    function check_favorite($thread_id)
+    {
+        if (!session('id')) {
+            return false;
+        } else {
+            return $this->DB->check("SELECT true FROM favorite WHERE thread_id=$1 AND member_id=$2", array($thread_id,session('id')));
+        }
+    }
 
-  function check_ignored_thread($thread_id)
-  {
-    if(!session('id')) return false;
-    $val = $this->DB->value("SELECT ignore FROM thread_member WHERE thread_id=$1 AND member_id=$2",array($thread_id,session('id')));
-    return $val=="t"?true:false;
-  }
+    function check_ignored_thread($thread_id)
+    {
+        if (!session('id')) {
+            return false;
+        }
+        $val = $this->DB->value("SELECT ignore FROM thread_member WHERE thread_id=$1 AND member_id=$2", array($thread_id,session('id')));
+        return $val == "t" ? true : false;
+    }
 
-  function check_dotted($thread_id)
-  {
-    if(!session('id')) return false;
-    $dot = $this->DB->value("SELECT date_posted IS NOT null AND undot IS false FROM thread_member WHERE thread_id=$1 AND member_id=$2",array($thread_id,session('id')));
-    return $dot=="t"?true:false;
-  }
+    function check_dotted($thread_id)
+    {
+        if (!session('id')) {
+            return false;
+        }
+        $dot = $this->DB->value("SELECT date_posted IS NOT null AND undot IS false FROM thread_member WHERE thread_id=$1 AND member_id=$2", array($thread_id,session('id')));
+        return $dot == "t" ? true : false;
+    }
 
-  function check_undotted($thread_id)
-  {
-    global $DB;
-    if(!session('id')) return false;
-    $dot = $DB->value("SELECT date_posted IS NOT null AND undot IS true FROM thread_member WHERE thread_id=$1 AND member_id=$2",array($thread_id,session('id')));
-    return $dot=="t"?true:false;
-  }
+    function check_undotted($thread_id)
+    {
+        global $DB;
+        if (!session('id')) {
+            return false;
+        }
+        $dot = $DB->value("SELECT date_posted IS NOT null AND undot IS true FROM thread_member WHERE thread_id=$1 AND member_id=$2", array($thread_id,session('id')));
+        return $dot == "t" ? true : false;
+    }
 
-  function thread_count()
-  {
-    return $this->DB->value("SELECT value FROM board_data where name='total_threads'");
-  }
+    function thread_count()
+    {
+        return $this->DB->value("SELECT value FROM board_data where name='total_threads'");
+    }
 
-  function thread_post_count()
-  {
-    return $this->DB->value("SELECT value FROM board_data where name='total_thread_posts'");
-  }
+    function thread_post_count()
+    {
+        return $this->DB->value("SELECT value FROM board_data where name='total_thread_posts'");
+    }
 
-  function member_count()
-  {
-    return $this->DB->value("SELECT value FROM board_data where name='total_members'");
-  }
+    function member_count()
+    {
+        return $this->DB->value("SELECT value FROM board_data where name='total_members'");
+    }
 
-  function active_member_count()
-  {
-    return $this->DB->value("SELECT count(id) FROM member WHERE last_view BETWEEN now() - INTERVAL '5 minutes' AND now()");
-  }
+    function active_member_count()
+    {
+        return $this->DB->value("SELECT count(id) FROM member WHERE last_view BETWEEN now() - INTERVAL '5 minutes' AND now()");
+    }
 
-  function posting_member_count()
-  {
-    return $this->DB->value("SELECT count(id) FROM member WHERE last_post BETWEEN now() - INTERVAL '5 minutes' AND now()");
-  }
+    function posting_member_count()
+    {
+        return $this->DB->value("SELECT count(id) FROM member WHERE last_post BETWEEN now() - INTERVAL '5 minutes' AND now()");
+    }
 
-  function chatting_member_count()
-  {
-    return $this->DB->value("SELECT count(id) FROM member WHERE last_chat BETWEEN now() - INTERVAL '5 minutes' AND now()");
-  }
+    function chatting_member_count()
+    {
+        return $this->DB->value("SELECT count(id) FROM member WHERE last_chat BETWEEN now() - INTERVAL '5 minutes' AND now()");
+    }
 
-  function lurking_member_count()
-  {
-    return $this->DB->value("SELECT count(id) FROM member WHERE last_post < now()-INTERVAL '3 day' AND last_view BETWEEN now() - INTERVAL '5 minutes' AND now()");
-  }
+    function lurking_member_count()
+    {
+        return $this->DB->value("SELECT count(id) FROM member WHERE last_post < now()-INTERVAL '1 year' AND last_view BETWEEN now() - INTERVAL '5 minutes' AND now()");
+    }
 
-  function active_members()
-  {
-    $this->DB->query("SELECT id,name FROM member WHERE last_view BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
-    return $this->DB->load_all_key();
-  }
+    function active_members()
+    {
+        $this->DB->query("SELECT id,name FROM member WHERE last_view BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
+        return $this->DB->load_all_key();
+    }
 
-  function posting_members()
-  {
-    $this->DB->query("SELECT id,name FROM member WHERE last_post BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
-    return $this->DB->load_all_key();
-  }
+    function posting_members()
+    {
+        $this->DB->query("SELECT id,name FROM member WHERE last_post BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
+        return $this->DB->load_all_key();
+    }
 
-  function chatting_members()
-  {
-    $this->DB->query("SELECT id,name FROM member WHERE last_chat BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
-    return $this->DB->load_all_key();
-  }
+    function chatting_members()
+    {
+        $this->DB->query("SELECT id,name FROM member WHERE last_chat BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
+        return $this->DB->load_all_key();
+    }
 
-  function lurking_members()
-  {
-    $this->DB->query("SELECT id,name FROM member WHERE last_post < now()-INTERVAL '3 day' AND last_view BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
-    return $this->DB->load_all_key();
-  }
+    function lurking_members()
+    {
+        $this->DB->query("SELECT id,name FROM member WHERE last_post < now()-INTERVAL '1 year' AND last_view BETWEEN now() - INTERVAL '5 minutes' AND now() ORDER BY name");
+        return $this->DB->load_all_key();
+    }
 
-  function fundraiser_name()
-  {
-    return $this->DB->value("SELECT name FROM fundraiser WHERE id=$1",array(FUNDRAISER_ID));
-  }
+    function fundraiser_name()
+    {
+        return $this->DB->value("SELECT name FROM fundraiser WHERE id=$1", array(FUNDRAISER_ID));
+    }
 
-  function fundraiser_goal()
-  {
-    return $this->DB->value("SELECT goal FROM fundraiser WHERE id=$1",array(FUNDRAISER_ID));
-  }
+    function fundraiser_goal()
+    {
+        return $this->DB->value("SELECT goal FROM fundraiser WHERE id=$1", array(FUNDRAISER_ID));
+    }
 
-  function fundraiser_total()
-  {
-    return $this->DB->value("SELECT
+    function fundraiser_total()
+    {
+        return $this->DB->value("SELECT
                          COALESCE(sum(payment_gross-payment_fee),'$0')
                        FROM
                          donation
                        WHERE
                          fundraiser_id=$1
                        AND
-                         payment_status  = 'Completed'",array(FUNDRAISER_ID));
-  }
+                         payment_status  = 'Completed'", array(FUNDRAISER_ID));
+    }
 }
