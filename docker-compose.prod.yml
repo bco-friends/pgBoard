@@ -45,6 +45,7 @@ services:
       - ./docker/nginx/production.conf:/etc/nginx/sites-available/default
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /var/www/certbot:/var/www/certbot:ro
+      - /var/log/boardcrewcial/nginx:/var/log/nginx
     ports:
       - "80:80"
       - "443:443"
